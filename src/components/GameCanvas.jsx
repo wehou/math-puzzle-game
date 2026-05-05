@@ -13,7 +13,8 @@ function GameCanvas({
   onDuplicate,
   pieceCount,
   currentColor,
-  gridDimensions
+  gridDimensions,
+  isPuzzleMode
 }) {
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
@@ -358,10 +359,13 @@ function GameCanvas({
       return
     }
 
-    if (isDrawing && drawingCells.length < pieceCount) {
-      const exists = drawingCells.some(([cx, cy]) => cx === pos.mouseX && cy === pos.mouseY)
-      if (!exists && isAdjacent(pos.mouseX, pos.mouseY, drawingCells)) {
-        setDrawingCells([...drawingCells, [pos.mouseX, pos.mouseY]])
+    if (isDrawing) {
+      const maxCells = isPuzzleMode ? pieceCount : Infinity
+      if (drawingCells.length < maxCells) {
+        const exists = drawingCells.some(([cx, cy]) => cx === pos.mouseX && cy === pos.mouseY)
+        if (!exists && isAdjacent(pos.mouseX, pos.mouseY, drawingCells)) {
+          setDrawingCells([...drawingCells, [pos.mouseX, pos.mouseY]])
+        }
       }
     }
   }
@@ -379,12 +383,18 @@ function GameCanvas({
       return
     }
 
-    if (isDrawing && drawingCells.length === pieceCount) {
-      const minX = Math.min(...drawingCells.map(([x]) => x))
-      const minY = Math.min(...drawingCells.map(([, y]) => y))
-      const normalizedShape = drawingCells.map(([x, y]) => [x - minX, y - minY])
+    if (isDrawing && drawingCells.length > 0) {
+      const shouldAdd = isPuzzleMode 
+        ? drawingCells.length === pieceCount 
+        : drawingCells.length > 0
       
-      onAddPiece(normalizedShape, minX, minY)
+      if (shouldAdd) {
+        const minX = Math.min(...drawingCells.map(([x]) => x))
+        const minY = Math.min(...drawingCells.map(([, y]) => y))
+        const normalizedShape = drawingCells.map(([x, y]) => [x - minX, y - minY])
+        
+        onAddPiece(normalizedShape, minX, minY)
+      }
     }
 
     setIsDrawing(false)
@@ -445,10 +455,13 @@ function GameCanvas({
       return
     }
 
-    if (isDrawing && drawingCells.length < pieceCount) {
-      const exists = drawingCells.some(([cx, cy]) => cx === pos.mouseX && cy === pos.mouseY)
-      if (!exists && isAdjacent(pos.mouseX, pos.mouseY, drawingCells)) {
-        setDrawingCells([...drawingCells, [pos.mouseX, pos.mouseY]])
+    if (isDrawing) {
+      const maxCells = isPuzzleMode ? pieceCount : Infinity
+      if (drawingCells.length < maxCells) {
+        const exists = drawingCells.some(([cx, cy]) => cx === pos.mouseX && cy === pos.mouseY)
+        if (!exists && isAdjacent(pos.mouseX, pos.mouseY, drawingCells)) {
+          setDrawingCells([...drawingCells, [pos.mouseX, pos.mouseY]])
+        }
       }
     }
   }
@@ -462,12 +475,18 @@ function GameCanvas({
       return
     }
 
-    if (isDrawing && drawingCells.length === pieceCount) {
-      const minX = Math.min(...drawingCells.map(([x]) => x))
-      const minY = Math.min(...drawingCells.map(([, y]) => y))
-      const normalizedShape = drawingCells.map(([x, y]) => [x - minX, y - minY])
+    if (isDrawing && drawingCells.length > 0) {
+      const shouldAdd = isPuzzleMode 
+        ? drawingCells.length === pieceCount 
+        : drawingCells.length > 0
       
-      onAddPiece(normalizedShape, minX, minY)
+      if (shouldAdd) {
+        const minX = Math.min(...drawingCells.map(([x]) => x))
+        const minY = Math.min(...drawingCells.map(([, y]) => y))
+        const normalizedShape = drawingCells.map(([x, y]) => [x - minX, y - minY])
+        
+        onAddPiece(normalizedShape, minX, minY)
+      }
     }
 
     setIsDrawing(false)

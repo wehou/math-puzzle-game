@@ -7,6 +7,7 @@ import { COLORS } from './utils/colors'
 import { checkAllCombinationsComplete, countUniqueShapes, countAllPieces } from './utils/shapes'
 
 const LG_BREAKPOINT = 1024
+const PUZZLE_MODE_THRESHOLD = 7
 
 function getGridDimensions(pieceCount, isDesktop) {
   if (isDesktop) {
@@ -63,6 +64,9 @@ function App() {
   const [completedBlockCount, setCompletedBlockCount] = useState(null)
   const [isDesktop, setIsDesktop] = useState(true)
 
+  const isPuzzleMode = pieceCount <= PUZZLE_MODE_THRESHOLD
+  const isFreeDrawMode = !isPuzzleMode
+
   useEffect(() => {
     const checkDesktop = () => {
       setIsDesktop(window.innerWidth >= LG_BREAKPOINT)
@@ -81,13 +85,18 @@ function App() {
   }, [pieces])
 
   const shapeStats = useMemo(() => {
+    if (isFreeDrawMode) {
+      return new Map()
+    }
     if (pieceCount >= 7) {
       return countAllPieces(pieces)
     }
     return countUniqueShapes(pieces)
-  }, [pieces, pieceCount])
+  }, [pieces, pieceCount, isFreeDrawMode])
 
   useEffect(() => {
+    if (isFreeDrawMode) return
+    
     const counts = new Set(pieces.map(p => p.shape.length))
     
     for (const count of counts) {
@@ -97,7 +106,7 @@ function App() {
         break
       }
     }
-  }, [pieces])
+  }, [pieces, isFreeDrawMode])
 
   const getNextColor = useCallback(() => {
     for (let i = 0; i < COLORS.length; i++) {
@@ -193,7 +202,7 @@ function App() {
   }, [])
 
   const arrangePieces = useCallback(() => {
-    if (pieces.length === 0) return
+    if (pieces.length === 0 || isFreeDrawMode) return
     
     const { width, height } = gridDimensions
     
@@ -265,7 +274,7 @@ function App() {
     
     setPieces(arrangedPieces)
     setSelectedPiece(null)
-  }, [pieces, gridDimensions])
+  }, [pieces, gridDimensions, isFreeDrawMode])
 
   return (
     <div className="w-full h-screen bg-dark-bg flex flex-col overflow-hidden">
@@ -279,6 +288,7 @@ function App() {
         onDelete={deletePiece}
         onChangeColor={changePieceColor}
         onArrange={arrangePieces}
+        isPuzzleMode={isPuzzleMode}
       />
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <div className="flex-1 flex items-center justify-center overflow-hidden">
@@ -294,10 +304,11 @@ function App() {
             pieceCount={pieceCount}
             currentColor={currentColor}
             gridDimensions={gridDimensions}
+            isPuzzleMode={isPuzzleMode}
           />
         </div>
         <div className="h-32 lg:h-full lg:w-64 border-t lg:border-t-0 lg:border-l border-dark-separator flex-shrink-0 overflow-hidden">
-          <StatusBar pieces={pieces} shapeStats={shapeStats} pieceCount={pieceCount} />
+          <StatusBar pieces={pieces} shapeStats={shapeStats} pieceCount={pieceCount} isFreeDrawMode={isFreeDrawMode} />
         </div>
       </div>
       

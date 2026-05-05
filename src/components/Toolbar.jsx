@@ -3,7 +3,7 @@ import { COLORS } from '../utils/colors'
 
 const MAX_PIECE_COUNT = 200
 
-function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor, onArrange }) {
+function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor, onArrange, isPuzzleMode }) {
   const [inputValue, setInputValue] = useState(pieceCount.toString())
   const [showWarning, setShowWarning] = useState(false)
 
@@ -49,7 +49,15 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
   return (
     <div className="toolbar-container">
       <div className="flex items-center gap-3 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2" style={{ width: '70%' }}>
+        <div className="flex items-center gap-2" style={{ width: '65%' }}>
+          <div className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
+            isPuzzleMode 
+              ? 'bg-apple-blue text-white' 
+              : 'bg-apple-purple text-white'
+          }`}>
+            {isPuzzleMode ? '🧩 拼图模式' : '🎨 自由绘图'}
+          </div>
+          
           <span className="text-xs font-medium text-dark-text-tertiary flex-shrink-0">
             {selectedPiece ? '改色:' : '颜色:'}
           </span>
@@ -72,7 +80,7 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
           </div>
         </div>
 
-        <div className="flex items-center gap-2 lg:gap-3 justify-end" style={{ width: '30%' }}>
+        <div className="flex items-center gap-2 lg:gap-3 justify-end" style={{ width: '35%' }}>
           <div className="flex items-center gap-1.5 lg:gap-2">
             <span className="text-xs font-medium text-dark-text-tertiary whitespace-nowrap">
               方块:
@@ -107,14 +115,6 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
           </div>
 
           <button
-            onClick={onArrange}
-            className="px-2 lg:px-3 py-1 text-xs font-medium text-white bg-apple-green rounded-lg hover:opacity-90 transition-opacity flex-shrink-0"
-            title="自动整理画布上的图形"
-          >
-            整理
-          </button>
-
-          <button
             onClick={() => selectedPiece && onDelete(selectedPiece)}
             disabled={!selectedPiece}
             className={`px-2 lg:px-3 py-1 text-xs font-medium rounded-lg transition-opacity flex-shrink-0 ${
@@ -134,6 +134,19 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
             清空
           </button>
 
+          <button
+            onClick={onArrange}
+            disabled={!isPuzzleMode}
+            className={`px-2 lg:px-3 py-1 text-xs font-medium rounded-lg transition-opacity flex-shrink-0 ${
+              isPuzzleMode 
+                ? 'text-white bg-apple-green hover:opacity-90' 
+                : 'text-dark-text-quaternary bg-dark-elevated cursor-not-allowed'
+            }`}
+            title={isPuzzleMode ? '自动整理画布上的图形' : '自由绘图模式下不可用'}
+          >
+            整理
+          </button>
+
           <div className="text-xs text-dark-text-quaternary flex-shrink-0 hidden xl:block">
             <span className="px-2 py-1 bg-dark-elevated rounded whitespace-nowrap">
               单击选择 | 双击旋转
@@ -150,7 +163,9 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
       
       <div className={`text-xs text-dark-text-quaternary text-center mt-1 xl:hidden ${showWarning ? 'hidden' : ''}`}>
         <span className="px-2 py-1 bg-dark-elevated rounded">
-          触摸绘制 | 双击旋转 | 点击颜色改色
+          {isPuzzleMode 
+            ? '触摸绘制 | 双击旋转 | 点击颜色改色' 
+            : '自由绘图 | 松开完成绘制'}
         </span>
       </div>
     </div>
