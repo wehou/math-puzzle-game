@@ -50,7 +50,7 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear 
 
           <div className="text-xs text-dark-text-quaternary flex-shrink-0 hidden xl:block">
             <span className="px-2 py-1 bg-dark-elevated rounded whitespace-nowrap">
-              PC: 左键绘制 | 右键旋转 | Shift+点击复制
+              单击选择 | 双击旋转 | 长按删除
             </span>
           </div>
         </div>
@@ -58,7 +58,7 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear 
       
       <div className="text-xs text-dark-text-quaternary text-center mt-1 xl:hidden">
         <span className="px-2 py-1 bg-dark-elevated rounded">
-          触摸绘制 | 长按旋转 | 拖动移动
+          触摸绘制 | 双击旋转 | 长按删除
         </span>
       </div>
     </div>

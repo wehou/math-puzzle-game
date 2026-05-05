@@ -1,6 +1,8 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 const GRID_SIZE = 30
+const LONG_PRESS_DURATION = 600
+const DOUBLE_CLICK_DURATION = 300
 
 function GameCanvas({ 
   pieces, 
@@ -24,7 +26,14 @@ function GameCanvas({
   const [drawingCells, setDrawingCells] = useState([])
   const [copiedPiece, setCopiedPiece] = useState(null)
   const [dragTrail, setDragTrail] = useState([])
-  const [longPressTimer, setLongPressTimer] = useState(null)
+  
+  const longPressTimerRef = useRef(null)
+  const lastClickTimeRef = useRef(0)
+  const lastClickPosRef = useRef({ x: -1, y: -1 })
+  const isLongPressTriggeredRef = useRef(false)
+  const touchStartTimeRef = useRef(0)
+  const lastTouchTimeRef = useRef(0)
+  const lastTouchPosRef = useRef({ x: -1, y: -1 })
 
   useEffect(() => {
     const updateSize = () => {
@@ -260,12 +269,20 @@ function GameCanvas({
     return null
   }
 
+  const getMousePos = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect()
+    return {
+      mouseX: Math.floor((e.clientX - rect.left) / cellSize),
+      mouseY: Math.floor((e.clientY - rect.top) / cellSize),
+      canvasX: e.clientX - rect.left,
+      canvasY: e.clientY - rect.top
+    }
+  }
+
   const getTouchPos = (e) => {
     const rect = canvasRef.current.getBoundingClientRect()
     const touch = e.touches[0] || e.changedTouches[0]
     return {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
       mouseX: Math.floor((touch.clientX - rect.left) / cellSize),
       mouseY: Math.floor((touch.clientY - rect.top) / cellSize),
       canvasX: touch.clientX - rect.left,
@@ -273,63 +290,102 @@ function GameCanvas({
     }
   }
 
+  const clearLongPressTimer = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+  }
+
   const handleMouseDown = (e) => {
     if (e.button !== 0) return
     
-    const rect = canvasRef.current.getBoundingClientRect()
-    const mouseX = Math.floor((e.clientX - rect.left) / cellSize)
-    const mouseY = Math.floor((e.clientY - rect.top) / cellSize)
-
-    if (e.shiftKey && selectedPiece) {
-      const piece = pieces.find(p => p.id === selectedPiece)
-      if (piece) {
-        setCopiedPiece({ ...piece, x: mouseX, y: mouseY })
+    const pos = getMousePos(e)
+    const currentTime = Date.now()
+    
+    isLongPressTriggeredRef.current = false
+    
+    const piece = getPieceAtPosition(pos.mouseX, pos.mouseY)
+    
+    if (piece) {
+      const isSamePos = lastClickPosRef.current.x === pos.mouseX && 
+                        lastClickPosRef.current.y === pos.mouseY
+      const isDoubleClick = isSamePos && 
+                           (currentTime - lastClickTimeRef.current) < DOUBLE_CLICK_DURATION
+      
+      if (isDoubleClick) {
+        clearLongPressTimer()
+        lastClickTimeRef.current = 0
+        lastClickPosRef.current = { x: -1, y: -1 }
+        
+        if (canRotate(piece)) {
+          onRotate(piece.id)
+          setWarning('🔄 已旋转 / Rotated')
+        } else {
+          setWarning('⚠️ 无法旋转：图形将超出边界')
+        }
         return
       }
-    }
-
-    const piece = getPieceAtPosition(mouseX, mouseY)
-    if (piece) {
+      
+      lastClickTimeRef.current = currentTime
+      lastClickPosRef.current = { x: pos.mouseX, y: pos.mouseY }
+      
+      longPressTimerRef.current = setTimeout(() => {
+        isLongPressTriggeredRef.current = true
+        onDelete(piece.id)
+        setWarning('🗑️ 已删除 / Deleted')
+      }, LONG_PRESS_DURATION)
+      
       setSelectedPiece(piece.id)
       setDraggedPiece(piece.id)
-      setDragOffset({ x: mouseX - piece.x, y: mouseY - piece.y })
-      setDragTrail([{ x: e.clientX - rect.left, y: e.clientY - rect.top }])
+      setDragOffset({ x: pos.mouseX - piece.x, y: pos.mouseY - piece.y })
+      setDragTrail([{ x: pos.canvasX, y: pos.canvasY }])
     } else {
+      if (e.shiftKey && selectedPiece) {
+        const selectedP = pieces.find(p => p.id === selectedPiece)
+        if (selectedP) {
+          setCopiedPiece({ ...selectedP, x: pos.mouseX, y: pos.mouseY })
+          return
+        }
+      }
+      
       setSelectedPiece(null)
       setIsDrawing(true)
-      setDrawingCells([[mouseX, mouseY]])
+      setDrawingCells([[pos.mouseX, pos.mouseY]])
     }
   }
 
   const handleMouseMove = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect()
-    const mouseX = Math.floor((e.clientX - rect.left) / cellSize)
-    const mouseY = Math.floor((e.clientY - rect.top) / cellSize)
+    const pos = getMousePos(e)
 
     if (copiedPiece) {
-      setCopiedPiece({ ...copiedPiece, x: mouseX, y: mouseY })
+      setCopiedPiece({ ...copiedPiece, x: pos.mouseX, y: pos.mouseY })
       return
     }
 
     if (draggedPiece) {
-      const newX = mouseX - dragOffset.x
-      const newY = mouseY - dragOffset.y
+      clearLongPressTimer()
+      
+      const newX = pos.mouseX - dragOffset.x
+      const newY = pos.mouseY - dragOffset.y
       onMove(draggedPiece, newX - pieces.find(p => p.id === draggedPiece).x, 
              newY - pieces.find(p => p.id === draggedPiece).y)
       
-      setDragTrail(prev => [...prev, { x: e.clientX - rect.left, y: e.clientY - rect.top }].slice(-50))
+      setDragTrail(prev => [...prev, { x: pos.canvasX, y: pos.canvasY }].slice(-50))
       return
     }
 
     if (isDrawing && drawingCells.length < pieceCount) {
-      const exists = drawingCells.some(([cx, cy]) => cx === mouseX && cy === mouseY)
-      if (!exists && isAdjacent(mouseX, mouseY, drawingCells)) {
-        setDrawingCells([...drawingCells, [mouseX, mouseY]])
+      const exists = drawingCells.some(([cx, cy]) => cx === pos.mouseX && cy === pos.mouseY)
+      if (!exists && isAdjacent(pos.mouseX, pos.mouseY, drawingCells)) {
+        setDrawingCells([...drawingCells, [pos.mouseX, pos.mouseY]])
       }
     }
   }
 
   const handleMouseUp = (e) => {
+    clearLongPressTimer()
+    
     if (copiedPiece) {
       onDuplicate(selectedPiece, copiedPiece.x, copiedPiece.y)
       setCopiedPiece(null)
@@ -354,39 +410,45 @@ function GameCanvas({
     setDrawingCells([])
   }
 
-  const handleContextMenu = (e) => {
-    e.preventDefault()
-    if (selectedPiece) {
-      const piece = pieces.find(p => p.id === selectedPiece)
-      if (piece && canRotate(piece)) {
-        onRotate(selectedPiece)
-      } else {
-        setWarning('⚠️ 无法旋转：图形将超出边界 / Cannot rotate: shape would exceed boundary')
-      }
-    }
-  }
-
   const handleTouchStart = (e) => {
     e.preventDefault()
     const pos = getTouchPos(e)
-
-    if (longPressTimer) {
-      clearTimeout(longPressTimer)
-    }
-
-    const timer = setTimeout(() => {
-      if (selectedPiece) {
-        const piece = pieces.find(p => p.id === selectedPiece)
-        if (piece && canRotate(piece)) {
-          onRotate(selectedPiece)
-          setWarning('🔄 已旋转 / Rotated')
-        }
-      }
-    }, 500)
-    setLongPressTimer(timer)
-
+    const currentTime = Date.now()
+    
+    touchStartTimeRef.current = currentTime
+    isLongPressTriggeredRef.current = false
+    
     const piece = getPieceAtPosition(pos.mouseX, pos.mouseY)
+    
     if (piece) {
+      const isSamePos = lastTouchPosRef.current.x === pos.mouseX && 
+                        lastTouchPosRef.current.y === pos.mouseY
+      const isDoubleTap = isSamePos && 
+                         (currentTime - lastTouchTimeRef.current) < DOUBLE_CLICK_DURATION
+      
+      if (isDoubleTap) {
+        clearLongPressTimer()
+        lastTouchTimeRef.current = 0
+        lastTouchPosRef.current = { x: -1, y: -1 }
+        
+        if (canRotate(piece)) {
+          onRotate(piece.id)
+          setWarning('🔄 已旋转 / Rotated')
+        } else {
+          setWarning('⚠️ 无法旋转：图形将超出边界')
+        }
+        return
+      }
+      
+      lastTouchTimeRef.current = currentTime
+      lastTouchPosRef.current = { x: pos.mouseX, y: pos.mouseY }
+      
+      longPressTimerRef.current = setTimeout(() => {
+        isLongPressTriggeredRef.current = true
+        onDelete(piece.id)
+        setWarning('🗑️ 已删除 / Deleted')
+      }, LONG_PRESS_DURATION)
+      
       setSelectedPiece(piece.id)
       setDraggedPiece(piece.id)
       setDragOffset({ x: pos.mouseX - piece.x, y: pos.mouseY - piece.y })
@@ -402,12 +464,9 @@ function GameCanvas({
     e.preventDefault()
     const pos = getTouchPos(e)
 
-    if (longPressTimer) {
-      clearTimeout(longPressTimer)
-      setLongPressTimer(null)
-    }
-
     if (draggedPiece) {
+      clearLongPressTimer()
+      
       const newX = pos.mouseX - dragOffset.x
       const newY = pos.mouseY - dragOffset.y
       onMove(draggedPiece, newX - pieces.find(p => p.id === draggedPiece).x, 
@@ -427,12 +486,8 @@ function GameCanvas({
 
   const handleTouchEnd = (e) => {
     e.preventDefault()
-
-    if (longPressTimer) {
-      clearTimeout(longPressTimer)
-      setLongPressTimer(null)
-    }
-
+    clearLongPressTimer()
+    
     if (draggedPiece) {
       setDraggedPiece(null)
       setTimeout(() => setDragTrail([]), 500)
@@ -465,6 +520,7 @@ function GameCanvas({
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={() => {
+            clearLongPressTimer()
             if (isDrawing) {
               setIsDrawing(false)
               setDrawingCells([])
@@ -475,7 +531,6 @@ function GameCanvas({
             setDraggedPiece(null)
             setDragTrail([])
           }}
-          onContextMenu={handleContextMenu}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
