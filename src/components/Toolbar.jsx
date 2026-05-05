@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { COLORS } from '../utils/colors'
 
-const MAX_PIECE_COUNT = 10
+const MAX_PIECE_COUNT = 200
 
 function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor, onArrange }) {
   const [inputValue, setInputValue] = useState(pieceCount.toString())

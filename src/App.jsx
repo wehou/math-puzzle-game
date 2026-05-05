@@ -4,16 +4,24 @@ import Toolbar from './components/Toolbar'
 import StatusBar from './components/StatusBar'
 import CelebrationDialog from './components/CelebrationDialog'
 import { COLORS } from './utils/colors'
-import { checkAllCombinationsComplete, countUniqueShapes } from './utils/shapes'
+import { checkAllCombinationsComplete, countUniqueShapes, countAllPieces } from './utils/shapes'
 
-function getGridDimensions(pieceCount) {
-  let width
-  if (pieceCount <= 5) {
-    width = 20
+const LG_BREAKPOINT = 1024
+
+function getGridDimensions(pieceCount, isDesktop) {
+  if (isDesktop) {
+    if (pieceCount <= 5) {
+      return { width: 40, height: 20 }
+    } else {
+      return { width: 50, height: 25 }
+    }
   } else {
-    width = 25
+    if (pieceCount <= 5) {
+      return { width: 20, height: 40 }
+    } else {
+      return { width: 25, height: 50 }
+    }
   }
-  return { width, height: width * 2 }
 }
 
 function getShapeBounds(shape) {
@@ -53,8 +61,18 @@ function App() {
   const [colorIndex, setColorIndex] = useState(0)
   const [showCelebration, setShowCelebration] = useState(false)
   const [completedBlockCount, setCompletedBlockCount] = useState(null)
+  const [isDesktop, setIsDesktop] = useState(true)
 
-  const gridDimensions = useMemo(() => getGridDimensions(pieceCount), [pieceCount])
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= LG_BREAKPOINT)
+    }
+    checkDesktop()
+    window.addEventListener('resize', checkDesktop)
+    return () => window.removeEventListener('resize', checkDesktop)
+  }, [])
+
+  const gridDimensions = useMemo(() => getGridDimensions(pieceCount, isDesktop), [pieceCount, isDesktop])
 
   const usedColors = useMemo(() => {
     const colors = new Set()
@@ -63,8 +81,11 @@ function App() {
   }, [pieces])
 
   const shapeStats = useMemo(() => {
+    if (pieceCount >= 7) {
+      return countAllPieces(pieces)
+    }
     return countUniqueShapes(pieces)
-  }, [pieces])
+  }, [pieces, pieceCount])
 
   useEffect(() => {
     const counts = new Set(pieces.map(p => p.shape.length))
@@ -272,10 +293,11 @@ function App() {
             onDuplicate={duplicatePiece}
             pieceCount={pieceCount}
             currentColor={currentColor}
+            gridDimensions={gridDimensions}
           />
         </div>
         <div className="h-32 lg:h-full lg:w-64 border-t lg:border-t-0 lg:border-l border-dark-separator flex-shrink-0 overflow-hidden">
-          <StatusBar pieces={pieces} shapeStats={shapeStats} />
+          <StatusBar pieces={pieces} shapeStats={shapeStats} pieceCount={pieceCount} />
         </div>
       </div>
       

@@ -73,6 +73,22 @@ export const countUniqueShapes = (pieces) => {
   return shapeMap
 }
 
+export const countAllPieces = (pieces) => {
+  const shapeMap = new Map()
+  
+  for (const piece of pieces) {
+    const key = JSON.stringify(piece.shape)
+    
+    if (shapeMap.has(key)) {
+      shapeMap.set(key, shapeMap.get(key) + 1)
+    } else {
+      shapeMap.set(key, 1)
+    }
+  }
+  
+  return shapeMap
+}
+
 const getAllRotations = (shape) => {
   const rotations = []
   let current = normalizeShape(shape)

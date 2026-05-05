@@ -1,16 +1,6 @@
-import { useRef, useEffect, useState, useMemo } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 const DOUBLE_CLICK_DURATION = 300
-
-function getGridDimensions(pieceCount) {
-  let width
-  if (pieceCount <= 5) {
-    width = 20
-  } else {
-    width = 25
-  }
-  return { width, height: width * 2 }
-}
 
 function GameCanvas({ 
   pieces, 
@@ -23,7 +13,7 @@ function GameCanvas({
   onDuplicate,
   pieceCount,
   currentColor,
-  onChangeColor
+  gridDimensions
 }) {
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
@@ -41,7 +31,6 @@ function GameCanvas({
   const lastTouchTimeRef = useRef(0)
   const lastTouchPosRef = useRef({ x: -1, y: -1 })
 
-  const gridDimensions = useMemo(() => getGridDimensions(pieceCount), [pieceCount])
   const GRID_WIDTH = gridDimensions.width
   const GRID_HEIGHT = gridDimensions.height
 
@@ -58,7 +47,7 @@ function GameCanvas({
       
       const newCellSize = Math.min(maxCellSizeByWidth, maxCellSizeByHeight)
       
-      setCellSize(Math.max(12, newCellSize))
+      setCellSize(Math.max(8, newCellSize))
     }
 
     updateSize()
