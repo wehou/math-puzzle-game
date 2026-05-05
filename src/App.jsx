@@ -77,7 +77,7 @@ function App() {
 
   useEffect(() => {
     if (isPuzzleMode) {
-      setPieces(prev => prev.filter(piece => piece.shape.length === pieceCount))
+      setPieces(prev => prev.filter(piece => piece.shape.length <= pieceCount))
     }
   }, [isPuzzleMode, pieceCount])
 
