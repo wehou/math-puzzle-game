@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 
-const GRID_SIZE = 30
-const LONG_PRESS_DURATION = 600
+const GRID_WIDTH = 20
+const GRID_HEIGHT = 30
 const DOUBLE_CLICK_DURATION = 300
 
 function GameCanvas({ 
@@ -10,11 +10,11 @@ function GameCanvas({
   setSelectedPiece, 
   onRotate, 
   onMove, 
-  onDelete, 
   onAddPiece,
   onDuplicate,
   pieceCount,
-  currentColor
+  currentColor,
+  onChangeColor
 }) {
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
@@ -27,11 +27,8 @@ function GameCanvas({
   const [copiedPiece, setCopiedPiece] = useState(null)
   const [dragTrail, setDragTrail] = useState([])
   
-  const longPressTimerRef = useRef(null)
   const lastClickTimeRef = useRef(0)
   const lastClickPosRef = useRef({ x: -1, y: -1 })
-  const isLongPressTriggeredRef = useRef(false)
-  const touchStartTimeRef = useRef(0)
   const lastTouchTimeRef = useRef(0)
   const lastTouchPosRef = useRef({ x: -1, y: -1 })
 
@@ -43,8 +40,8 @@ function GameCanvas({
       const maxWidth = container.clientWidth - 16
       const maxHeight = container.clientHeight - 16
       
-      const maxCellSizeByWidth = Math.floor(maxWidth / GRID_SIZE)
-      const maxCellSizeByHeight = Math.floor(maxHeight / GRID_SIZE)
+      const maxCellSizeByWidth = Math.floor(maxWidth / GRID_WIDTH)
+      const maxCellSizeByHeight = Math.floor(maxHeight / GRID_HEIGHT)
       
       const newCellSize = Math.min(maxCellSizeByWidth, maxCellSizeByHeight)
       
@@ -109,22 +106,24 @@ function GameCanvas({
   }, [selectedPiece, pieces, onMove, onDelete])
 
   const drawCanvas = (ctx) => {
-    const canvasSize = GRID_SIZE * cellSize
+    const canvasWidth = GRID_WIDTH * cellSize
+    const canvasHeight = GRID_HEIGHT * cellSize
     
     ctx.fillStyle = '#1C1C1E'
-    ctx.fillRect(0, 0, canvasSize, canvasSize)
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
     ctx.strokeStyle = '#38383A'
     ctx.lineWidth = 1
-    for (let i = 0; i <= GRID_SIZE; i++) {
+    for (let i = 0; i <= GRID_WIDTH; i++) {
       ctx.beginPath()
       ctx.moveTo(i * cellSize, 0)
-      ctx.lineTo(i * cellSize, canvasSize)
+      ctx.lineTo(i * cellSize, canvasHeight)
       ctx.stroke()
-
+    }
+    for (let i = 0; i <= GRID_HEIGHT; i++) {
       ctx.beginPath()
       ctx.moveTo(0, i * cellSize)
-      ctx.lineTo(canvasSize, i * cellSize)
+      ctx.lineTo(canvasWidth, i * cellSize)
       ctx.stroke()
     }
 
@@ -234,7 +233,7 @@ function GameCanvas({
       const newX = piece.x + rx
       const newY = piece.y + ry
       
-      if (newX < 0 || newX >= GRID_SIZE || newY < 0 || newY >= GRID_SIZE) {
+      if (newX < 0 || newX >= GRID_WIDTH || newY < 0 || newY >= GRID_HEIGHT) {
         return false
       }
     }
@@ -290,20 +289,11 @@ function GameCanvas({
     }
   }
 
-  const clearLongPressTimer = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current)
-      longPressTimerRef.current = null
-    }
-  }
-
   const handleMouseDown = (e) => {
     if (e.button !== 0) return
     
     const pos = getMousePos(e)
     const currentTime = Date.now()
-    
-    isLongPressTriggeredRef.current = false
     
     const piece = getPieceAtPosition(pos.mouseX, pos.mouseY)
     
@@ -314,7 +304,6 @@ function GameCanvas({
                            (currentTime - lastClickTimeRef.current) < DOUBLE_CLICK_DURATION
       
       if (isDoubleClick) {
-        clearLongPressTimer()
         lastClickTimeRef.current = 0
         lastClickPosRef.current = { x: -1, y: -1 }
         
@@ -329,12 +318,6 @@ function GameCanvas({
       
       lastClickTimeRef.current = currentTime
       lastClickPosRef.current = { x: pos.mouseX, y: pos.mouseY }
-      
-      longPressTimerRef.current = setTimeout(() => {
-        isLongPressTriggeredRef.current = true
-        onDelete(piece.id)
-        setWarning('🗑️ 已删除 / Deleted')
-      }, LONG_PRESS_DURATION)
       
       setSelectedPiece(piece.id)
       setDraggedPiece(piece.id)
@@ -364,8 +347,6 @@ function GameCanvas({
     }
 
     if (draggedPiece) {
-      clearLongPressTimer()
-      
       const newX = pos.mouseX - dragOffset.x
       const newY = pos.mouseY - dragOffset.y
       onMove(draggedPiece, newX - pieces.find(p => p.id === draggedPiece).x, 
@@ -384,8 +365,6 @@ function GameCanvas({
   }
 
   const handleMouseUp = (e) => {
-    clearLongPressTimer()
-    
     if (copiedPiece) {
       onDuplicate(selectedPiece, copiedPiece.x, copiedPiece.y)
       setCopiedPiece(null)
@@ -415,9 +394,6 @@ function GameCanvas({
     const pos = getTouchPos(e)
     const currentTime = Date.now()
     
-    touchStartTimeRef.current = currentTime
-    isLongPressTriggeredRef.current = false
-    
     const piece = getPieceAtPosition(pos.mouseX, pos.mouseY)
     
     if (piece) {
@@ -427,7 +403,6 @@ function GameCanvas({
                          (currentTime - lastTouchTimeRef.current) < DOUBLE_CLICK_DURATION
       
       if (isDoubleTap) {
-        clearLongPressTimer()
         lastTouchTimeRef.current = 0
         lastTouchPosRef.current = { x: -1, y: -1 }
         
@@ -442,12 +417,6 @@ function GameCanvas({
       
       lastTouchTimeRef.current = currentTime
       lastTouchPosRef.current = { x: pos.mouseX, y: pos.mouseY }
-      
-      longPressTimerRef.current = setTimeout(() => {
-        isLongPressTriggeredRef.current = true
-        onDelete(piece.id)
-        setWarning('🗑️ 已删除 / Deleted')
-      }, LONG_PRESS_DURATION)
       
       setSelectedPiece(piece.id)
       setDraggedPiece(piece.id)
@@ -465,8 +434,6 @@ function GameCanvas({
     const pos = getTouchPos(e)
 
     if (draggedPiece) {
-      clearLongPressTimer()
-      
       const newX = pos.mouseX - dragOffset.x
       const newY = pos.mouseY - dragOffset.y
       onMove(draggedPiece, newX - pieces.find(p => p.id === draggedPiece).x, 
@@ -486,7 +453,6 @@ function GameCanvas({
 
   const handleTouchEnd = (e) => {
     e.preventDefault()
-    clearLongPressTimer()
     
     if (draggedPiece) {
       setDraggedPiece(null)
@@ -506,21 +472,21 @@ function GameCanvas({
     setDrawingCells([])
   }
 
-  const canvasSize = GRID_SIZE * cellSize
+  const canvasWidth = GRID_WIDTH * cellSize
+  const canvasHeight = GRID_HEIGHT * cellSize
 
   return (
     <div ref={containerRef} className="w-full h-full flex items-center justify-center p-2">
       <div className="relative">
         <canvas
           ref={canvasRef}
-          width={canvasSize}
-          height={canvasSize}
+          width={canvasWidth}
+          height={canvasHeight}
           className="border border-dark-separator rounded-xl apple-shadow-lg cursor-crosshair touch-none"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={() => {
-            clearLongPressTimer()
             if (isDrawing) {
               setIsDrawing(false)
               setDrawingCells([])

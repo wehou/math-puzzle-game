@@ -91,7 +91,7 @@ function App() {
   const movePiece = useCallback((pieceId, dx, dy) => {
     setPieces(prev => prev.map(p => {
       if (p.id === pieceId) {
-        const newX = Math.max(0, Math.min(29, p.x + dx))
+        const newX = Math.max(0, Math.min(19, p.x + dx))
         const newY = Math.max(0, Math.min(29, p.y + dy))
         return { ...p, x: newX, y: newY }
       }
@@ -105,6 +105,15 @@ function App() {
       setSelectedPiece(null)
     }
   }, [selectedPiece])
+
+  const changePieceColor = useCallback((pieceId, newColor) => {
+    setPieces(prev => prev.map(p => {
+      if (p.id === pieceId) {
+        return { ...p, color: newColor }
+      }
+      return p
+    }))
+  }, [])
 
   const currentColor = getNextColor()
 
@@ -127,6 +136,9 @@ function App() {
         setPieceCount={setPieceCount}
         usedColors={usedColors}
         onClear={clearCanvas}
+        selectedPiece={selectedPiece}
+        onDelete={deletePiece}
+        onChangeColor={changePieceColor}
       />
       <div className="flex-1 flex items-center justify-center overflow-hidden">
         <GameCanvas
