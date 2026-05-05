@@ -58,7 +58,7 @@ function App() {
     }
     setPieces(prev => [...prev, newPiece])
     setSelectedPiece(newPiece.id)
-    setColorIndex(prev => (prev + 1) % COLORS.length)
+    setColorIndex(prev => (prev + 3) % COLORS.length)
   }, [getNextColor])
 
   const duplicatePiece = useCallback((pieceId, x, y) => {
@@ -76,7 +76,7 @@ function App() {
     }
     setPieces(prev => [...prev, newPiece])
     setSelectedPiece(newPiece.id)
-    setColorIndex(prev => (prev + 1) % COLORS.length)
+    setColorIndex(prev => (prev + 3) % COLORS.length)
   }, [pieces, getNextColor])
 
   const rotatePiece = useCallback((pieceId) => {
@@ -140,21 +140,25 @@ function App() {
         onDelete={deletePiece}
         onChangeColor={changePieceColor}
       />
-      <div className="flex-1 flex items-center justify-center overflow-hidden">
-        <GameCanvas
-          pieces={pieces}
-          selectedPiece={selectedPiece}
-          setSelectedPiece={setSelectedPiece}
-          onRotate={rotatePiece}
-          onMove={movePiece}
-          onDelete={deletePiece}
-          onAddPiece={addPiece}
-          onDuplicate={duplicatePiece}
-          pieceCount={pieceCount}
-          currentColor={currentColor}
-        />
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="flex-1 flex items-center justify-center overflow-hidden">
+          <GameCanvas
+            pieces={pieces}
+            selectedPiece={selectedPiece}
+            setSelectedPiece={setSelectedPiece}
+            onRotate={rotatePiece}
+            onMove={movePiece}
+            onDelete={deletePiece}
+            onAddPiece={addPiece}
+            onDuplicate={duplicatePiece}
+            pieceCount={pieceCount}
+            currentColor={currentColor}
+          />
+        </div>
+        <div className="h-32 lg:h-full lg:w-64 border-t lg:border-t-0 lg:border-l border-dark-separator flex-shrink-0 overflow-hidden">
+          <StatusBar pieces={pieces} shapeStats={shapeStats} />
+        </div>
       </div>
-      <StatusBar pieces={pieces} shapeStats={shapeStats} />
       
       {showCelebration && (
         <CelebrationDialog 

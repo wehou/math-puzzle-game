@@ -25,16 +25,18 @@ function StatusBar({ pieces, shapeStats }) {
   const stats = Array.from(shapeStats.entries())
 
   return (
-    <div className="status-bar-container">
-      <div className="flex items-center gap-6 max-w-7xl mx-auto flex-wrap">
-        <span className="text-sm font-medium text-dark-text-secondary">
-          图形统计 / Shape Statistics:
-        </span>
-        
+    <div className="h-full flex flex-col lg:flex-col">
+      <div className="hidden lg:block p-3 border-b border-dark-separator">
+        <h3 className="text-sm font-medium text-dark-text-secondary">
+          图形统计 / Statistics
+        </h3>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 lg:p-3">
         {stats.length === 0 ? (
-          <span className="text-sm text-dark-text-tertiary">暂无图形 / No shapes</span>
+          <span className="text-xs lg:text-sm text-dark-text-tertiary">暂无图形 / No shapes</span>
         ) : (
-          <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex flex-row lg:flex-col gap-1 lg:gap-2 overflow-x-auto lg:overflow-x-visible">
             {stats.map(([key, count], index) => {
               const shape = JSON.parse(key)
               const piece = pieces.find(p => {
@@ -44,12 +46,12 @@ function StatusBar({ pieces, shapeStats }) {
               const color = piece?.color || '#007AFF'
               
               return (
-                <div key={index} className="flex items-center gap-2 px-2 py-1 bg-dark-elevated rounded-lg">
+                <div key={index} className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-2 bg-dark-elevated rounded-lg flex-shrink-0">
                   <ShapeIcon shape={shape} color={color} size={20} />
-                  <span className="text-sm text-dark-text-primary">
+                  <span className="text-xs lg:text-sm text-dark-text-primary hidden lg:inline flex-1">
                     {shape.length}方块
                   </span>
-                  <span className="text-xs text-dark-text-tertiary">
+                  <span className="text-xs text-dark-text-tertiary bg-dark-surface px-1.5 lg:px-2 py-0.5 rounded">
                     ×{count}
                   </span>
                 </div>
@@ -57,12 +59,19 @@ function StatusBar({ pieces, shapeStats }) {
             })}
           </div>
         )}
-        
-        <div className="ml-auto text-sm text-dark-text-tertiary flex items-center gap-2">
-          <span className="px-2 py-0.5 bg-dark-elevated rounded">
-            总计 / Total: {pieces.length} 个
+      </div>
+      
+      <div className="hidden lg:block p-3 border-t border-dark-separator">
+        <div className="text-sm text-dark-text-tertiary flex items-center justify-between">
+          <span>总计 / Total</span>
+          <span className="px-2 py-0.5 bg-dark-elevated rounded font-medium text-dark-text-primary">
+            {pieces.length} 个
           </span>
         </div>
+      </div>
+      
+      <div className="lg:hidden px-2 py-1 border-t border-dark-separator flex items-center justify-between">
+        <span className="text-xs text-dark-text-tertiary">总计: {pieces.length} 个</span>
       </div>
     </div>
   )
