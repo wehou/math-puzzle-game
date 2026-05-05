@@ -10,6 +10,7 @@ function GameCanvas({
   setSelectedPiece, 
   onRotate, 
   onMove, 
+  onDelete,
   onAddPiece,
   onDuplicate,
   pieceCount,
