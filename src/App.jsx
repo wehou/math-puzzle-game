@@ -75,6 +75,12 @@ function App() {
     return () => window.removeEventListener('resize', checkDesktop)
   }, [])
 
+  useEffect(() => {
+    if (isPuzzleMode) {
+      setPieces(prev => prev.filter(piece => piece.shape.length === pieceCount))
+    }
+  }, [isPuzzleMode, pieceCount])
+
   const gridDimensions = useMemo(() => getGridDimensions(isPuzzleMode, isDesktop), [isPuzzleMode, isDesktop])
 
   const usedColors = useMemo(() => {
