@@ -7,7 +7,6 @@ import { COLORS } from './utils/colors'
 import { checkAllCombinationsComplete, countUniqueShapes, countAllPieces } from './utils/shapes'
 
 const LG_BREAKPOINT = 1024
-const PUZZLE_MODE_THRESHOLD = 7
 
 function getGridDimensions(pieceCount, isDesktop) {
   if (isDesktop) {
@@ -63,8 +62,8 @@ function App() {
   const [showCelebration, setShowCelebration] = useState(false)
   const [completedBlockCount, setCompletedBlockCount] = useState(null)
   const [isDesktop, setIsDesktop] = useState(true)
+  const [isPuzzleMode, setIsPuzzleMode] = useState(true)
 
-  const isPuzzleMode = pieceCount <= PUZZLE_MODE_THRESHOLD
   const isFreeDrawMode = !isPuzzleMode
 
   useEffect(() => {
@@ -289,6 +288,7 @@ function App() {
         onChangeColor={changePieceColor}
         onArrange={arrangePieces}
         isPuzzleMode={isPuzzleMode}
+        setIsPuzzleMode={setIsPuzzleMode}
       />
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <div className="flex-1 flex items-center justify-center overflow-hidden">

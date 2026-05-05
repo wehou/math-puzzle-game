@@ -1,11 +1,22 @@
 import { useState, useEffect } from 'react'
 import { COLORS } from '../utils/colors'
 
-const MAX_PIECE_COUNT = 200
+const MAX_PIECE_COUNT_PUZZLE = 7
 
-function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor, onArrange, isPuzzleMode }) {
+function Toolbar({ 
+  currentColor, 
+  pieceCount, 
+  setPieceCount, 
+  usedColors, 
+  onClear, 
+  selectedPiece, 
+  onDelete, 
+  onChangeColor, 
+  onArrange, 
+  isPuzzleMode, 
+  setIsPuzzleMode 
+}) {
   const [inputValue, setInputValue] = useState(pieceCount.toString())
-  const [showWarning, setShowWarning] = useState(false)
 
   useEffect(() => {
     setInputValue(pieceCount.toString())
@@ -18,44 +29,86 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
   }
 
   const handleInputChange = (e) => {
+    if (!isPuzzleMode) return
+    
     const value = e.target.value
     setInputValue(value)
     
     const numValue = parseInt(value)
     if (!isNaN(numValue)) {
-      if (numValue > MAX_PIECE_COUNT) {
-        setPieceCount(MAX_PIECE_COUNT)
-        setInputValue(MAX_PIECE_COUNT.toString())
-        setShowWarning(true)
-        setTimeout(() => setShowWarning(false), 2000)
+      if (numValue > MAX_PIECE_COUNT_PUZZLE) {
+        setPieceCount(MAX_PIECE_COUNT_PUZZLE)
+        setInputValue(MAX_PIECE_COUNT_PUZZLE.toString())
       } else if (numValue >= 1) {
         setPieceCount(numValue)
-        setShowWarning(false)
       }
     }
   }
 
   const handleSliderChange = (e) => {
+    if (!isPuzzleMode) return
     const value = parseInt(e.target.value)
     setPieceCount(value)
     setInputValue(value.toString())
-    if (value < MAX_PIECE_COUNT) {
-      setShowWarning(false)
-    }
   }
-
-  const isAtMax = pieceCount === MAX_PIECE_COUNT
 
   return (
     <div className="toolbar-container">
       <div className="flex items-center gap-3 max-w-7xl mx-auto">
         <div className="flex items-center gap-2" style={{ width: '65%' }}>
-          <div className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
-            isPuzzleMode 
-              ? 'bg-apple-blue text-white' 
-              : 'bg-apple-purple text-white'
-          }`}>
-            {isPuzzleMode ? '🧩 拼图模式' : '🎨 自由绘图'}
+          <div className="flex items-center bg-dark-elevated rounded-lg p-0.5 flex-shrink-0">
+            <button
+              onClick={() => setIsPuzzleMode(true)}
+              className={`px-2 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                isPuzzleMode 
+                  ? 'bg-apple-blue text-white shadow-sm' 
+                  : 'text-dark-text-tertiary hover:text-dark-text-secondary'
+              }`}
+            >
+              🧩 拼图
+            </button>
+            <button
+              onClick={() => setIsPuzzleMode(false)}
+              className={`px-2 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                !isPuzzleMode 
+                  ? 'bg-apple-purple text-white shadow-sm' 
+                  : 'text-dark-text-tertiary hover:text-dark-text-secondary'
+              }`}
+            >
+              🎨 自由
+            </button>
+          </div>
+
+          <div className={`flex items-center gap-1.5 lg:gap-2 ${!isPuzzleMode ? 'opacity-50' : ''}`}>
+            <span className="text-xs font-medium text-dark-text-tertiary whitespace-nowrap">
+              方块:
+            </span>
+            <input
+              type="number"
+              min="1"
+              max={MAX_PIECE_COUNT_PUZZLE}
+              value={inputValue}
+              onChange={handleInputChange}
+              disabled={!isPuzzleMode}
+              className={`w-10 lg:w-12 h-6 text-xs text-center bg-dark-surface rounded border transition-all duration-200 ${
+                isPuzzleMode 
+                  ? 'border-dark-separator text-dark-text-primary focus:border-apple-blue focus:outline-none' 
+                  : 'border-dark-elevated text-dark-text-quaternary cursor-not-allowed'
+              }`}
+            />
+            <input
+              type="range"
+              min="1"
+              max={MAX_PIECE_COUNT_PUZZLE}
+              value={pieceCount}
+              onChange={handleSliderChange}
+              disabled={!isPuzzleMode}
+              className={`w-12 lg:w-16 h-1 rounded-full appearance-none ${
+                isPuzzleMode 
+                  ? 'accent-apple-blue bg-dark-elevated cursor-pointer' 
+                  : 'accent-dark-text-quaternary bg-dark-elevated cursor-not-allowed opacity-50'
+              }`}
+            />
           </div>
           
           <span className="text-xs font-medium text-dark-text-tertiary flex-shrink-0">
@@ -81,39 +134,6 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
         </div>
 
         <div className="flex items-center gap-2 lg:gap-3 justify-end" style={{ width: '35%' }}>
-          <div className="flex items-center gap-1.5 lg:gap-2">
-            <span className="text-xs font-medium text-dark-text-tertiary whitespace-nowrap">
-              方块:
-            </span>
-            <input
-              type="number"
-              min="1"
-              max={MAX_PIECE_COUNT}
-              value={inputValue}
-              onChange={handleInputChange}
-              className={`w-10 lg:w-12 h-6 text-xs text-center bg-dark-elevated rounded border transition-all duration-200 ${
-                isAtMax 
-                  ? 'border-apple-orange text-apple-orange font-medium' 
-                  : 'border-dark-separator text-dark-text-primary focus:border-apple-blue focus:outline-none'
-              } ${showWarning ? 'animate-pulse' : ''}`}
-            />
-            <input
-              type="range"
-              min="1"
-              max={MAX_PIECE_COUNT}
-              value={pieceCount}
-              onChange={handleSliderChange}
-              className={`w-12 lg:w-16 h-1 rounded-full appearance-none cursor-pointer ${
-                isAtMax ? 'accent-apple-orange' : 'accent-apple-blue bg-dark-elevated'
-              }`}
-            />
-            {isAtMax && (
-              <span className="text-xs text-apple-orange font-medium hidden lg:inline">
-                MAX
-              </span>
-            )}
-          </div>
-
           <button
             onClick={() => selectedPiece && onDelete(selectedPiece)}
             disabled={!selectedPiece}
@@ -155,13 +175,7 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
         </div>
       </div>
       
-      {showWarning && (
-        <div className="text-xs text-apple-orange text-center mt-1 animate-pulse">
-          方块数量已达到最大值 {MAX_PIECE_COUNT}
-        </div>
-      )}
-      
-      <div className={`text-xs text-dark-text-quaternary text-center mt-1 xl:hidden ${showWarning ? 'hidden' : ''}`}>
+      <div className="text-xs text-dark-text-quaternary text-center mt-1 xl:hidden">
         <span className="px-2 py-1 bg-dark-elevated rounded">
           {isPuzzleMode 
             ? '触摸绘制 | 双击旋转 | 点击颜色改色' 
