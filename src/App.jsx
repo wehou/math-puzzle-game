@@ -102,16 +102,11 @@ function App() {
   useEffect(() => {
     if (isFreeDrawMode) return
     
-    const counts = new Set(pieces.map(p => p.shape.length))
-    
-    for (const count of counts) {
-      if (checkAllCombinationsComplete(pieces, count)) {
-        setCompletedBlockCount(count)
-        setShowCelebration(true)
-        break
-      }
+    if (checkAllCombinationsComplete(pieces, pieceCount)) {
+      setCompletedBlockCount(pieceCount)
+      setShowCelebration(true)
     }
-  }, [pieces, isFreeDrawMode])
+  }, [pieces, isFreeDrawMode, pieceCount])
 
   const getNextColor = useCallback(() => {
     for (let i = 0; i < COLORS.length; i++) {
