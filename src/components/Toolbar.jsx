@@ -1,11 +1,50 @@
+import { useState, useEffect } from 'react'
 import { COLORS } from '../utils/colors'
 
+const MAX_PIECE_COUNT = 10
+
 function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor, onArrange }) {
+  const [inputValue, setInputValue] = useState(pieceCount.toString())
+  const [showWarning, setShowWarning] = useState(false)
+
+  useEffect(() => {
+    setInputValue(pieceCount.toString())
+  }, [pieceCount])
+
   const handleColorClick = (colorValue) => {
     if (selectedPiece) {
       onChangeColor(selectedPiece, colorValue)
     }
   }
+
+  const handleInputChange = (e) => {
+    const value = e.target.value
+    setInputValue(value)
+    
+    const numValue = parseInt(value)
+    if (!isNaN(numValue)) {
+      if (numValue > MAX_PIECE_COUNT) {
+        setPieceCount(MAX_PIECE_COUNT)
+        setInputValue(MAX_PIECE_COUNT.toString())
+        setShowWarning(true)
+        setTimeout(() => setShowWarning(false), 2000)
+      } else if (numValue >= 1) {
+        setPieceCount(numValue)
+        setShowWarning(false)
+      }
+    }
+  }
+
+  const handleSliderChange = (e) => {
+    const value = parseInt(e.target.value)
+    setPieceCount(value)
+    setInputValue(value.toString())
+    if (value < MAX_PIECE_COUNT) {
+      setShowWarning(false)
+    }
+  }
+
+  const isAtMax = pieceCount === MAX_PIECE_COUNT
 
   return (
     <div className="toolbar-container">
@@ -34,18 +73,37 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
         </div>
 
         <div className="flex items-center gap-2 lg:gap-3 justify-end" style={{ width: '30%' }}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 lg:gap-2">
             <span className="text-xs font-medium text-dark-text-tertiary whitespace-nowrap">
-              方块: {pieceCount}
+              方块:
             </span>
+            <input
+              type="number"
+              min="1"
+              max={MAX_PIECE_COUNT}
+              value={inputValue}
+              onChange={handleInputChange}
+              className={`w-10 lg:w-12 h-6 text-xs text-center bg-dark-elevated rounded border transition-all duration-200 ${
+                isAtMax 
+                  ? 'border-apple-orange text-apple-orange font-medium' 
+                  : 'border-dark-separator text-dark-text-primary focus:border-apple-blue focus:outline-none'
+              } ${showWarning ? 'animate-pulse' : ''}`}
+            />
             <input
               type="range"
               min="1"
-              max="25"
+              max={MAX_PIECE_COUNT}
               value={pieceCount}
-              onChange={(e) => setPieceCount(parseInt(e.target.value))}
-              className="w-16 lg:w-20 h-1 bg-dark-elevated rounded-full appearance-none cursor-pointer accent-apple-blue"
+              onChange={handleSliderChange}
+              className={`w-12 lg:w-16 h-1 rounded-full appearance-none cursor-pointer ${
+                isAtMax ? 'accent-apple-orange' : 'accent-apple-blue bg-dark-elevated'
+              }`}
             />
+            {isAtMax && (
+              <span className="text-xs text-apple-orange font-medium hidden lg:inline">
+                MAX
+              </span>
+            )}
           </div>
 
           <button
@@ -84,7 +142,13 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
         </div>
       </div>
       
-      <div className="text-xs text-dark-text-quaternary text-center mt-1 xl:hidden">
+      {showWarning && (
+        <div className="text-xs text-apple-orange text-center mt-1 animate-pulse">
+          方块数量已达到最大值 {MAX_PIECE_COUNT}
+        </div>
+      )}
+      
+      <div className={`text-xs text-dark-text-quaternary text-center mt-1 xl:hidden ${showWarning ? 'hidden' : ''}`}>
         <span className="px-2 py-1 bg-dark-elevated rounded">
           触摸绘制 | 双击旋转 | 点击颜色改色
         </span>

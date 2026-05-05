@@ -6,14 +6,8 @@ function getGridDimensions(pieceCount) {
   let width
   if (pieceCount <= 5) {
     width = 20
-  } else if (pieceCount <= 10) {
-    width = 25
-  } else if (pieceCount <= 15) {
-    width = 30
-  } else if (pieceCount <= 20) {
-    width = 35
   } else {
-    width = 30
+    width = 25
   }
   return { width, height: width * 2 }
 }
