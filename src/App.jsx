@@ -6,6 +6,52 @@ import CelebrationDialog from './components/CelebrationDialog'
 import { COLORS } from './utils/colors'
 import { checkAllCombinationsComplete, countUniqueShapes } from './utils/shapes'
 
+function getGridDimensions(pieceCount) {
+  let width
+  if (pieceCount <= 5) {
+    width = 20
+  } else if (pieceCount <= 10) {
+    width = 25
+  } else if (pieceCount <= 15) {
+    width = 30
+  } else if (pieceCount <= 20) {
+    width = 35
+  } else {
+    width = 30
+  }
+  return { width, height: width * 2 }
+}
+
+function getShapeBounds(shape) {
+  let minX = Infinity, maxX = -Infinity
+  let minY = Infinity, maxY = -Infinity
+  shape.forEach(([x, y]) => {
+    minX = Math.min(minX, x)
+    maxX = Math.max(maxX, x)
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y)
+  })
+  return { minX, maxX, minY, maxY, width: maxX - minX + 1, height: maxY - minY + 1 }
+}
+
+function isShapeSymmetric(shape) {
+  const bounds = getShapeBounds(shape)
+  const centerX = (bounds.minX + bounds.maxX) / 2
+  const centerY = (bounds.minY + bounds.maxY) / 2
+  
+  const hasVerticalSymmetry = shape.every(([x, y]) => {
+    const mirrorX = 2 * centerX - x
+    return shape.some(([sx, sy]) => Math.abs(sx - mirrorX) < 0.01 && sy === y)
+  })
+  
+  const hasHorizontalSymmetry = shape.every(([x, y]) => {
+    const mirrorY = 2 * centerY - y
+    return shape.some(([sx, sy]) => sx === x && Math.abs(sy - mirrorY) < 0.01)
+  })
+  
+  return hasVerticalSymmetry || hasHorizontalSymmetry
+}
+
 function App() {
   const [pieces, setPieces] = useState([])
   const [selectedPiece, setSelectedPiece] = useState(null)
@@ -13,6 +59,8 @@ function App() {
   const [colorIndex, setColorIndex] = useState(0)
   const [showCelebration, setShowCelebration] = useState(false)
   const [completedBlockCount, setCompletedBlockCount] = useState(null)
+
+  const gridDimensions = useMemo(() => getGridDimensions(pieceCount), [pieceCount])
 
   const usedColors = useMemo(() => {
     const colors = new Set()
@@ -89,15 +137,16 @@ function App() {
   }, [])
 
   const movePiece = useCallback((pieceId, dx, dy) => {
+    const { width, height } = gridDimensions
     setPieces(prev => prev.map(p => {
       if (p.id === pieceId) {
-        const newX = Math.max(0, Math.min(19, p.x + dx))
-        const newY = Math.max(0, Math.min(29, p.y + dy))
+        const newX = Math.max(0, Math.min(width - 1, p.x + dx))
+        const newY = Math.max(0, Math.min(height - 1, p.y + dy))
         return { ...p, x: newX, y: newY }
       }
       return p
     }))
-  }, [])
+  }, [gridDimensions])
 
   const deletePiece = useCallback((pieceId) => {
     setPieces(prev => prev.filter(p => p.id !== pieceId))
@@ -128,6 +177,81 @@ function App() {
     setColorIndex(0)
   }, [])
 
+  const arrangePieces = useCallback(() => {
+    if (pieces.length === 0) return
+    
+    const { width, height } = gridDimensions
+    
+    const sortedPieces = [...pieces].sort((a, b) => b.shape.length - a.shape.length)
+    
+    const symmetricPieces = []
+    const asymmetricPieces = []
+    
+    sortedPieces.forEach(piece => {
+      if (isShapeSymmetric(piece.shape)) {
+        symmetricPieces.push(piece)
+      } else {
+        asymmetricPieces.push(piece)
+      }
+    })
+    
+    const arrangedPieces = []
+    let currentX = 0
+    let currentY = 0
+    let rowHeight = 0
+    
+    const placePiece = (piece) => {
+      const bounds = getShapeBounds(piece.shape)
+      const pieceWidth = bounds.width
+      const pieceHeight = bounds.height
+      
+      if (currentX + pieceWidth > width) {
+        currentX = 0
+        currentY += rowHeight + 1
+        rowHeight = 0
+      }
+      
+      if (currentY + pieceHeight > height) {
+        return null
+      }
+      
+      const newPiece = {
+        ...piece,
+        x: currentX,
+        y: currentY,
+        rotation: 0
+      }
+      
+      currentX += pieceWidth + 1
+      rowHeight = Math.max(rowHeight, pieceHeight)
+      
+      return newPiece
+    }
+    
+    let i = 0
+    while (i < symmetricPieces.length) {
+      const piece = symmetricPieces[i]
+      const placed = placePiece(piece)
+      if (placed) arrangedPieces.push(placed)
+      i++
+      
+      if (i < symmetricPieces.length) {
+        const nextPiece = symmetricPieces[i]
+        const nextPlaced = placePiece(nextPiece)
+        if (nextPlaced) arrangedPieces.push(nextPlaced)
+        i++
+      }
+    }
+    
+    asymmetricPieces.forEach(piece => {
+      const placed = placePiece(piece)
+      if (placed) arrangedPieces.push(placed)
+    })
+    
+    setPieces(arrangedPieces)
+    setSelectedPiece(null)
+  }, [pieces, gridDimensions])
+
   return (
     <div className="w-full h-screen bg-dark-bg flex flex-col overflow-hidden">
       <Toolbar
@@ -139,6 +263,7 @@ function App() {
         selectedPiece={selectedPiece}
         onDelete={deletePiece}
         onChangeColor={changePieceColor}
+        onArrange={arrangePieces}
       />
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <div className="flex-1 flex items-center justify-center overflow-hidden">

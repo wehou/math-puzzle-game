@@ -1,6 +1,6 @@
 import { COLORS } from '../utils/colors'
 
-function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor }) {
+function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear, selectedPiece, onDelete, onChangeColor, onArrange }) {
   const handleColorClick = (colorValue) => {
     if (selectedPiece) {
       onChangeColor(selectedPiece, colorValue)
@@ -33,7 +33,7 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
           </div>
         </div>
 
-        <div className="flex items-center gap-3 justify-end" style={{ width: '30%' }}>
+        <div className="flex items-center gap-2 lg:gap-3 justify-end" style={{ width: '30%' }}>
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-dark-text-tertiary whitespace-nowrap">
               方块: {pieceCount}
@@ -44,14 +44,22 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
               max="25"
               value={pieceCount}
               onChange={(e) => setPieceCount(parseInt(e.target.value))}
-              className="w-20 h-1 bg-dark-elevated rounded-full appearance-none cursor-pointer accent-apple-blue"
+              className="w-16 lg:w-20 h-1 bg-dark-elevated rounded-full appearance-none cursor-pointer accent-apple-blue"
             />
           </div>
 
           <button
+            onClick={onArrange}
+            className="px-2 lg:px-3 py-1 text-xs font-medium text-white bg-apple-green rounded-lg hover:opacity-90 transition-opacity flex-shrink-0"
+            title="自动整理画布上的图形"
+          >
+            整理
+          </button>
+
+          <button
             onClick={() => selectedPiece && onDelete(selectedPiece)}
             disabled={!selectedPiece}
-            className={`px-3 py-1 text-xs font-medium rounded-lg transition-opacity flex-shrink-0 ${
+            className={`px-2 lg:px-3 py-1 text-xs font-medium rounded-lg transition-opacity flex-shrink-0 ${
               selectedPiece 
                 ? 'text-white bg-apple-orange hover:opacity-90' 
                 : 'text-dark-text-quaternary bg-dark-elevated cursor-not-allowed'
@@ -63,7 +71,7 @@ function Toolbar({ currentColor, pieceCount, setPieceCount, usedColors, onClear,
 
           <button
             onClick={onClear}
-            className="px-3 py-1 text-xs font-medium text-white bg-apple-red rounded-lg hover:opacity-90 transition-opacity flex-shrink-0"
+            className="px-2 lg:px-3 py-1 text-xs font-medium text-white bg-apple-red rounded-lg hover:opacity-90 transition-opacity flex-shrink-0"
           >
             清空
           </button>
