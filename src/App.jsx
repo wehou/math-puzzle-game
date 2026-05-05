@@ -8,16 +8,16 @@ import { checkAllCombinationsComplete, countUniqueShapes, countAllPieces } from 
 
 const LG_BREAKPOINT = 1024
 
-function getGridDimensions(pieceCount, isDesktop) {
-  if (isDesktop) {
-    if (pieceCount <= 5) {
+function getGridDimensions(isPuzzleMode, isDesktop) {
+  if (isPuzzleMode) {
+    if (isDesktop) {
       return { width: 40, height: 20 }
     } else {
-      return { width: 50, height: 25 }
+      return { width: 20, height: 40 }
     }
   } else {
-    if (pieceCount <= 5) {
-      return { width: 20, height: 40 }
+    if (isDesktop) {
+      return { width: 50, height: 25 }
     } else {
       return { width: 25, height: 50 }
     }
@@ -75,7 +75,7 @@ function App() {
     return () => window.removeEventListener('resize', checkDesktop)
   }, [])
 
-  const gridDimensions = useMemo(() => getGridDimensions(pieceCount, isDesktop), [pieceCount, isDesktop])
+  const gridDimensions = useMemo(() => getGridDimensions(isPuzzleMode, isDesktop), [isPuzzleMode, isDesktop])
 
   const usedColors = useMemo(() => {
     const colors = new Set()
