@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>贴瓷砖小工匠 · 数学趣味游戏</title>
+<style>
+  :root{
+    --bg:#f4ede0;--paper:#fffaf2;--ink:#2b2620;--muted:#7a6f60;--line:#d9cdb8;
+    --accent:#c8472b;--accent2:#1f7a5a;--accent3:#d9a441;--tile-edge:#b9ad95;
+    --wall:#e8dcc4;--wall-edge:#a8956f;--grid-line:#c4b08a;
+    --shadow:0 10px 30px rgba(60,40,20,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:radial-gradient(circle at 20% 10%,#fff5e2 0,transparent 40%),radial-gradient(circle at 80% 90%,#f0e4cf 0,transparent 45%),var(--bg);
+    color:var(--ink);min-height:100vh;padding:14px 16px 40px;overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;touch-action:manipulation;
+  }
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#e87354);display:grid;place-items:center;color:#fff;font-size:24px;box-shadow:0 8px 20px rgba(200,71,43,.35);transform:rotate(-6deg)}
+  .title h1{font-size:22px;letter-spacing:.5px;font-weight:800}
+  .title p{font-size:12px;color:var(--muted);margin-top:2px}
+  .stats{display:flex;gap:8px;flex-wrap:wrap}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:7px 12px;min-width:84px;box-shadow:var(--shadow)}
+  .stat .k{font-size:10px;color:var(--muted)}
+  .stat .v{font-size:16px;font-weight:700;color:var(--ink);margin-top:2px}
+  .stat .v small{font-size:10px;color:var(--muted);font-weight:500;margin-left:2px}
+  .stat.accent .v{color:var(--accent)}
+  .stat.green .v{color:var(--accent2)}
+  .stat.gold .v{color:#b5821e}
+
+  main{display:grid;grid-template-columns:260px 1fr 260px;grid-template-rows:auto;gap:14px}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px;position:relative}
+  .panel h2{font-size:13px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .panel h2::before{content:"";width:6px;height:14px;border-radius:3px;background:var(--accent)}
+
+  .controls{grid-column:1;grid-row:1}
+  .field{margin-bottom:12px}
+  .field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink);margin-bottom:6px;font-weight:600}
+  .field label .hint{font-size:11px;color:var(--muted);font-weight:400}
+  .field input[type=number]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:15px;background:#fff;color:var(--ink);transition:.2s}
+  .field input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,71,43,.15)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .btn{padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 6px 14px rgba(200,71,43,.3)}
+  .btn.primary:hover,.btn.primary:active{transform:translateY(-1px);box-shadow:0 8px 18px rgba(200,71,43,.4)}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn.ghost:hover,.btn.ghost:active{background:var(--line)}
+
+  .wall-area{grid-column:2;grid-row:1}
+  .wall-wrap{position:relative;background:repeating-linear-gradient(45deg,#e0d3b8 0 8px,#e6dac0 8px 16px);border:3px solid var(--wall-edge);border-radius:10px;padding:18px 14px 14px;min-height:380px;display:flex;justify-content:center;align-items:center;overflow:auto}
+  .wall{position:relative;background-color:var(--wall);background-image:linear-gradient(to right,var(--grid-line) 1px,transparent 1px),linear-gradient(to bottom,var(--grid-line) 1px,transparent 1px);background-size:var(--cell) var(--cell);border:2px solid var(--wall-edge);transition:width .4s ease,height .4s ease;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);touch-action:none;overflow:visible}
+  .wall::before,.wall::after{position:absolute;font-size:11px;color:var(--ink);font-weight:700;background:var(--paper);padding:2px 6px;border-radius:4px;border:1px solid var(--line);white-space:nowrap;z-index:10}
+  .wall::before{content:attr(data-w-label);top:-14px;left:50%;transform:translateX(-50%)}
+  .wall::after{content:attr(data-h-label);left:-14px;top:50%;transform:translate(-100%,-50%) rotate(-90deg);transform-origin:right center;white-space:nowrap}
+
+  .tile-on-wall{position:absolute;background:linear-gradient(135deg,#fbf6ea,#efe6d2);border:1.5px solid var(--tile-edge);border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.08),inset 0 0 0 2px rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);animation:dropIn .35s cubic-bezier(.34,1.56,.64,1);cursor:grab;transition:box-shadow .15s;z-index:3}
+  .tile-on-wall:hover{box-shadow:0 4px 10px rgba(0,0,0,.18);z-index:5}
+  .tile-on-wall.dragging{cursor:grabbing;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:.85}
+  .tile-on-wall.cut-piece{background:linear-gradient(135deg,#fde9c8,#f5d49a);border-color:#c9952f}
+  .tile-on-wall .lbl{background:rgba(255,255,255,.88);padding:1px 5px;border-radius:3px;font-size:10px;color:#5a4a30;font-weight:600;pointer-events:none}
+  @keyframes dropIn{0%{opacity:0;transform:translateY(-18px) scale(.6) rotate(-8deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+
+  /* 切割闪光动画 - 切割线沿两端延伸 */
+  .cut-flash{position:absolute;z-index:30;pointer-events:none;background:rgba(200,71,43,.7);box-shadow:0 0 8px rgba(200,71,43,.8);animation:cutFlash .6s ease-out forwards}
+  .cut-flash.cut-line-v{width:3px}
+  .cut-flash.cut-line-h{height:3px}
+  @keyframes cutFlash{0%{opacity:1;transform:scale(1.1)}40%{opacity:.9}100%{opacity:0;transform:scale(1)}}
+
+  /* 数学公式面板 */
+  .formula-panel{grid-column:1 / span 3}
+  .formula-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .formula-card{background:linear-gradient(135deg,#fffaf2,#f7eed9);border:1px solid var(--line);border-radius:10px;padding:10px 12px;position:relative;overflow:hidden}
+  .formula-card .fc-title{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+  .formula-card .fc-title::before{content:"";width:4px;height:12px;border-radius:2px;background:var(--accent2)}
+  .formula-card .fc-expr{font-size:12px;color:var(--ink);line-height:1.5}
+  .formula-card .fc-expr b{color:var(--accent);font-weight:700}
+  .formula-card .fc-val{font-size:16px;font-weight:800;color:var(--accent2);margin-top:6px;background:#fff;padding:4px 8px;border-radius:6px;display:inline-block;border:1px solid var(--line)}
+  .formula-card.highlight{background:linear-gradient(135deg,#fff5e2,#fde9c8);border-color:#c9952f}
+  .formula-card.highlight .fc-val{color:#b5821e}
+  .formula-card.highlight .fc-title::before{background:var(--accent3)}
+  .formula-empty{grid-column:1 / span 4;text-align:center;color:var(--muted);font-size:13px;padding:20px}
+
+  .snap-preview{position:absolute;background:rgba(200,71,43,.15);border:2px dashed var(--accent);border-radius:2px;pointer-events:none;z-index:4;transition:left .06s,top .06s;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);font-weight:700}
+  .snap-preview.invalid{background:rgba(180,40,40,.12);border-color:#a02020;color:#a02020}
+  .wall-center-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,250,242,.92);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ink);pointer-events:none;text-align:center;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:1}
+  .wall-center-label .area{font-size:16px;color:var(--accent);font-weight:800}
+  .wall-toolbar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+  .wall-toolbar .info{font-size:12px;color:var(--muted);margin-left:auto}
+
+  .selected-bar{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#fff5e2,#fde9c8);border:1px solid #c9952f;border-radius:10px;padding:6px 10px;font-size:12px;color:#5a4a30}
+  .selected-bar .mini-tile{background:linear-gradient(135deg,#fbf6ea,#efe6d2);border:1px solid var(--tile-edge);border-radius:3px;display:grid;place-items:center;font-size:9px;color:var(--muted);flex-shrink:0}
+  .selected-bar .meta{flex:1;line-height:1.4}
+  .selected-bar .meta b{color:var(--ink)}
+  .icon-btn{width:36px;height:36px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;font-size:16px;display:grid;place-items:center;transition:.2s;flex-shrink:0}
+  .icon-btn:hover,.icon-btn:active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+  .icon-btn.rot{transition:transform .4s}
+  .icon-btn.rot.spin{transform:rotate(360deg)}
+
+  .tile-area{grid-column:3;grid-row:1}
+  .tile-stack{display:flex;flex-direction:column;gap:10px;max-height:520px;overflow-y:auto;padding-right:4px}
+  .tile-stack::-webkit-scrollbar{width:6px}
+  .tile-stack::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+  .tile-item{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:.2s;position:relative}
+  .tile-item:hover,.tile-item:active{border-color:var(--accent);transform:translateX(2px);box-shadow:0 4px 10px rgba(0,0,0,.08)}
+  .tile-item.selected{border-color:var(--accent2);background:#f0f8f4;box-shadow:0 0 0 2px rgba(31,122,90,.25)}
+  .tile-item.fragment{border-left:3px solid var(--accent3)}
+  .tile-visual{background:linear-gradient(135deg,#fbf6ea,#efe6d2);border:1px solid var(--tile-edge);border-radius:3px;flex-shrink:0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4);display:grid;place-items:center;font-size:9px;color:var(--muted)}
+  .tile-visual.fragment-vis{background:linear-gradient(135deg,#fde9c8,#f5d49a);border-color:#c9952f}
+  .tile-meta{flex:1;font-size:12px;min-width:0}
+  .tile-meta .n{font-weight:700;color:var(--ink)}
+  .tile-meta .d{color:var(--muted);font-size:11px;margin-top:1px}
+  .tile-count{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;min-width:24px;text-align:center}
+  .tile-count.frag-cnt{background:var(--accent3);color:#2b2620}
+  .tile-count.inf-cnt{background:var(--accent2)}
+  .tile-empty{text-align:center;color:var(--muted);font-size:12px;padding:30px 10px}
+
+  .calc-bar{grid-column:1 / span 3;background:linear-gradient(135deg,#2b2620,#3d342a);color:#fff;border-radius:16px;padding:16px 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:14px;box-shadow:var(--shadow)}
+  .calc-item .k{font-size:10px;color:#c9bba3;letter-spacing:1px;text-transform:uppercase}
+  .calc-item .v{font-size:20px;font-weight:800;margin-top:4px}
+  .calc-item .v small{font-size:10px;color:#c9bba3;font-weight:500;margin-left:3px}
+  .calc-item .f{font-size:10px;color:#9a8b73;margin-top:2px}
+  .calc-item.highlight .v{color:var(--accent3)}
+
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.34,1.56,.64,1);z-index:1000;max-width:86vw;text-align:center}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.success{background:var(--accent2)}
+  .toast.warn{background:var(--accent3);color:#2b2620}
+  .toast.error{background:var(--accent)}
+
+  @media(max-width:1100px){main{grid-template-columns:1fr}.controls{grid-column:1;grid-row:auto;order:1}.wall-area{grid-column:1;grid-row:auto;order:2}.tile-area{grid-column:1;grid-row:auto;order:3}.calc-bar{grid-column:1;grid-template-columns:repeat(3,1fr);order:4}.formula-panel{grid-column:1;order:5}.formula-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.calc-bar{grid-template-columns:repeat(2,1fr);padding:14px}.calc-item .v{font-size:17px}body{padding:10px}.title h1{font-size:19px}.stat{min-width:72px;padding:6px 10px}.stat .v{font-size:14px}.wall-wrap{min-height:300px;padding:22px 12px 12px}.icon-btn{width:40px;height:40px;font-size:18px}.btn{padding:13px;font-size:14px}.tile-item{padding:12px}.formula-grid{grid-template-columns:1fr}.formula-card .fc-val{font-size:14px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><div class="logo">🧱</div><div class="title"><h1>贴瓷砖小工匠</h1><p>Tile Master · 沿墙面边框自动切割</p></div></div>
+  <div class="stats">
+    <div class="stat accent"><div class="k">已铺瓷砖</div><div class="v" id="stat-placed">0<small>块</small></div></div>
+    <div class="stat green"><div class="k">覆盖率</div><div class="v" id="stat-cover">0<small>%</small></div></div>
+    <div class="stat gold"><div class="k">零碎瓷砖</div><div class="v" id="stat-frag">0<small>块</small></div></div>
+  </div>
+</header>
+
+<main>
+  <section class="panel controls">
+    <h2>参数设置</h2>
+    <div class="field">
+      <label>墙面尺寸 <span class="hint">单位：分米 dm</span></label>
+      <div class="row2"><input type="number" id="wall-w" value="20" min="1" max="40" step="1"><input type="number" id="wall-h" value="30" min="1" max="40" step="1"></div>
+    </div>
+    <div class="field">
+      <label>瓷砖尺寸 <span class="hint">单位：分米 dm · 无限供应</span></label>
+      <div class="row2"><input type="number" id="tile-w" value="2" min="1" max="10" step="0.5"><input type="number" id="tile-h" value="2" min="1" max="10" step="0.5"></div>
+    </div>
+    <div class="actions"><button class="btn primary" id="btn-auto">一键铺贴</button><button class="btn ghost" id="btn-reset">清空墙面</button></div>
+    <div class="actions" style="margin-top:8px"><button class="btn ghost" id="btn-solve">显示答案</button></div>
+  </section>
+
+  <section class="panel wall-area">
+    <h2>墙面区 · Wall（1格=1dm）</h2>
+    <div class="wall-wrap">
+      <div class="wall" id="wall" data-w-label="" data-h-label="">
+        <div class="snap-preview" id="snap-preview" style="display:none"></div>
+        <div class="wall-center-label" id="wall-center">面积 <span class="area" id="wall-area-val">0</span> dm²</div>
+      </div>
+    </div>
+    <div class="wall-toolbar" id="wall-toolbar">
+      <div class="selected-bar" id="selected-bar" style="display:none">
+        <div class="mini-tile" id="sel-mini"></div>
+        <div class="meta" id="sel-meta"></div>
+        <button class="icon-btn rot" id="btn-rotate" title="旋转90°">⟳</button>
+        <button class="icon-btn" id="btn-cancel-sel" title="取消选择">✕</button>
+      </div>
+      <span class="info" id="wall-info">提示：点墙面铺贴；超出墙面沿边框自动切割；拖动可移动</span>
+    </div>
+  </section>
+
+  <section class="panel tile-area">
+    <h2>瓷砖区 · Tiles</h2>
+    <div class="tile-stack" id="tile-stack"></div>
+  </section>
+
+  <section class="calc-bar">
+    <div class="calc-item"><div class="k">墙面面积</div><div class="v" id="c-wall">0 <small>dm²</small></div><div class="f">长 × 宽</div></div>
+    <div class="calc-item"><div class="k">单块瓷砖面积</div><div class="v" id="c-tile">0 <small>dm²</small></div><div class="f">长 × 宽</div></div>
+    <div class="calc-item highlight"><div class="k">理论所需块数</div><div class="v" id="c-need">0 <small>块</small></div><div class="f">墙面 ÷ 瓷砖（向上取整）</div></div>
+    <div class="calc-item"><div class="k">已用整砖</div><div class="v" id="c-used">0 <small>块</small></div><div class="f">整砖铺贴</div></div>
+    <div class="calc-item"><div class="k">零碎瓷砖</div><div class="v" id="c-frag">0 <small>块</small></div><div class="f">切割回收可用</div></div>
+    <div class="calc-item highlight"><div class="k">利用率</div><div class="v" id="c-rate">0 <small>%</small></div><div class="f">已铺 ÷ 墙面</div></div>
+  </section>
+
+  <section class="panel formula-panel">
+    <h2>数学公式 · Formulas（贴砖时动态计算）</h2>
+    <div class="formula-grid" id="formula-grid">
+      <div class="formula-empty">开始贴瓷砖后，此处显示横向/纵向铺贴的数学公式</div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============== 状态 ============== */
+const state = {
+  wall:{w:16,h:12},
+  tile:{w:2,h:2},       // 当前瓷砖尺寸（无限供应）
+  fragments:[],          // {id,w,h,used} 切割产生的零碎瓷砖（有限）
+  placed:[],             // {id,x,y,w,h,isCut} 墙上的瓷砖
+  nextId:1,
+  selectedType:'tile',   // 'tile'=当前整砖, 'fragment'=某个零碎id
+  selectedFragmentId:null,
+  rotated:false,         // 当前整砖是否旋转
+  wastedArea:0,
+};
+let SCALE = 26;
+
+const $ = id=>document.getElementById(id);
+const wall = $('wall');
+const tileStack = $('tile-stack');
+const toastEl = $('toast');
+const snapPreview = $('snap-preview');
+
+function toast(msg,type='info'){
+  toastEl.textContent=msg;toastEl.className='toast show '+type;
+  clearTimeout(toast._t);toast._t=setTimeout(()=>toastEl.className='toast',2200);
+}
+function fmt(n){return Math.abs(n-Math.round(n))<0.001?Math.round(n):n.toFixed(2).replace(/\.?0+$/,'')}
+
+/* 适配屏幕分辨率：短边10-20格，按屏幕宽高比确定长边 */
+function adaptWallSize(){
+  const sw=window.innerWidth, sh=window.innerHeight;
+  const aspect=sw/sh; // 屏幕宽高比
+  // 短边格数：手机10格，平板/桌面14-18格
+  let shortCells;
+  if(sw<600) shortCells=10;
+  else if(sw<1100) shortCells=14;
+  else shortCells=16;
+  shortCells=Math.max(10,Math.min(20,shortCells));
+  let longCells=Math.round(shortCells*aspect);
+  longCells=Math.max(12,Math.min(30,longCells));
+  if(aspect>=1){
+    // 横屏：宽>高
+    state.wall.w=longCells;
+    state.wall.h=shortCells;
+  }else{
+    // 竖屏：高>宽
+    state.wall.w=shortCells;
+    state.wall.h=longCells;
+  }
+  $('wall-w').value=state.wall.w;
+  $('wall-h').value=state.wall.h;
+}
+
+function computeScale(){
+  const wrap=document.querySelector('.wall-wrap');
+  const availW=wrap?wrap.clientWidth-40:600;
+  const availH=Math.max(window.innerHeight-380,240);
+  let s=Math.min(availW/state.wall.w,availH/state.wall.h,42);
+  s=Math.max(10,Math.floor(s));SCALE=s;
+  document.documentElement.style.setProperty('--cell',SCALE+'px');
+}
+
+/* 当前选中的瓷砖实际尺寸（考虑旋转） */
+function getSelectedSize(){
+  if(state.selectedType==='fragment'){
+    const f=state.fragments.find(f=>f.id===state.selectedFragmentId);
+    return f?{w:f.w,h:f.h}:{w:state.tile.w,h:state.tile.h};
+  }
+  return state.rotated?{w:state.tile.h,h:state.tile.w}:{w:state.tile.w,h:state.tile.h};
+}
+
+/* ============== 沿墙面边框线切割 ============== */
+/* 瓷砖超出墙面时，沿墙面的右边框线(x=W)和底边框线(y=H)切割
+   切割线沿瓷砖两端延伸：
+   - 仅右超出 → 1刀竖切 → 2部分（左内 + 右外）
+   - 仅底超出 → 1刀横切 → 2部分（上内 + 下外）
+   - 右+底超出 → 2刀（一竖一横） → 4部分（左上内 + 右上外 + 左下外 + 右下外角）*/
+function cutAlongWall(tileX,tileY,tileW,tileH){
+  const W=state.wall.w, H=state.wall.h;
+  const rightCut = (tileX < W - 0.001) && (tileX + tileW > W + 0.001);  // 需要在 x=W 处竖切
+  const bottomCut = (tileY < H - 0.001) && (tileY + tileH > H + 0.001); // 需要在 y=H 处横切
+
+  const pieces=[]; // {x,y,w,h,inside}
+  if(!rightCut && !bottomCut){
+    // 无需切割，整块在墙内
+    pieces.push({x:tileX,y:tileY,w:tileW,h:tileH,inside:true});
+  }else if(rightCut && !bottomCut){
+    // 1刀竖切 → 2部分
+    pieces.push({x:tileX,y:tileY,w:W-tileX,h:tileH,inside:true});        // 左（墙内）
+    pieces.push({x:W,y:tileY,w:tileX+tileW-W,h:tileH,inside:false});    // 右（墙外）
+  }else if(!rightCut && bottomCut){
+    // 1刀横切 → 2部分
+    pieces.push({x:tileX,y:tileY,w:tileW,h:H-tileY,inside:true});        // 上（墙内）
+    pieces.push({x:tileX,y:H,w:tileW,h:tileY+tileH-H,inside:false});    // 下（墙外）
+  }else{
+    // 2刀（一竖一横） → 4部分
+    const inW=W-tileX, inH=H-tileY;
+    const outW=tileX+tileW-W, outH=tileY+tileH-H;
+    pieces.push({x:tileX,y:tileY,w:inW,h:inH,inside:true});    // 左上（墙内）
+    pieces.push({x:W,y:tileY,w:outW,h:inH,inside:false});      // 右上（墙外）
+    pieces.push({x:tileX,y:H,w:inW,h:outH,inside:false});      // 左下（墙外）
+    pieces.push({x:W,y:H,w:outW,h:outH,inside:false});         // 右下角（墙外）
+  }
+
+  const inside=pieces.find(p=>p.inside);
+  const outside=pieces.filter(p=>!p.inside);
+
+  // 墙外部分：≥1×1 的回收为零碎瓷砖，<1×1 的计入浪费
+  const recycled=[];
+  let wasteArea=0;
+  outside.forEach(p=>{
+    if(p.w>=1 && p.h>=1){
+      recycled.push({w:p.w,h:p.h});
+    }else{
+      wasteArea+=p.w*p.h;
+    }
+  });
+
+  const cutCount = (rightCut?1:0) + (bottomCut?1:0);
+  return {inside:{w:inside.w,h:inside.h}, recycled, wasteArea, cutCount, rightCut, bottomCut};
+}
+
+/* ============== 渲染墙面 ============== */
+function renderWall(){
+  computeScale();
+  const w=state.wall.w*SCALE, h=state.wall.h*SCALE;
+  wall.style.width=w+'px';wall.style.height=h+'px';
+  wall.style.backgroundSize=SCALE+'px '+SCALE+'px';
+  wall.setAttribute('data-w-label',`宽 ${fmt(state.wall.w)} dm`);
+  wall.setAttribute('data-h-label',`高 ${fmt(state.wall.h)} dm`);
+
+  wall.querySelectorAll('.tile-on-wall,.cut-flash').forEach(e=>e.remove());
+
+  state.placed.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='tile-on-wall'+(p.isCut?' cut-piece':'');
+    el.style.left=(p.x*SCALE)+'px';el.style.top=(p.y*SCALE)+'px';
+    el.style.width=(p.w*SCALE)+'px';el.style.height=(p.h*SCALE)+'px';
+    el.dataset.pid=p.id;
+    const lbl=document.createElement('span');lbl.className='lbl';
+    lbl.textContent=`${fmt(p.w)}×${fmt(p.h)}`;
+    el.appendChild(lbl);
+    wall.appendChild(el);
+  });
+  $('wall-area-val').textContent=fmt(state.wall.w*state.wall.h);
+}
+
+/* ============== 渲染瓷砖区 ============== */
+function renderTiles(){
+  tileStack.innerHTML='';
+
+  // 当前整砖（无限供应）
+  const sz=getSelectedSize();
+  const isTileSelected=state.selectedType==='tile';
+  const item=document.createElement('div');
+  item.className='tile-item'+(isTileSelected?' selected':'');
+  const vis=document.createElement('div');
+  vis.className='tile-visual';
+  const vw=Math.min(54,sz.w*SCALE/1.5),vh=Math.min(54,sz.h*SCALE/1.5);
+  vis.style.width=vw+'px';vis.style.height=vh+'px';
+  vis.textContent=`${fmt(sz.w)}×${fmt(sz.h)}`;
+  const meta=document.createElement('div');meta.className='tile-meta';
+  meta.innerHTML=`<div class="n">${fmt(sz.w)} × ${fmt(sz.h)} dm</div><div class="d">面积 ${(sz.w*sz.h).toFixed(2)} dm² · 无限</div>`;
+  const cnt=document.createElement('div');
+  cnt.className='tile-count inf-cnt';cnt.textContent='∞';
+  item.appendChild(vis);item.appendChild(meta);item.appendChild(cnt);
+  item.addEventListener('click',()=>{state.selectedType='tile';state.selectedFragmentId=null;renderAll();});
+  tileStack.appendChild(item);
+
+  // 零碎瓷砖
+  const fragGroups={};
+  state.fragments.forEach(f=>{
+    if(f.used)return;
+    const k=`${f.w}x${f.h}`;
+    if(!fragGroups[k])fragGroups[k]={w:f.w,h:f.h,count:0,ids:[]};
+    fragGroups[k].count++;fragGroups[k].ids.push(f.id);
+  });
+  Object.keys(fragGroups).forEach(k=>{
+    const g=fragGroups[k];
+    const fi=document.createElement('div');
+    fi.className='tile-item fragment';
+    if(state.selectedType==='fragment'&&g.ids.includes(state.selectedFragmentId))fi.classList.add('selected');
+    const fvis=document.createElement('div');
+    fvis.className='tile-visual fragment-vis';
+    const fvw=Math.min(54,g.w*SCALE/1.5),fvh=Math.min(54,g.h*SCALE/1.5);
+    fvis.style.width=fvw+'px';fvis.style.height=fvh+'px';
+    fvis.textContent=`${fmt(g.w)}×${fmt(g.h)}`;
+    const fmeta=document.createElement('div');fmeta.className='tile-meta';
+    fmeta.innerHTML=`<div class="n">${fmt(g.w)} × ${fmt(g.h)} dm</div><div class="d">面积 ${(g.w*g.h).toFixed(2)} dm² · 零碎</div>`;
+    const fcnt=document.createElement('div');
+    fcnt.className='tile-count frag-cnt';fcnt.textContent='×'+g.count;
+    fi.appendChild(fvis);fi.appendChild(fmeta);fi.appendChild(fcnt);
+    fi.addEventListener('click',()=>{state.selectedType='fragment';state.selectedFragmentId=g.ids[0];renderAll();});
+    tileStack.appendChild(fi);
+  });
+}
+
+function renderSelectedBar(){
+  const bar=$('selected-bar');
+  const sz=getSelectedSize();
+  bar.style.display='flex';
+  const mini=$('sel-mini');
+  // mini-tile 尺寸：旋转时宽高互换，并添加视觉旋转
+  const baseW=Math.min(40,sz.w*SCALE/1.5),baseH=Math.min(40,sz.h*SCALE/1.5);
+  mini.style.width=baseW+'px';
+  mini.style.height=baseH+'px';
+  // 视觉旋转动画
+  if(state.selectedType==='tile'&&state.rotated){
+    mini.style.transform='rotate(90deg)';
+  }else{
+    mini.style.transform='none';
+  }
+  mini.textContent=`${fmt(sz.w)}×${fmt(sz.h)}`;
+  const isFrag=state.selectedType==='fragment';
+  const rotHint=(state.selectedType==='tile'&&state.rotated)?' · 已旋转90°':'';
+  $('sel-meta').innerHTML=`已选：<b>${fmt(sz.w)} × ${fmt(sz.h)} dm</b><br>面积 ${(sz.w*sz.h).toFixed(2)} dm²${isFrag?' · 零碎':' · 整砖∞'}${rotHint}`;
+}
+
+function renderStats(){
+  const wallArea=state.wall.w*state.wall.h;
+  const tileArea=state.tile.w*state.tile.h;
+  const need=Math.ceil(wallArea/tileArea);
+  const placedCount=state.placed.length;
+  const placedArea=state.placed.reduce((s,p)=>s+p.w*p.h,0);
+  const cover=wallArea>0?(placedArea/wallArea*100):0;
+  const usedWhole=state.placed.filter(p=>!p.isCut).length;
+  const fragAvail=state.fragments.filter(f=>!f.used).length;
+
+  $('stat-placed').innerHTML=placedCount+'<small>块</small>';
+  $('stat-cover').innerHTML=cover.toFixed(1)+'<small>%</small>';
+  $('stat-frag').innerHTML=fragAvail+'<small>块</small>';
+
+  $('c-wall').innerHTML=fmt(wallArea)+' <small>dm²</small>';
+  $('c-tile').innerHTML=fmt(tileArea)+' <small>dm²</small>';
+  $('c-need').innerHTML=need+' <small>块</small>';
+  $('c-used').innerHTML=usedWhole+' <small>块</small>';
+  $('c-frag').innerHTML=fragAvail+' <small>块</small>';
+  $('c-rate').innerHTML=cover.toFixed(1)+' <small>%</small>';
+}
+
+function renderFormulas(){
+  const grid=$('formula-grid');
+  if(state.placed.length===0){
+    grid.innerHTML='<div class="formula-empty">开始贴瓷砖后，此处显示横向/纵向铺贴的数学公式</div>';
+    return;
+  }
+  const W=state.wall.w,H=state.wall.h;
+  const sz=getSelectedSize();
+  const tw=sz.w, th=sz.h;
+
+  // 计算已贴范围（前沿）
+  let maxX=0,maxY=0;
+  state.placed.forEach(p=>{
+    maxX=Math.max(maxX,Math.min(p.x+p.w,W));
+    maxY=Math.max(maxY,Math.min(p.y+p.h,H));
+  });
+
+  // 统计第一行（顶部）和第一列（左侧）的瓷砖数，判断主铺贴方向
+  const firstRow=state.placed.filter(p=>p.y<0.5).length;
+  const firstCol=state.placed.filter(p=>p.x<0.5).length;
+  const isHorizontal=firstRow>=firstCol; // 横向铺贴为主
+
+  // 横向分析（沿宽度 W）
+  const placedW=maxX, remainW=W-placedW;
+  const needX=Math.ceil(W/tw);
+  const placedX=Math.max(0,Math.round(placedW/tw));
+  const remainX=Math.max(0,needX-placedX);
+
+  // 纵向分析（沿高度 H）
+  const placedH=maxY, remainH=H-placedH;
+  const needY=Math.ceil(H/th);
+  const placedY=Math.max(0,Math.round(placedH/th));
+  const remainY=Math.max(0,needY-placedY);
+
+  // 已贴面积 = 横向个数 × 竖向个数 × 单块面积
+  const placedArea=placedX*placedY*tw*th;
+  const tileArea=tw*th;
+
+  // 主方向参数
+  const dirLabel=isHorizontal?'横向（沿宽度）':'纵向（沿高度）';
+  const wallLen=isHorizontal?W:H;
+  const placedLen=isHorizontal?placedW:placedH;
+  const remainLen=isHorizontal?remainW:remainH;
+  const tileSide=isHorizontal?tw:th;
+  const needCount=isHorizontal?needX:needY;
+  const placedCount=isHorizontal?placedX:placedY;
+  const remainCount=isHorizontal?remainX:remainY;
+
+  grid.innerHTML=`
+    <div class="formula-card">
+      <div class="fc-title">① 未贴瓷砖长度（${dirLabel}）</div>
+      <div class="fc-expr">墙面长度 − 已贴瓷砖长度<br><b>${fmt(wallLen)}</b> − <b>${fmt(placedLen)}</b></div>
+      <div class="fc-val">= ${fmt(remainLen)} dm</div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-title">② 需要瓷砖个数</div>
+      <div class="fc-expr">墙面长度 ÷ 瓷砖${isHorizontal?'宽':'高'}度<br><b>${fmt(wallLen)}</b> ÷ <b>${fmt(tileSide)}</b> = ${(wallLen/tileSide).toFixed(2)}</div>
+      <div class="fc-val">= ${needCount} 块（向上取整）</div>
+    </div>
+    <div class="formula-card">
+      <div class="fc-title">③ 剩余瓷砖个数</div>
+      <div class="fc-expr">需要个数 − 已贴个数<br><b>${needCount}</b> − <b>${placedCount}</b></div>
+      <div class="fc-val">= ${remainCount} 块</div>
+    </div>
+    <div class="formula-card highlight">
+      <div class="fc-title">④ 已贴瓷砖面积</div>
+      <div class="fc-expr">横向个数 × 竖向个数 × 单块面积<br><b>${placedX}</b> × <b>${placedY}</b> × <b>${fmt(tileArea)}</b></div>
+      <div class="fc-val">= ${fmt(placedArea)} dm²</div>
+    </div>
+  `;
+}
+
+function renderAll(){renderWall();renderTiles();renderStats();renderSelectedBar();renderFormulas();}
+
+/* ============== 旋转 ============== */
+function rotateSelected(){
+  if(state.selectedType==='fragment'){
+    // 零碎瓷砖：直接交换选中碎片的宽高
+    const f=state.fragments.find(f=>f.id===state.selectedFragmentId);
+    if(f){const t=f.w;f.w=f.h;f.h=t;}
+  }else{
+    // 整砖：切换旋转状态（长宽互换）
+    state.rotated=!state.rotated;
+  }
+  const btn=$('btn-rotate');btn.classList.remove('spin');void btn.offsetWidth;btn.classList.add('spin');
+  renderAll();
+  const sz=getSelectedSize();
+  toast(`已旋转 → ${fmt(sz.w)} × ${fmt(sz.h)} dm`,'success');
+}
+
+/* ============== 墙面交互 ============== */
+function getWallPos(cx,cy){const r=wall.getBoundingClientRect();return{x:(cx-r.left)/SCALE,y:(cy-r.top)/SCALE};}
+
+function snapPos(x,y,tw,th){
+  let px=Math.round(x-tw/2),py=Math.round(y-th/2);
+  const minIn=Math.min(tw,th)/3;
+  if(px+tw-minIn<0)px=-tw+Math.round(minIn);
+  if(py+th-minIn<0)py=-th+Math.round(minIn);
+  if(px+minIn>state.wall.w)px=state.wall.w-Math.round(minIn);
+  if(py+minIn>state.wall.h)py=state.wall.h-Math.round(minIn);
+  return{px,py};
+}
+
+function checkOverlap(px,py,tw,th,excludeId){
+  const W=state.wall.w,H=state.wall.h;
+  // 只检查墙内部分是否重叠
+  const ax1=Math.max(px,0),ay1=Math.max(py,0);
+  const ax2=Math.min(px+tw,W),ay2=Math.min(py+th,H);
+  if(ax2<=ax1||ay2<=ay1)return false;
+  return state.placed.some(p=>{
+    if(p.id===excludeId)return false;
+    const bx1=p.x,by1=p.y,bx2=p.x+p.w,by2=p.y+p.h;
+    return ax1<bx2-0.001&&ax2>bx1+0.001&&ay1<by2-0.001&&ay2>by1+0.001;
+  });
+}
+
+function showSnapPreview(cx,cy){
+  if(dragState.dragging){snapPreview.style.display='none';return;}
+  const sz=getSelectedSize();
+  const{x,y}=getWallPos(cx,cy);const{px,py}=snapPos(x,y,sz.w,sz.h);
+  if(x<-1||x>state.wall.w+1||y<-1||y>state.wall.h+1){snapPreview.style.display='none';return;}
+  const overlap=checkOverlap(px,py,sz.w,sz.h,null);
+  const overX=px+sz.w-state.wall.w,overY=py+sz.h-state.wall.h;
+  const hasOverflow=overX>0.001||overY>0.001;
+  const cutCount=(overX>0.001?1:0)+(overY>0.001?1:0);
+  const visW=Math.min(sz.w,state.wall.w-px),visH=Math.min(sz.h,state.wall.h-py);
+  snapPreview.style.display='block';
+  snapPreview.style.left=(px*SCALE)+'px';snapPreview.style.top=(py*SCALE)+'px';
+  snapPreview.style.width=(visW*SCALE)+'px';snapPreview.style.height=(visH*SCALE)+'px';
+  snapPreview.classList.toggle('invalid',overlap||(visW<=0||visH<=0));
+  snapPreview.textContent=hasOverflow?`${fmt(sz.w)}×${fmt(sz.h)} → 切${cutCount}刀`:`${fmt(sz.w)}×${fmt(sz.h)}`;
+}
+
+/* ============== 自动选择瓷砖 ============== */
+/* 铺贴后自动选中上一次使用的瓷砖：
+   - 整砖：无限供应，继续选中
+   - 零碎瓷砖：优先同尺寸 → 旋转同尺寸 → 剩余中面积最大 → 回退整砖 */
+function autoSelectTile(lastType,lastW,lastH){
+  if(lastType==='tile'){
+    // 整砖无限供应，保持选中整砖
+    state.selectedType='tile';
+    state.selectedFragmentId=null;
+    return;
+  }
+  // 零碎瓷砖：优先找同尺寸的
+  let f=state.fragments.find(f=>!f.used && Math.abs(f.w-lastW)<0.001 && Math.abs(f.h-lastH)<0.001);
+  if(f){state.selectedType='fragment';state.selectedFragmentId=f.id;return;}
+  // 旋转后同尺寸
+  f=state.fragments.find(f=>!f.used && Math.abs(f.w-lastH)<0.001 && Math.abs(f.h-lastW)<0.001);
+  if(f){state.selectedType='fragment';state.selectedFragmentId=f.id;return;}
+  // 从剩余零碎瓷砖中选面积最大的
+  const avail=state.fragments.filter(f=>!f.used).sort((a,b)=>(b.w*b.h)-(a.w*a.h));
+  if(avail.length>0){state.selectedType='fragment';state.selectedFragmentId=avail[0].id;return;}
+  // 没有零碎瓷砖了，回退到整砖
+  state.selectedType='tile';
+  state.selectedFragmentId=null;
+}
+
+/* ============== 铺贴 + 沿边框切割 ============== */
+function placeAt(cx,cy){
+  const sz=getSelectedSize();
+  const{x,y}=getWallPos(cx,cy);const{px,py}=snapPos(x,y,sz.w,sz.h);
+  if(checkOverlap(px,py,sz.w,sz.h,null)){toast('该位置已被占用','error');return;}
+  const visW=Math.min(sz.w,state.wall.w-px),visH=Math.min(sz.h,state.wall.h-py);
+  if(visW<=0.001||visH<=0.001){toast('瓷砖完全在墙面外','error');return;}
+
+  // 记录铺贴前选中的类型和尺寸
+  const lastType=state.selectedType;
+  const lastW=sz.w, lastH=sz.h;
+
+  // 如果是零碎瓷砖，标记已用
+  const isFrag=state.selectedType==='fragment';
+  if(isFrag){
+    const f=state.fragments.find(f=>f.id===state.selectedFragmentId);
+    if(!f||f.used){toast('该零碎瓷砖已用完','error');return;}
+    f.used=true;
+  }
+
+  // 沿墙面边框线切割
+  const cutResult=cutAlongWall(px,py,sz.w,sz.h);
+  const hasOverflow=cutResult.recycled.length>0||cutResult.wasteArea>0.001;
+
+  // 墙内部分上墙
+  const isCut=hasOverflow||isFrag;
+  state.placed.push({id:state.nextId++,x:px,y:py,w:cutResult.inside.w,h:cutResult.inside.h,isCut});
+
+  // 切割动画：沿切割线显示闪光
+  if(hasOverflow) addCutFlash(px,py,sz.w,sz.h,cutResult);
+
+  // 零碎件回收到瓷砖区
+  let cutMsg='';
+  cutResult.recycled.forEach(p=>{
+    state.fragments.push({id:state.nextId++,w:p.w,h:p.h,used:false});
+    cutMsg+=` ${fmt(p.w)}×${fmt(p.h)}`;
+  });
+  state.wastedArea+=cutResult.wasteArea;
+
+  // 自动选中上一次使用的瓷砖（同尺寸优先，用完则从剩余中选择）
+  autoSelectTile(lastType,lastW,lastH);
+
+  snapPreview.style.display='none';
+  renderAll();
+  if(cutMsg)toast(`切${cutResult.cutCount}刀，回收：${cutMsg.trim()}`,'success');
+  checkComplete();
+}
+
+/* 切割闪光：切割线沿瓷砖两端延伸 */
+function addCutFlash(tileX,tileY,tileW,tileH,cutResult){
+  const W=state.wall.w,H=state.wall.h;
+  if(cutResult.rightCut){
+    // 竖切线 at x=W，沿瓷砖全高延伸
+    const fl=document.createElement('div');fl.className='cut-flash cut-line-v';
+    fl.style.left=(W*SCALE-1.5)+'px';
+    fl.style.top=(tileY*SCALE)+'px';
+    fl.style.height=(tileH*SCALE)+'px';
+    wall.appendChild(fl);
+  }
+  if(cutResult.bottomCut){
+    // 横切线 at y=H，沿瓷砖全宽延伸
+    const fl=document.createElement('div');fl.className='cut-flash cut-line-h';
+    fl.style.top=(H*SCALE-1.5)+'px';
+    fl.style.left=(tileX*SCALE)+'px';
+    fl.style.width=(tileW*SCALE)+'px';
+    wall.appendChild(fl);
+  }
+}
+
+function removePlaced(pid){
+  const p=state.placed.find(p=>p.id===pid);if(!p)return;
+  if(p.isCut){
+    // 切割件移除 → 回收到零碎瓷砖区
+    state.fragments.push({id:state.nextId++,w:p.w,h:p.h,used:false});
+  }
+  state.placed=state.placed.filter(x=>x.id!==pid);renderAll();
+}
+
+/* ============== 拖动 ============== */
+const dragState={dragging:false,placedId:null,startCX:0,startCY:0,origX:0,origY:0,origW:0,origH:0,moved:false};
+
+function startDrag(pid,cx,cy){
+  const p=state.placed.find(p=>p.id===pid);if(!p)return;
+  dragState.dragging=true;dragState.placedId=pid;
+  dragState.startCX=cx;dragState.startCY=cy;
+  dragState.origX=p.x;dragState.origY=p.y;dragState.origW=p.w;dragState.origH=p.h;
+  dragState.moved=false;
+  const el=wall.querySelector(`[data-pid="${pid}"]`);if(el)el.classList.add('dragging');
+}
+
+function moveDrag(cx,cy){
+  if(!dragState.dragging)return;
+  const dx=(cx-dragState.startCX)/SCALE,dy=(cy-dragState.startCY)/SCALE;
+  if(Math.abs(dx)>0.3||Math.abs(dy)>0.3)dragState.moved=true;
+  const p=state.placed.find(p=>p.id===dragState.placedId);if(!p)return;
+  const newX=Math.round(dragState.origX+dx),newY=Math.round(dragState.origY+dy);
+  const minIn=Math.min(p.w,p.h)/3;
+  p.x=Math.max(-p.w+Math.round(minIn),Math.min(newX,state.wall.w-Math.round(minIn)));
+  p.y=Math.max(-p.h+Math.round(minIn),Math.min(newY,state.wall.h-Math.round(minIn)));
+  renderWall();
+  const el=wall.querySelector(`[data-pid="${dragState.placedId}"]`);if(el)el.classList.add('dragging');
+}
+
+function endDrag(cx,cy){
+  if(!dragState.dragging)return;
+  const p=state.placed.find(p=>p.id===dragState.placedId);
+  if(!p){dragState.dragging=false;return;}
+  if(!dragState.moved){dragState.dragging=false;removePlaced(p.id);return;}
+
+  if(checkOverlap(p.x,p.y,p.w,p.h,p.id)){
+    p.x=dragState.origX;p.y=dragState.origY;
+    toast('该位置已被占用','error');dragState.dragging=false;renderAll();return;
+  }
+
+  // 检查是否超出墙面 → 沿边框重新切割
+  const overX=p.x+p.w-state.wall.w, overY=p.y+p.h-state.wall.h;
+  if(overX>0.001||overY>0.001){
+    // 重新切割
+    const cutResult=cutAlongWall(p.x,p.y,p.w,p.h);
+    addCutFlash(p.x,p.y,p.w,p.h,cutResult);
+    // 回收零碎件
+    cutResult.recycled.forEach(pc=>{
+      state.fragments.push({id:state.nextId++,w:pc.w,h:pc.h,used:false});
+    });
+    state.wastedArea+=cutResult.wasteArea;
+    p.w=cutResult.inside.w;p.h=cutResult.inside.h;p.isCut=true;
+    if(cutResult.recycled.length>0){
+      toast(`切${cutResult.cutCount}刀，回收 ${cutResult.recycled.length} 块`,'success');
+    }
+  }
+
+  // 完全拖出墙外
+  const visW=Math.min(p.w,state.wall.w-p.x),visH=Math.min(p.h,state.wall.h-p.y);
+  if(visW<=0.001||visH<=0.001){
+    removePlaced(p.id);toast('瓷砖已移出墙面，已回收','info');dragState.dragging=false;return;
+  }
+
+  dragState.dragging=false;renderAll();checkComplete();
+}
+
+/* ============== 墙面事件 ============== */
+wall.addEventListener('mousedown',e=>{
+  const tileEl=e.target.closest('.tile-on-wall');
+  if(tileEl){const pid=parseInt(tileEl.dataset.pid);if(!isNaN(pid)){startDrag(pid,e.clientX,e.clientY);e.preventDefault();}return;}
+  placeAt(e.clientX,e.clientY);
+});
+wall.addEventListener('mousemove',e=>{
+  if(dragState.dragging){moveDrag(e.clientX,e.clientY);return;}
+  showSnapPreview(e.clientX,e.clientY);
+});
+wall.addEventListener('mouseup',e=>{if(dragState.dragging){endDrag(e.clientX,e.clientY);return;}});
+wall.addEventListener('mouseleave',()=>{if(!dragState.dragging)snapPreview.style.display='none';});
+
+wall.addEventListener('touchstart',e=>{
+  const t=e.touches[0];const el=document.elementFromPoint(t.clientX,t.clientY);
+  const tw=el?el.closest('.tile-on-wall'):null;
+  if(tw){const pid=parseInt(tw.dataset.pid);if(!isNaN(pid)){startDrag(pid,t.clientX,t.clientY);e.preventDefault();return;}}
+  showSnapPreview(t.clientX,t.clientY);
+  e.preventDefault();
+},{passive:false});
+wall.addEventListener('touchmove',e=>{
+  const t=e.touches[0];
+  if(dragState.dragging){moveDrag(t.clientX,t.clientY);e.preventDefault();return;}
+  showSnapPreview(t.clientX,t.clientY);
+  e.preventDefault();
+},{passive:false});
+wall.addEventListener('touchend',e=>{
+  const t=e.changedTouches[0];
+  if(dragState.dragging){endDrag(t.clientX,t.clientY);e.preventDefault();return;}
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  if(el&&!el.closest('.tile-on-wall'))placeAt(t.clientX,t.clientY);
+  snapPreview.style.display='none';e.preventDefault();
+},{passive:false});
+
+/* ============== 控件 ============== */
+function syncInputs(){
+  state.wall.w=Math.max(1,Math.min(40,parseFloat($('wall-w').value)||1));
+  state.wall.h=Math.max(1,Math.min(40,parseFloat($('wall-h').value)||1));
+  state.tile.w=Math.max(0.5,Math.min(10,parseFloat($('tile-w').value)||1));
+  state.tile.h=Math.max(0.5,Math.min(10,parseFloat($('tile-h').value)||1));
+}
+['wall-w','wall-h','tile-w','tile-h'].forEach(id=>{
+  $(id).addEventListener('input',()=>{syncInputs();state.placed=[];renderAll();});
+});
+
+$('btn-reset').addEventListener('click',()=>{state.placed=[];state.fragments=[];state.wastedArea=0;state.selectedType='tile';state.selectedFragmentId=null;renderAll();toast('墙面已清空','info');});
+$('btn-auto').addEventListener('click',()=>autoLayout());
+$('btn-solve').addEventListener('click',()=>{
+  const wa=state.wall.w*state.wall.h,ta=state.tile.w*state.tile.h;
+  toast(`墙面 ${fmt(wa)} ÷ 瓷砖 ${fmt(ta)} = ${(wa/ta).toFixed(2)}，需 ${Math.ceil(wa/ta)} 块（向上取整）`,'success');
+});
+$('btn-rotate').addEventListener('click',rotateSelected);
+$('btn-cancel-sel').addEventListener('click',()=>{state.selectedType='tile';state.selectedFragmentId=null;state.rotated=false;snapPreview.style.display='none';renderAll();});
+
+/* ============== 自动铺贴 ============== */
+function autoLayout(){
+  state.placed=[];state.fragments=[];state.wastedArea=0;
+  const W=state.wall.w,H=state.wall.h,tw=state.tile.w,th=state.tile.h;
+
+  const tryLayout=(tW,tH)=>{
+    const pos=[];
+    // 整砖区域
+    const cols=Math.floor(W/tW), rows=Math.floor(H/tH);
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)pos.push({x:c*tW,y:r*tH,w:tW,h:tH,isCut:false});
+
+    // 右侧剩余
+    const rW=W-cols*tW;
+    if(rW>=1){for(let r=0;r<rows;r++)pos.push({x:cols*tW,y:r*tH,w:rW,h:tH,isCut:true});}
+    // 底部剩余
+    const rH=H-rows*tH;
+    if(rH>=1){for(let c=0;c<cols;c++)pos.push({x:c*tW,y:rows*tH,w:tW,h:rH,isCut:true});}
+    // 右下角
+    if(rW>=1&&rH>=1)pos.push({x:cols*tW,y:rows*tH,w:rW,h:rH,isCut:true});
+
+    return pos;
+  };
+
+  const hz=tryLayout(tw,th),vt=tryLayout(th,tw);
+  const cc=arr=>arr.reduce((s,p)=>s+p.w*p.h,0);
+  const best=cc(hz)>=cc(vt)?{arr:hz}:{arr:vt};
+  best.arr.forEach(p=>{state.placed.push({id:state.nextId++,...p});});
+  toast(`自动铺贴完成：${best.arr.length} 块，覆盖率 ${(cc(best.arr)/(W*H)*100).toFixed(1)}%`,'success');
+  renderAll();checkComplete();
+}
+
+function checkComplete(){
+  const wa=state.wall.w*state.wall.h;
+  const pa=state.placed.reduce((s,p)=>s+p.w*p.h,0);
+  if(Math.abs(pa-wa)<0.01&&state.placed.length>0)setTimeout(()=>toast(`🎉 完美铺贴！共用 ${state.placed.length} 块，覆盖率 100%`,'success'),300);
+}
+
+let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderWall();renderTiles();},150);});
+
+function init(){
+  adaptWallSize();       // 根据屏幕分辨率设置默认墙面尺寸
+  syncInputs();
+  state.selectedType='tile';
+  renderAll();
+  setTimeout(()=>toast(`墙面 ${state.wall.w}×${state.wall.h}，直接点墙面铺贴，超出部分沿边框自动切割`,'info'),400);
+}
+init();
+</script>
+</body>
+</html>

@@ -278,6 +278,17 @@ function App() {
 
   return (
     <div className="w-full h-screen bg-dark-bg flex flex-col overflow-hidden">
+      <nav className="flex items-center gap-4 px-4 py-2 bg-dark-card border-b border-dark-separator text-xs">
+        <a href="./calendar-math-teacher-日历数学课堂.html" className="text-dark-primary hover:text-orange-400 transition-colors" target="_blank" rel="noopener noreferrer">
+          📅 年历数学课堂
+        </a>
+        <span className="text-dark-muted">互动式年历生成教学，演示闰年判断与星期推算的数学原理</span>
+        <span className="text-dark-separator">|</span>
+        <a href="./tile-game.html" className="text-dark-primary hover:text-orange-400 transition-colors" target="_blank" rel="noopener noreferrer">
+          🔲 贴瓷砖小工匠
+        </a>
+        <span className="text-dark-muted">数学趣味拼图游戏，用方块拼出各种图形</span>
+      </nav>
       <Toolbar
         currentColor={currentColor}
         pieceCount={pieceCount}
