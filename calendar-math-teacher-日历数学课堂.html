@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="互动式年历生成教学应用 - 帮助小学生理解年历背后的数学原理">
+<title>yzh的年历数学课堂</title>
+<style>
+/* ============ 全局变量：Claude 设计风格 ============ */
+:root{
+  --bg:#FAF9F5;
+  --bg-elevated:#FFFFFF;
+  --bg-soft:#F5F4ED;
+  --bg-tint:#EFEEE5;
+  --border:#E5E2D9;
+  --border-strong:#D4D0C4;
+  --coral:#D97757;
+  --coral-deep:#C15F3F;
+  --coral-tint:#F5E6DF;
+  --text:#1F1F1F;
+  --text-soft:#3D3D3D;
+  --text-muted:#6B6B6B;
+  --text-light:#9A9A9A;
+  --accent:#2C5F5D;
+  --accent-soft:#E8EFEE;
+  --warn:#B8860B;
+  --warn-tint:#FAF3E0;
+  --positive:#4A7C59;
+  --positive-tint:#E8F0EA;
+  --negative:#B85450;
+  --shadow-sm:0 1px 2px rgba(31,31,31,.04),0 1px 3px rgba(31,31,31,.06);
+  --shadow:0 2px 8px rgba(31,31,31,.06),0 1px 3px rgba(31,31,31,.04);
+  --shadow-lg:0 8px 24px rgba(31,31,31,.08),0 2px 6px rgba(31,31,31,.04);
+  --radius:10px;
+  --radius-sm:6px;
+  --radius-lg:14px;
+  --serif:"Tiempos Text","Charter","Iowan Old Style","Apple Garamondo",Baskerville,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit;color:inherit}
+
+/* ============ 通用工具类 ============ */
+.wrap{max-width:1400px;margin:0 auto;padding:0 32px}
+@media(max-width:767px){.wrap{padding:0 20px}}
+
+.serif{font-family:var(--serif)}
+.formula{
+  background:var(--bg-soft);
+  border-left:3px solid var(--coral);
+  padding:14px 18px;
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  font-size:14px;
+  margin:12px 0;
+  color:var(--text-soft);
+}
+.koujue{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  padding:18px 24px;
+  border-radius:var(--radius);
+  font-family:var(--serif);
+  font-size:18px;
+  font-weight:500;
+  color:var(--text);
+  text-align:center;
+  letter-spacing:3px;
+  position:relative;
+}
+.koujue::before{
+  content:"";
+  position:absolute;
+  top:-1px;left:-1px;right:-1px;bottom:-1px;
+  border:1px solid var(--coral);
+  border-radius:var(--radius);
+  opacity:.3;
+  pointer-events:none;
+}
+
+/* ============ 数据表格 ============ */
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  margin:12px 0;
+  font-variant-numeric:tabular-nums;
+}
+.data-table th{
+  background:var(--bg-soft);
+  color:var(--text-muted);
+  font-weight:500;
+  padding:8px 6px;
+  text-align:center;
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+  letter-spacing:0.02em;
+}
+.data-table td{
+  padding:8px 6px;
+  text-align:center;
+  border-bottom:1px solid var(--border);
+  color:var(--text-soft);
+}
+.data-table tr.total td{
+  font-weight:500;
+  color:var(--text);
+  background:var(--bg-soft);
+}
+.data-table td.highlight{color:var(--coral);font-weight:600}
+.data-table td.pass{color:var(--positive);font-weight:600}
+.data-table td.fail{color:var(--negative);font-weight:600}
+.data-table td.na{color:var(--text-light)}
+/* 月份天数表：相同数字相同背景色 */
+.days-color-table{border:2px solid var(--border-strong)}
+.days-color-table th,.days-color-table td{border:1px solid var(--border-strong)}
+.days-color-table td.d-31{background:#E8EFEE;color:var(--accent);font-weight:600}
+.days-color-table td.d-30{background:#FAF3E0;color:var(--warn);font-weight:600}
+.days-color-table td.d-29{background:var(--coral-tint);color:var(--coral-deep);font-weight:600}
+.days-color-table td.d-28{background:var(--coral-tint);color:var(--coral-deep);font-weight:600}
+.days-color-table td.d-total{background:var(--bg-tint);color:var(--text);font-weight:700}
+.data-table .ic{
+  display:inline-block;width:18px;height:18px;
+  border-radius:50%;vertical-align:-3px;margin-right:5px;
+  font-size:11px;font-weight:700;line-height:18px;
+  text-align:center;color:#fff;font-family:var(--sans);
+  font-variant-emoji:text;
+}
+.data-table .ic-ok{background:var(--positive)}
+.data-table .ic-no{background:var(--negative)}
+
+/* ============ 顶部导航 ============ */
+.site-header{
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:18px 0;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:saturate(180%) blur(8px);
+  -webkit-backdrop-filter:saturate(180%) blur(8px);
+  background:rgba(250,249,245,.85);
+}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--serif);
+  font-size:19px;font-weight:500;letter-spacing:-0.01em;
+  color:var(--text);
+}
+.logo-mark{width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:100%;height:100%}
+.header-tag{font-size:13px;color:var(--text-muted);letter-spacing:0.02em}
+
+/* ============ Hero / 输入区 ============ */
+.input-section{padding:48px 0 24px}
+.input-card{text-align:center;max-width:640px;margin:0 auto}
+.input-card h1{
+  font-family:var(--serif);
+  font-size:36px;font-weight:400;
+  letter-spacing:-0.02em;
+  color:var(--text);
+  margin-bottom:12px;
+  line-height:1.2;
+}
+.input-card .subtitle{font-size:15px;color:var(--text-muted);margin-bottom:32px}
+.year-input-row{display:flex;align-items:stretch;gap:12px;justify-content:center;flex-wrap:wrap}
+.year-input-group{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.year-input-label{
+  font-size:12px;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:0.08em;font-weight:500;
+}
+.year-input{
+  width:260px;
+  height:64px;
+  padding:0 28px;
+  font-family:var(--serif);
+  font-size:40px;font-weight:600;
+  text-align:center;
+  border:2px solid var(--text);
+  border-radius:var(--radius);
+  background:var(--bg-elevated);
+  color:var(--text);
+  outline:none;
+  letter-spacing:0.08em;
+  font-variant-numeric:tabular-nums;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  transition:all .15s ease;
+  box-sizing:border-box;
+  flex:0 0 auto;
+  user-select:text;
+  line-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:text;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.year-input:empty::before{
+  content:attr(data-placeholder);
+  color:var(--text-muted);
+  font-weight:500;
+  letter-spacing:0.02em;
+}
+.year-input:hover{border-color:var(--text)}
+.year-input:focus{border-color:var(--coral);box-shadow:0 0 0 3px rgba(217,119,87,.12)}
+.year-input.error{border-color:var(--coral-deep);background:#FDF5F2}
+.err-tip{color:var(--coral-deep);font-size:13px;min-height:20px;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* 按钮系统 */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 20px;border-radius:var(--radius);
+  font-size:14px;font-weight:500;
+  transition:all .15s ease;user-select:none;white-space:nowrap;letter-spacing:0.01em;
+}
+.btn:active{transform:translateY(0.5px)}
+.btn-primary{background:var(--coral);color:#fff;height:56px;padding:0 28px;font-size:15px}
+.btn-primary:hover{background:var(--coral-deep)}
+.btn-secondary{background:var(--text);color:var(--bg);height:56px;padding:0 28px;font-size:15px}
+.btn-secondary:hover{background:#000}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border-strong)}
+.btn-ghost:hover{background:var(--bg-soft);border-color:var(--text-muted)}
+.btn-sm{padding:6px 12px;font-size:13px;height:32px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ============ 主体布局 ============ */
+.main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);
+  gap:32px;
+  padding:24px 0 48px;
+  align-items:start;
+}
+/* 窄屏下取消sticky，避免内容重叠 */
+@media(max-width:1280px){
+  .main-grid{grid-template-columns:1fr;gap:24px}
+  .steps-section{position:static!important;top:auto!important}
+  .step-content{min-height:auto!important}
+}
+
+/* ============ 通用卡片 ============ */
+.card{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.card-header{padding:24px 28px 16px;border-bottom:1px solid var(--border)}
+.card-header h2{font-family:var(--serif);font-size:22px;font-weight:500;letter-spacing:-0.01em;color:var(--text)}
+.card-header .subtitle{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+/* ============ 步骤演示区 ============ */
+.steps-section{position:sticky;top:88px}
+.steps-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);overflow-x:auto}
+.step-tab{
+  flex:1;min-width:auto;padding:14px 8px;
+  font-size:13px;font-weight:500;color:var(--text-muted);
+  background:transparent;border:none;border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.step-tab:hover{color:var(--text)}
+.step-tab.active{color:var(--coral);border-bottom-color:var(--coral)}
+.step-tab .tab-num{
+  display:inline-flex;width:18px;height:18px;border-radius:50%;
+  border:1px solid currentColor;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;margin-right:6px;vertical-align:-2px;
+}
+.step-tab.active .tab-num{background:var(--coral);border-color:var(--coral);color:#fff}
+
+.step-content{padding:28px;min-height:420px}
+.step-pane{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.step-title{
+  font-family:var(--serif);font-size:24px;font-weight:500;letter-spacing:-0.01em;
+  color:var(--text);margin-bottom:8px;display:flex;align-items:baseline;gap:12px;
+}
+.step-title .step-num{font-size:14px;font-weight:500;color:var(--coral);font-family:var(--sans);letter-spacing:0.1em}
+.step-desc{font-size:15px;color:var(--text-soft);margin:12px 0;line-height:1.7}
+.step-desc b{color:var(--text);font-weight:600}
+.step-result{
+  background:var(--positive-tint);color:var(--positive);
+  padding:14px 18px;border-radius:var(--radius);
+  font-weight:500;font-size:14px;margin:16px 0;
+  border:1px solid rgba(74,124,89,.2);
+  text-align:center;
+}
+
+/* 步骤控制条 */
+.step-controls{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 28px;border-top:1px solid var(--border);background:var(--bg-soft);
+}
+.step-controls .nav-group{display:flex;gap:8px;align-items:center}
+.progress-dots{display:flex;gap:4px;margin:0 8px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border-strong);transition:all .3s}
+.dot.active{background:var(--coral);width:20px;border-radius:3px}
+.auto-badge{font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+
+/* ============ 闰年教学 ============ */
+.leap-conclusion{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding:24px 24px;border-radius:var(--radius);margin:8px 0 4px;
+  border:2px solid var(--border-strong);text-align:center;
+}
+.leap-conclusion.common{background:var(--accent-soft);border-color:var(--accent)}
+.leap-conclusion.leap{background:var(--coral-tint);border-color:var(--coral)}
+.leap-conclusion .lc-type{
+  font-family:var(--serif);font-size:32px;font-weight:500;letter-spacing:0.05em;
+  line-height:1;
+}
+.leap-conclusion.common .lc-type{color:var(--accent)}
+.leap-conclusion.leap .lc-type{color:var(--coral)}
+.leap-conclusion .lc-detail{font-size:16px;color:var(--text-soft);line-height:1.5}
+.leap-conclusion .lc-detail b{color:var(--text);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.leap-calc{background:var(--bg-soft);border-radius:var(--radius);padding:18px 20px;margin:14px 0}
+.leap-calc-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px;flex-wrap:wrap}
+.leap-calc-row .num{
+  display:inline-flex;min-width:36px;height:32px;align-items:center;justify-content:center;
+  background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+  padding:0 8px;font-family:var(--serif);font-weight:500;color:var(--text);font-variant-numeric:tabular-nums;
+}
+.op{color:var(--text-muted);font-size:14px;font-weight:400}
+.verdict-yes{color:var(--positive);font-weight:500}
+.verdict-no{color:var(--coral-deep);font-weight:500}
+
+/* ============ 基准日期 ============ */
+.today-card{background:var(--bg-soft);border-radius:var(--radius);padding:20px;text-align:center;margin:14px 0}
+.today-card .today-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500}
+.today-card .today-date{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--text);margin:4px 0;letter-spacing:-0.01em}
+.today-card .today-weekday{font-size:14px;color:var(--coral);font-weight:500}
+
+.month-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:14px 0}
+.month-thumb{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-size:11px}
+.month-thumb.current{border-color:var(--coral);background:var(--coral-tint)}
+.month-thumb .mt-title{font-family:var(--serif);font-weight:500;color:var(--text);text-align:center;margin-bottom:6px;font-size:13px}
+.month-thumb .mt-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;font-size:9px;text-align:center;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.month-thumb .mt-grid div{padding:2px 0}
+.month-thumb .mt-grid div.today{background:var(--coral);color:#fff;border-radius:2px;font-weight:500}
+
+/* ============ 7进制动画 ============ */
+.modulo-viz{
+  background:var(--bg-soft);border-radius:var(--radius);padding:20px;margin:14px 0;
+}
+.mv-equation{
+  text-align:center;font-family:var(--serif);font-size:18px;
+  color:var(--text-soft);margin-bottom:16px;
+}
+.mv-equation b{color:var(--text);font-weight:600}
+.mv-week-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.mv-wl{text-align:center;font-size:11px;color:var(--text-muted);font-weight:500}
+.mv-slots{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
+.mv-slot{
+  aspect-ratio:1;max-width:48px;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg-elevated);font-size:13px;font-weight:500;
+  color:var(--text-muted);transition:all .15s;
+  font-variant-numeric:tabular-nums;
+}
+.mv-slot.filled{background:var(--text);color:var(--bg);border-color:var(--text)}
+.mv-slot.clearing{opacity:.2;transform:scale(.9)}
+.mv-slot.remainder{background:var(--coral);color:#fff;border-color:var(--coral);transform:scale(1.08)}
+.mv-status{display:flex;justify-content:center;gap:24px;font-size:14px;color:var(--text-soft)}
+.mv-status b{color:var(--coral);font-weight:600;font-variant-numeric:tabular-nums}
+.mv-hint{font-size:12px;color:var(--text-muted);text-align:center;margin-top:10px}
+
+/* ============ 目标年1月1日 ============ */
+.timeline{display:flex;align-items:center;gap:6px;padding:14px 0;overflow-x:auto;flex-wrap:nowrap}
+.timeline-node{
+  min-width:60px;padding:10px 8px;border-radius:var(--radius-sm);text-align:center;
+  font-size:11px;font-weight:500;background:var(--bg-elevated);border:1px solid var(--border);
+  flex-shrink:0;font-variant-numeric:tabular-nums;
+}
+.timeline-node.start{background:var(--text);color:var(--bg);border-color:var(--text)}
+.timeline-node.end{background:var(--coral);color:#fff;border-color:var(--coral)}
+.timeline-node .tn-year{font-family:var(--serif);font-size:13px;font-weight:500}
+.timeline-node .tn-type{font-size:10px;margin-top:2px;opacity:.7;text-transform:uppercase;letter-spacing:0.05em}
+.timeline-arrow{color:var(--text-light);font-size:14px;flex-shrink:0}
+
+/* count-box 左右布局 */
+.count-row{display:flex;gap:12px;justify-content:center;margin:16px 0;flex-wrap:wrap}
+.count-box{
+  display:flex;align-items:center;gap:16px;
+  background:var(--bg-elevated);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 24px;min-width:160px;
+}
+.cb-left{flex:1}
+.cb-days{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--coral);line-height:1.2}
+.cb-type{font-size:12px;color:var(--text-muted);margin-top:2px}
+.cb-divider{width:1px;height:40px;background:var(--border)}
+.cb-right{text-align:center}
+.cb-count{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--coral);line-height:1.2}
+.cb-count-label{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+.brick-stack{display:flex;flex-direction:column-reverse;align-items:center;gap:2px;margin:16px auto;max-width:280px}
+.brick{padding:7px 14px;color:#fff;font-weight:400;font-size:12px;animation:brickDrop .4s;text-align:center;width:100%;border-radius:var(--radius-sm);font-variant-numeric:tabular-nums}
+.brick.common{background:var(--text)}
+.brick.leap{background:var(--coral)}
+.brick.total{background:var(--positive)}
+@keyframes brickDrop{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.week-shift{display:flex;align-items:center;justify-content:center;gap:4px;margin:14px 0;flex-wrap:wrap;padding:16px;background:var(--bg-soft);border-radius:var(--radius)}
+.ws-day{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;background:var(--bg-elevated);border:1px solid var(--border);transition:all .3s;font-variant-numeric:tabular-nums}
+.ws-day.weekend{background:var(--bg-tint);color:var(--text-muted)}
+.ws-day.start{background:var(--text);color:var(--bg);border-color:var(--text)}
+.ws-day.target{background:var(--coral);color:#fff;border-color:var(--coral);transform:scale(1.1);box-shadow:0 2px 8px rgba(217,119,87,.3)}
+.ws-arrow{color:var(--text-light);font-size:12px}
+
+/* 方向箭头图示 */
+.shift-indicator{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  margin:12px 0 4px;padding:14px 18px;
+  background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);
+  flex-wrap:wrap;
+}
+.shift-indicator .si-day{
+  font-family:var(--serif);font-size:15px;font-weight:500;
+  padding:6px 12px;border-radius:var(--radius-sm);
+  background:var(--bg-soft);color:var(--text);
+}
+.shift-indicator .si-from{background:var(--text);color:var(--bg)}
+.shift-indicator .si-to{background:var(--coral);color:#fff}
+.shift-indicator .si-flow{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px}
+.shift-indicator .si-label{font-size:13px;color:var(--text-soft);font-weight:500}
+.shift-indicator .si-label b{color:var(--coral);font-size:16px;font-weight:600}
+.shift-indicator .si-arrow-line{
+  font-size:16px;letter-spacing:-1px;font-weight:700;
+  font-family:var(--sans);
+}
+.shift-indicator.forward .si-arrow-line{color:var(--coral)}
+.shift-indicator.backward .si-arrow-line{color:var(--accent)}
+.shift-indicator.none{padding:12px 18px}
+.shift-indicator.none .si-label{color:var(--text-muted)}
+
+/* 田字格跑马灯 - 大网格小单元格 */
+.tian-grid-wrap{
+  background:var(--bg-soft);border-radius:var(--radius);padding:18px;margin:14px 0;
+}
+.tian-status{
+  display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+  font-size:14px;color:var(--text-soft);margin-bottom:14px;
+  font-variant-numeric:tabular-nums;
+}
+.tian-status b{color:var(--coral);font-weight:600;font-size:16px}
+.tian-grid{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;
+  max-width:280px;margin:0 auto;
+}
+.tg-cell{
+  height:18px;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:500;border-radius:2px;
+  background:var(--bg-elevated);border:1px solid var(--border);
+  color:var(--text-muted);transition:all .15s;
+  font-variant-numeric:tabular-nums;
+}
+.tg-cell.active{
+  background:var(--text);color:var(--bg);border-color:var(--text);
+  transform:scale(1.1);
+}
+.tg-cell.clearing{opacity:.4;transform:scale(.8);background:var(--bg-tint)}
+.tg-cell.cleared{opacity:.15;background:var(--bg-tint);border-color:var(--border)}
+.tg-cell.remainder{
+  background:var(--coral);color:#fff;border-color:var(--coral);
+  transform:scale(1.15);
+  animation:tgBounce .4s;
+}
+@keyframes tgBounce{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.3)}100%{transform:scale(1.15);opacity:1}}
+.tian-controls{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin-top:14px;flex-wrap:wrap;
+}
+.tian-hint{font-size:12px;color:var(--text-muted)}
+
+/* 天数累加公式 */
+.days-formula{
+  background:var(--bg-soft);border-left:3px solid var(--coral);
+  padding:16px 20px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  font-family:var(--serif);font-size:16px;color:var(--text-soft);
+  text-align:center;line-height:1.8;letter-spacing:0.02em;
+  word-break:break-all;
+}
+.days-formula b{color:var(--coral);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* 月份推移表格 */
+.month-shift-table{margin:10px 0}
+.month-shift-table .demo-month-row{cursor:pointer;transition:background .15s}
+.month-shift-table .demo-month-row:hover{background:var(--coral-tint)}
+.month-shift-table .demo-month-row.selected{background:var(--coral-tint);box-shadow:inset 3px 0 0 var(--coral)}
+.month-shift-table .demo-month-row.selected td:first-child{color:var(--coral);font-weight:600}
+.month-shift-table td.highlight{color:var(--coral);font-weight:600}
+
+/* ============ 年历生成演示 ============ */
+.cal-gen-demo{background:var(--bg-soft);border-radius:var(--radius);padding:18px;margin:14px 0}
+.demo-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-width:340px;margin:10px auto}
+.demo-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;border-radius:4px;background:transparent;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.demo-cell.header{background:var(--text);color:var(--bg);font-size:11px;font-weight:500;letter-spacing:0.05em}
+.demo-cell.header.weekend{background:var(--coral)}
+.demo-cell.day{background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);animation:popIn .3s}
+.demo-cell.day.weekend{color:var(--coral)}
+.demo-cell.day.start{background:var(--coral);color:#fff;border-color:var(--coral)}
+@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+/* ============ 年历展示区 ============ */
+.cal-section{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px}
+.cal-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.cal-section-header h2{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);letter-spacing:-0.01em}
+.year-banner{text-align:center;font-family:var(--serif);font-size:32px;font-weight:400;color:var(--text);margin:8px 0 24px;letter-spacing:-0.01em}
+.year-banner .year-tag{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--coral);background:var(--coral-tint);padding:3px 10px;border-radius:20px;margin-left:10px;vertical-align:middle;letter-spacing:0.05em}
+
+/* 默认2列，宽屏3列 */
+.cal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media(min-width:1600px){.cal-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){
+  .cal-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:8px;scroll-behavior:smooth}
+  .cal-grid::-webkit-scrollbar{display:none}
+  .month-card{scroll-snap-align:center;flex:0 0 88%}
+  .swipe-dots{display:flex!important}
+}
+
+.month-card{
+  background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;transition:border-color .2s,box-shadow .2s;min-width:0;
+}
+.month-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
+.month-card.highlight{border-color:var(--coral);box-shadow:0 0 0 3px rgba(217,119,87,.15)}
+
+/* 31天 vs 其他天数 背景色区分 */
+.month-card.days-31 .mc-title{background:var(--accent-soft);border-bottom:1px solid var(--accent)}
+.month-card.days-other .mc-title{background:var(--coral-tint);border-bottom:1px solid var(--coral)}
+
+.mc-title{
+  color:var(--text);padding:10px 12px;text-align:center;
+  font-family:var(--serif);font-weight:500;font-size:14px;letter-spacing:0.02em;
+  background:var(--bg-soft);border-bottom:1px solid var(--border);
+}
+.mc-title .leap-tag{display:inline-block;font-family:var(--sans);background:var(--coral);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:1px;font-weight:500;letter-spacing:0.05em}
+.mc-title .days-tag{display:inline-block;font-family:var(--sans);font-size:10px;color:var(--text-muted);margin-left:8px;font-weight:400;letter-spacing:0.02em}
+.mc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:8px;min-width:0}
+.mc-cell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:400;border-radius:4px;position:relative;
+  min-height:32px;font-variant-numeric:tabular-nums;color:var(--text);
+}
+.mc-cell.header{background:transparent;color:var(--text-muted);font-size:10px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;aspect-ratio:auto;min-height:auto;padding:6px 0}
+.mc-cell.header.weekend{color:var(--coral)}
+.mc-cell.empty{background:transparent}
+.mc-cell.day{background:var(--bg-soft)}
+.mc-cell.day.weekend{color:var(--coral)}
+.mc-cell.day.today{background:var(--coral);color:#fff;font-weight:600}
+.mc-cell.day.has-holiday{background:var(--accent-soft)}
+.mc-cell.day.animated{animation:bounceIn .4s}
+@keyframes bounceIn{0%{opacity:0;transform:scale(.5)}60%{opacity:1;transform:scale(1.1)}100%{transform:scale(1)}}
+
+/* 上月末尾日期（前置显示，浅色） */
+.mc-cell.day.prev-month{
+  color:var(--text-light);background:transparent;
+  opacity:.5;font-weight:400;
+}
+.mc-cell.day.next-month{
+  color:var(--text-light);background:transparent;
+  opacity:.5;font-weight:400;
+}
+
+.swipe-dots{display:none;justify-content:center;gap:6px;padding:12px 0 4px}
+.swipe-dots .sd{width:6px;height:6px;border-radius:50%;background:var(--border-strong);transition:all .3s;border:none;padding:0;cursor:pointer}
+.swipe-dots .sd.active{background:var(--coral);width:20px;border-radius:3px}
+.swipe-hint{display:none;text-align:center;color:var(--text-muted);font-size:12px;padding:0 0 8px;letter-spacing:0.02em}
+@media(max-width:640px){.swipe-hint{display:block}}
+
+/* ============ 模态/浮窗 ============ */
+.modal-overlay{position:fixed;inset:0;background:rgba(31,31,31,.4);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex;animation:fadeIn .2s}
+.modal{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;max-width:480px;width:100%;box-shadow:var(--shadow-lg);animation:modalIn .25s}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal h3{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:12px;letter-spacing:-0.01em}
+.modal p{color:var(--text-soft);font-size:14px;line-height:1.7;margin-bottom:18px}
+
+/* 加载动画 */
+.loader-overlay{position:fixed;inset:0;background:rgba(250,249,245,.92);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:2000;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.loader-overlay.show{display:flex}
+.loader{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--coral);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:14px;font-weight:400;color:var(--text-muted);letter-spacing:0.02em}
+
+/* ============ 底部 ============ */
+.site-footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:13px;color:var(--text-muted);line-height:1.8}
+
+/* ============ 打印样式 ============ */
+@media print{
+  @page{size:A4 landscape;margin:6mm}
+  *{box-sizing:border-box!important}
+  html,body{width:100%;height:auto;margin:0;padding:0;background:#fff;font-size:8px;overflow:hidden}
+  .site-header,.input-section,.steps-section,.site-footer,.cal-section-header,.year-banner,.swipe-hint,.swipe-dots,.mc-connector{display:none!important}
+  .wrap{max-width:none!important;padding:0!important;margin:0!important}
+  .main-grid{display:block!important;padding:0!important;margin:0!important;gap:0!important}
+  .cal-section{border:none;padding:0;margin:0}
+  .cal-grid{grid-template-columns:repeat(4,1fr)!important;gap:2px!important;margin:0!important;padding:0!important}
+  .month-card{break-inside:avoid;border:1px solid #ccc;margin:0;padding:0}
+  .mc-grid{gap:1px!important;padding:3px!important;min-width:0}
+  .mc-cell{height:10px;font-size:5px;line-height:1;padding:0}
+  .mc-cell.header{font-size:4px;padding:1px 0;min-height:auto}
+  .mc-title{font-size:8px;padding:2px 4px;margin:0}
+  .mc-cell.day{background:#f8f8f8}
+  .mc-cell.day.today{background:#eee;color:#000}
+  .mc-cell.day.prev-month,.mc-cell.day.next-month{display:none}
+  .mc-cell.day.weekend{color:#c00}
+  .cal-grid{page-break-inside:avoid}
+  .print-logic{page-break-before:avoid;page-break-inside:avoid;margin-top:4px;padding:4px 8px;border:1px solid #ccc;border-radius:3px;background:#fafafa}
+  .print-logic-title{font-size:8px;font-weight:600;margin:0 0 2px 0;text-align:center;color:#000}
+  .print-logic-line{font-size:6px;text-align:center;margin:1px 0;color:#333;line-height:1.3}
+}
+.print-logic{display:none}
+@media print{.print-logic{display:block}}
+
+/* ============ 响应式 ============ */
+@media(max-width:767px){
+  .input-card h1{font-size:28px}
+  .year-input{width:180px;height:52px;font-size:28px;line-height:52px}
+  .step-content{padding:20px 18px;min-height:auto}
+  .step-title{font-size:20px}
+  .cal-section{padding:18px}
+  .year-banner{font-size:26px}
+  .card-header{padding:18px 20px 12px}
+  .step-controls{padding:12px 18px}
+  .btn-primary,.btn-secondary{height:48px}
+}
+
+/* 无障碍 */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+button:focus-visible,input:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<header class="site-header">
+  <div class="wrap">
+    <div class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="6" width="22" height="19" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3 11h22" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M9 3v5M19 3v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="16" r="1.2" fill="#D97757"/>
+          <circle cx="14" cy="16" r="1.2" fill="currentColor"/>
+          <circle cx="19" cy="16" r="1.2" fill="currentColor"/>
+          <circle cx="9" cy="20" r="1.2" fill="currentColor"/>
+          <circle cx="14" cy="20" r="1.2" fill="currentColor"/>
+        </svg>
+      </span>
+      <span>yzh的年历数学课堂</span>
+    </div>
+    <span class="header-tag">理解历法背后的数学</span>
+  </div>
+</header>
+
+<!-- Hero / 输入区 -->
+<section class="input-section">
+  <div class="wrap">
+    <div class="input-card">
+      <h1>探索年历中的数学</h1>
+      <p class="subtitle">输入任意年份，观察它是如何被一步步计算出来的</p>
+      <div class="year-input-row">
+        <div class="year-input" id="yearInput" contenteditable="true" inputmode="numeric" role="textbox" aria-label="请输入年份数字，负数表示公元前" data-placeholder="2026"></div>
+        <button class="btn btn-primary" id="generateBtn">生成年历</button>
+        <button class="btn btn-secondary" id="randomBtn">随机一年</button>
+      </div>
+      <div class="err-tip" id="errTip" role="alert" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 主体内容 -->
+<div class="wrap">
+  <div class="main-grid">
+
+    <!-- 步骤演示区 -->
+    <section class="steps-section" aria-label="年历数学原理分步教学">
+      <div class="card">
+        <div class="card-header">
+          <h2>数学原理</h2>
+          <div class="subtitle">四个步骤，揭开年历的算法</div>
+        </div>
+        <div class="steps-tabs" role="tablist">
+          <button class="step-tab active" data-step="0" role="tab"><span class="tab-num">1</span>推算二月天</button>
+          <button class="step-tab" data-step="1" role="tab"><span class="tab-num">2</span>推算星期几</button>
+          <button class="step-tab" data-step="2" role="tab"><span class="tab-num">3</span>目标年元旦</button>
+          <button class="step-tab" data-step="3" role="tab"><span class="tab-num">4</span>生成年历</button>
+        </div>
+        <div class="step-content" id="stepContent"></div>
+        <div class="step-controls">
+          <div class="nav-group">
+            <button class="btn btn-ghost btn-sm" id="prevBtn">上一步</button>
+            <div class="progress-dots" aria-hidden="true">
+              <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="nextBtn">下一步</button>
+          </div>
+          <div class="nav-group">
+            <button class="btn btn-ghost btn-sm" id="autoBtn">自动播放</button>
+            <span class="auto-badge" id="autoBadge"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 年历展示区 -->
+    <section class="cal-section" id="calSection" aria-label="年历展示区">
+      <div class="cal-section-header">
+        <h2>年历</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="printAllBtn">打印全部</button>
+          <button class="btn btn-ghost btn-sm" id="printPickBtn">选择月份</button>
+        </div>
+      </div>
+      <div class="year-banner" id="yearBanner">2026<span class="year-tag">平年</span></div>
+      <div class="swipe-hint">左右滑动查看各月份</div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="swipe-dots" id="swipeDots" aria-label="月份滑动指示器"></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- 底部 -->
+<footer class="site-footer">
+  <div class="wrap"><p>yzh的年历数学课堂 · 通过算法理解时间</p></div>
+</footer>
+
+<!-- 加载动画 -->
+<div class="loader-overlay" id="loaderOverlay" role="status" aria-live="polite">
+  <div class="loader"></div>
+  <div class="loader-text">正在计算</div>
+</div>
+
+<!-- 打印月份选择浮窗 -->
+<div class="modal-overlay" id="printModal" role="dialog" aria-modal="true" aria-labelledby="printTitle">
+  <div class="modal">
+    <h3 id="printTitle">选择要打印的月份</h3>
+    <p>勾选你想打印的月份，然后点击"开始打印"。</p>
+    <div id="printMonths" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" data-modal="printModal">取消</button>
+      <button class="btn btn-primary btn-sm" id="printGoBtn">开始打印</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   yzh的年历数学课堂 - 主程序
+   ============================================================ */
+(function(){
+'use strict';
+
+/* ============ 全局状态 ============ */
+var state = {
+  year: new Date().getFullYear(),
+  currentStep: 0,
+  autoPlay: false,
+  autoPlayTimer: null,
+  calendarGenerated: false,
+  moduloAnimTimer: null,
+  tianAnimTimer: null
+};
+
+var TODAY = new Date();
+var TODAY_YEAR = TODAY.getFullYear();
+var TODAY_MONTH = TODAY.getMonth();
+var TODAY_DATE = TODAY.getDate();
+var TODAY_WEEKDAY = (TODAY.getDay() + 6) % 7;
+
+var WEEK_NAMES = ['一','二','三','四','五','六','日'];
+var WEEK_FULL = ['星期一','星期二','星期三','星期四','星期五','星期六','星期日'];
+var MONTH_NAMES = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+var MONTH_DAYS_COMMON = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+var HOLIDAYS = [
+  {md:'1-1', name:'元旦'},{md:'2-14', name:'情人节'},{md:'3-8', name:'妇女节'},
+  {md:'3-12', name:'植树节'},{md:'5-1', name:'劳动节'},{md:'6-1', name:'儿童节'},
+  {md:'7-1', name:'建党节'},{md:'8-1', name:'建军节'},{md:'9-10', name:'教师节'},
+  {md:'10-1', name:'国庆节'},{md:'12-25', name:'圣诞节'}
+];
+
+/* ============ 年份显示（处理公元前） ============ */
+function yearDisplay(y){
+  if(y < 0) return '公元前 ' + Math.abs(y) + ' 年';
+  return y + ' 年';
+}
+function yearShort(y){
+  if(y < 0) return '公元前' + Math.abs(y);
+  return y + '年';
+}
+
+/* ============ 核心算法（支持负数/公元前） ============ */
+function isLeapYear(y){
+  var m4 = ((y % 4) + 4) % 4;
+  var m100 = ((y % 100) + 100) % 100;
+  var m400 = ((y % 400) + 400) % 400;
+  return (m4===0 && m100!==0) || (m400===0);
+}
+function daysInMonth(y, m){
+  if(m===1) return isLeapYear(y) ? 29 : 28;
+  return MONTH_DAYS_COMMON[m];
+}
+function jan1Weekday(y){
+  var days = 0;
+  if(y >= 1900){
+    for(var yy=1900; yy<y; yy++) days += isLeapYear(yy) ? 366 : 365;
+  } else {
+    for(var yy=y; yy<1900; yy++) days -= isLeapYear(yy) ? 366 : 365;
+  }
+  return ((days % 7) + 7) % 7;
+}
+function dateWeekday(y, m, d){
+  var days = jan1Weekday(y);
+  for(var i=0; i<m; i++) days += daysInMonth(y, i);
+  days += (d - 1);
+  return ((days % 7) + 7) % 7;
+}
+function daysBetweenJan1(fromYear, toYear){
+  var days = 0;
+  if(toYear > fromYear){
+    for(var y=fromYear; y<toYear; y++) days += isLeapYear(y) ? 366 : 365;
+  } else if(toYear < fromYear){
+    for(var y=toYear; y<fromYear; y++) days -= isLeapYear(y) ? 366 : 365;
+  }
+  return days;
+}
+function countYearTypes(fromYear, toYear){
+  var common=0, leap=0;
+  var start = Math.min(fromYear, toYear);
+  var end = Math.max(fromYear, toYear);
+  for(var y=start; y<end; y++){
+    if(isLeapYear(y)) leap++; else common++;
+  }
+  return {common:common, leap:leap};
+}
+function daysFromJan1ToToday(y){
+  if(y !== TODAY_YEAR) return null;
+  var days = 0;
+  for(var m=0; m<TODAY_MONTH; m++) days += daysInMonth(y, m);
+  days += TODAY_DATE;
+  return days;
+}
+
+/* ============ DOM 工具 ============ */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+/* ============ 输入验证（取消范围限制，支持负数） ============ */
+function validateYear(raw){
+  if(raw === '') return {ok:false, msg:'请输入年份'};
+  if(!/^-?\d+$/.test(raw)) return {ok:false, msg:'请输入整数（负数表示公元前）'};
+  var y = parseInt(raw, 10);
+  if(isNaN(y)) return {ok:false, msg:'请输入有效数字'};
+  return {ok:true, year:y};
+}
+function showErr(msg){
+  var tip = $('errTip');
+  if(msg){ tip.textContent = msg; $('yearInput').classList.add('error'); }
+  else { tip.textContent = ''; $('yearInput').classList.remove('error'); }
+}
+
+/* ============ 生成年历 ============ */
+function generateCalendar(year){
+  showLoader(true);
+  state.year = year;
+  setTimeout(function(){
+    renderCalendar(year);
+    renderStep(state.currentStep);
+    state.calendarGenerated = true;
+    showLoader(false);
+  }, 400);
+}
+function showLoader(show){ $('loaderOverlay').classList.toggle('show', show); }
+
+/* ============ 渲染年历 ============ */
+function renderCalendar(year){
+  var leap = isLeapYear(year);
+  $('yearBanner').innerHTML = yearDisplay(year) + '<span class="year-tag">' + (leap ? '闰年' : '平年') + '</span>';
+  var grid = $('calGrid');
+  grid.innerHTML = '';
+  for(var m=0; m<12; m++){
+    grid.appendChild(renderMonthCard(year, m, leap));
+  }
+  animateMonthDates(0);
+  setupSwipeDots();
+}
+
+function renderMonthCard(year, m, leap){
+  var days = daysInMonth(year, m);
+  var card = el('div', 'month-card ' + (days===31 ? 'days-31' : 'days-other'));
+  card.id = 'month-' + m;
+  var title = el('div', 'mc-title');
+  var titleHTML = MONTH_NAMES[m];
+  if(m===1 && leap) titleHTML += '<span class="leap-tag">29天</span>';
+  titleHTML += '<span class="days-tag">（'+days+'天）</span>';
+  title.innerHTML = titleHTML;
+  card.appendChild(title);
+
+  var grid = el('div', 'mc-grid');
+  // 表头
+  for(var d=0; d<7; d++){
+    var h = el('div', 'mc-cell header' + (d>=5 ? ' weekend' : ''));
+    h.textContent = WEEK_NAMES[d];
+    grid.appendChild(h);
+  }
+
+  var firstWeekday = dateWeekday(year, m, 1);
+  // 前置：上月末尾几天
+  if(firstWeekday > 0){
+    var prevM = m === 0 ? 11 : m - 1;
+    var prevY = m === 0 ? year - 1 : year;
+    var prevDays = daysInMonth(prevY, prevM);
+    for(var i = firstWeekday - 1; i >= 0; i--){
+      var prevDate = prevDays - i;
+      var pw = (firstWeekday - i - 1) % 7;
+      var pcell = el('div', 'mc-cell day prev-month' + (pw>=5 ? ' weekend' : ''));
+      pcell.textContent = prevDate;
+      grid.appendChild(pcell);
+    }
+  }
+
+  // 当月日期
+  for(var d=1; d<=days; d++){
+    var w = (firstWeekday + d - 1) % 7;
+    var cell = el('div', 'mc-cell day' + (w>=5 ? ' weekend' : ''));
+    cell.textContent = d;
+    cell.dataset.date = d;
+    cell.dataset.month = m;
+    if(year === TODAY_YEAR && m === TODAY_MONTH && d === TODAY_DATE) cell.classList.add('today');
+    var h = findHoliday(m+1, d);
+    if(h){ cell.classList.add('has-holiday'); cell.title = h.name; cell.dataset.holiday = h.name; }
+    grid.appendChild(cell);
+  }
+
+  // 后置：下月开头几天填满最后一行
+  var totalCells = firstWeekday + days;
+  var remaining = (7 - (totalCells % 7)) % 7;
+  if(remaining > 0){
+    var nextM = m === 11 ? 0 : m + 1;
+    for(var j=1; j<=remaining; j++){
+      var nw = (totalCells + j - 1) % 7;
+      var ncell = el('div', 'mc-cell day next-month' + (nw>=5 ? ' weekend' : ''));
+      ncell.textContent = j;
+      grid.appendChild(ncell);
+    }
+  }
+
+  card.appendChild(grid);
+  return card;
+}
+
+function animateMonthDates(monthIdx){
+  var card = $('month-' + monthIdx);
+  if(!card) return;
+  var cells = card.querySelectorAll('.mc-cell.day');
+  cells.forEach(function(cell, i){
+    setTimeout(function(){ cell.classList.add('animated'); }, i * 25);
+  });
+}
+function findHoliday(month, date){
+  var key = month + '-' + date;
+  for(var i=0; i<HOLIDAYS.length; i++){ if(HOLIDAYS[i].md === key) return HOLIDAYS[i]; }
+  return null;
+}
+
+/* ============ 手机端滑动指示器 ============ */
+function setupSwipeDots(){
+  var dots = $('swipeDots');
+  dots.innerHTML = '';
+  for(var i=0; i<12; i++){
+    var b = document.createElement('button');
+    b.className = 'sd' + (i===0 ? ' active' : '');
+    b.dataset.m = i;
+    b.setAttribute('aria-label', '跳到'+(i+1)+'月');
+    b.addEventListener('click', function(){
+      var m = parseInt(this.dataset.m, 10);
+      var card = $('month-' + m);
+      if(card) card.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    });
+    dots.appendChild(b);
+  }
+  var grid = $('calGrid');
+  var scrollTimer = null;
+  grid.addEventListener('scroll', function(){
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(function(){
+      var cardWidth = grid.offsetWidth * 0.88 + 12;
+      var idx = Math.round(grid.scrollLeft / cardWidth);
+      idx = Math.max(0, Math.min(11, idx));
+      dots.querySelectorAll('.sd').forEach(function(d, i){ d.classList.toggle('active', i===idx); });
+    }, 100);
+  });
+}
+
+/* ============ 教学步骤 ============ */
+function renderStep(idx){
+  state.currentStep = idx;
+  // 清除动画定时器
+  if(state.moduloAnimTimer){ clearTimeout(state.moduloAnimTimer); state.moduloAnimTimer = null; }
+  if(state.tianAnimTimer){ clearTimeout(state.tianAnimTimer); state.tianAnimTimer = null; }
+  document.querySelectorAll('.step-tab').forEach(function(t, i){ t.classList.toggle('active', i===idx); });
+  document.querySelectorAll('.progress-dots .dot').forEach(function(d, i){ d.classList.toggle('active', i===idx); });
+  var content = $('stepContent');
+  content.innerHTML = '';
+  var pane = el('div', 'step-pane');
+  switch(idx){
+    case 0: pane.innerHTML = step0HTML(); break;
+    case 1: pane.innerHTML = step1HTML(); break;
+    case 2: pane.innerHTML = step2HTML(); break;
+    case 3: pane.innerHTML = step3HTML(); break;
+  }
+  content.appendChild(pane);
+  bindStepInteractions(idx);
+}
+
+/* 步骤1：闰年判断 */
+function step0HTML(){
+  var y = state.year;
+  var leap = isLeapYear(y);
+  var mod4 = ((y % 4) + 4) % 4;
+  var mod100 = ((y % 100) + 100) % 100;
+  var mod400 = ((y % 400) + 400) % 400;
+  var div4 = Math.floor(y/4);
+  var div100 = Math.floor(y/100);
+  var div400 = Math.floor(y/400);
+  var febDays = leap ? 29 : 28;
+  var yearDays = leap ? 366 : 365;
+
+  var html = ''
+  + '<div class="step-title"><span class="step-num">STEP 01</span>推算二月天</div>'
+  + '<p class="step-desc">要确定一年有多少天，首先要判断它是平年还是闰年。判断口诀：</p>'
+  + '<div class="koujue">四闰 · 百不闰 · 四百再闰</div>'
+  + '<p class="step-desc">能被 4 整除的年份通常是闰年；但能被 100 整除时不是闰年；除非它能被 400 整除。用 <b>'+yearShort(y)+'</b> 验证：</p>'
+
+  // 分步计算
+  + '<div class="leap-calc">'
+  +   '<div class="leap-calc-row"><span class="step-num" style="font-size:12px">01</span><span>除以 4</span></div>'
+  +   '<div class="leap-calc-row" style="padding-left:32px">'
+  +     '<span class="num">'+y+'</span><span class="op">÷</span><span class="num">4</span><span class="op">=</span><span class="num">'+div4+'</span><span class="op">余</span><span class="num">'+mod4+'</span>'
+  +     ' &nbsp; ' + (mod4===0 ? '<span class="verdict-yes">能整除</span>' : '<span class="verdict-no">不能整除</span>')
+  +   '</div>'
+  + '</div>';
+
+  if(mod4===0){
+    html += '<div class="leap-calc">'
+    +   '<div class="leap-calc-row"><span class="step-num" style="font-size:12px">02</span><span>除以 100</span></div>'
+    +   '<div class="leap-calc-row" style="padding-left:32px">'
+    +     '<span class="num">'+y+'</span><span class="op">÷</span><span class="num">100</span><span class="op">=</span><span class="num">'+div100+'</span><span class="op">余</span><span class="num">'+mod100+'</span>'
+    +     ' &nbsp; ' + (mod100===0 ? '<span class="verdict-yes">能整除</span>' : '<span class="verdict-no">不能整除</span>')
+    +   '</div>'
+    + '</div>';
+  }
+  if(mod4===0 && mod100===0){
+    html += '<div class="leap-calc">'
+    +   '<div class="leap-calc-row"><span class="step-num" style="font-size:12px">03</span><span>除以 400</span></div>'
+    +   '<div class="leap-calc-row" style="padding-left:32px">'
+    +     '<span class="num">'+y+'</span><span class="op">÷</span><span class="num">400</span><span class="op">=</span><span class="num">'+div400+'</span><span class="op">余</span><span class="num">'+mod400+'</span>'
+    +     ' &nbsp; ' + (mod400===0 ? '<span class="verdict-yes">能整除</span>' : '<span class="verdict-no">不能整除</span>')
+    +   '</div>'
+    + '</div>';
+  }
+
+  // 整除结论表格
+  var icOk = '<span class="ic ic-ok">✓</span>';
+  var icNo = '<span class="ic ic-no">✕</span>';
+  html += '<p class="step-desc" style="margin-top:16px">整除判断结论：</p>'
+  + '<table class="data-table">'
+  +   '<thead><tr><th>规则</th><th>口诀</th><th>计算</th><th>结果</th></tr></thead>'
+  +   '<tbody>'
+  +     '<tr><td>第一关</td><td>四闰</td><td>'+y+' ÷ 4 余 '+mod4+'</td><td class="'+(mod4===0?'pass':'fail')+'">'+(mod4===0?icOk+'能整除':icNo+'不能整除')+'</td></tr>';
+
+  if(mod4===0){
+    var b2pass = mod100!==0;
+    html += '<tr><td>第二关</td><td>百不闰</td><td>'+y+' ÷ 100 余 '+mod100+'</td><td class="'+(b2pass?'pass':'fail')+'">'+(b2pass?icOk+'不被100整除':icNo+'被100整除')+'</td></tr>';
+    if(mod100===0){
+      var b3pass = mod400===0;
+      html += '<tr><td>第三关</td><td>四百再闰</td><td>'+y+' ÷ 400 余 '+mod400+'</td><td class="'+(b3pass?'pass':'fail')+'">'+(b3pass?icOk+'能整除':icNo+'不能整除')+'</td></tr>';
+    } else {
+      html += '<tr><td>第三关</td><td>四百再闰</td><td>不适用</td><td class="na">—</td></tr>';
+    }
+  } else {
+    html += '<tr><td>第二关</td><td>百不闰</td><td>不适用</td><td class="na">—</td></tr>'
+    +       '<tr><td>第三关</td><td>四百再闰</td><td>不适用</td><td class="na">—</td></tr>';
+  }
+
+  html += '<tr class="total"><td colspan="3">结论</td><td class="'+(leap?'pass':'fail')+'">'+yearShort(y)+(leap?' 是闰年':' 是平年')+'</td></tr>'
+  +   '</tbody>'
+  + '</table>';
+
+  // 每月天数累加得到全年天数 - 表格形式
+  var monthDayTable = '<table class="data-table days-color-table"><thead><tr><th>月份</th>';
+  for(var m=0; m<12; m++) monthDayTable += '<th>'+(m+1)+'</th>';
+  monthDayTable += '<th>合计</th></tr></thead><tbody><tr><td>天数</td>';
+  var dayColorMap = {31:'d-31',30:'d-30',28:'d-28',29:'d-29',365:'d-total',366:'d-total'};
+  for(var m=0; m<12; m++){
+    var dm = daysInMonth(y, m);
+    var cls = dayColorMap[dm] || '';
+    monthDayTable += '<td'+(cls?' class="'+cls+'"':'')+'>'+dm+'</td>';
+  }
+  monthDayTable += '<td class="'+dayColorMap[yearDays]+'">'+yearDays+'</td></tr></tbody></table>';
+
+  html += '<p class="step-desc" style="margin-top:16px">每年天数累加得到总间隔天数：</p>'
+  + monthDayTable;
+
+  // 最后给出结论
+  html += '<div class="leap-conclusion '+(leap?'leap':'common')+'">'
+  +   '<div class="lc-type">'+(leap?'闰年':'平年')+'</div>'
+  +   '<div class="lc-detail">2 月 <b>'+febDays+'</b> 天 · 全年 <b>'+yearDays+'</b> 天</div>'
+  + '</div>';
+
+  return html;
+}
+
+/* 步骤2：基准日期 */
+function step1HTML(){
+  var y = TODAY_YEAR;
+  var leap = isLeapYear(y);
+  var daysToToday = daysFromJan1ToToday(y);
+  var todayWk = TODAY_WEEKDAY;
+
+  // 月份天数表格 - 相同数字添加同背景色
+  // 为不同天数分配不同颜色类
+  var dayColorMap = {31:'d-31',30:'d-30',28:'d-28',29:'d-29',365:'d-total',366:'d-total'};
+  var monthDaysTable = '<table class="data-table days-color-table"><thead><tr><th>月份</th>';
+  for(var m=0; m<12; m++) monthDaysTable += '<th>'+(m+1)+'</th>';
+  monthDaysTable += '<th>合计</th></tr></thead><tbody><tr><td>天数</td>';
+  for(var m=0; m<12; m++){
+    var d = daysInMonth(y, m);
+    var cls = dayColorMap[d] || '';
+    monthDaysTable += '<td'+(cls?' class="'+cls+'"':'')+'>'+d+'</td>';
+  }
+  var totalY = leap?366:365;
+  monthDaysTable += '<td class="'+dayColorMap[totalY]+'">'+totalY+'</td></tr></tbody></table>';
+
+  // 累加公式（替代表格）
+  var acc = 0;
+  var formulaParts = [];
+  for(var m=0; m<TODAY_MONTH; m++){
+    var dm = daysInMonth(y, m);
+    acc += dm;
+    formulaParts.push(dm.toString());
+  }
+  acc += TODAY_DATE;
+  formulaParts.push(TODAY_DATE.toString());
+  var accFormula = formulaParts.join(' + ') + ' = <b>' + acc + '</b> 天';
+
+  return ''
+  + '<div class="step-title"><span class="step-num">STEP 02</span>推算星期几</div>'
+  + '<p class="step-desc">要算出目标年份的 1 月 1 日是星期几，需要已知起点：今天的日期和星期。</p>'
+  + '<div class="today-card">'
+  +   '<div class="today-label">今天</div>'
+  +   '<div class="today-date">'+y+' 年 '+(TODAY_MONTH+1)+' 月 '+TODAY_DATE+' 日</div>'
+  +   '<div class="today-weekday">'+WEEK_FULL[todayWk]+'</div>'
+  + '</div>'
+  + '<p class="step-desc" style="margin-top:16px">每月天数规律：</p>'
+  + monthDaysTable
+  + (leap ? '<p class="step-desc" style="font-size:13px">今年是闰年，2 月 29 天，全年 366 天。</p>' : '<p class="step-desc" style="font-size:13px">今年是平年，2 月 28 天，全年 365 天。</p>')
+  + '<p class="step-desc" style="margin-top:16px">从 1 月 1 日累加到今天：</p>'
+  + '<div class="days-formula">' + accFormula + '</div>'
+  + '<p class="step-desc" style="margin-top:16px">总天数 '+acc+' 除以 7，每满 7 天消除一周，剩下的就是余数：</p>'
+  + '<p class="step-desc" style="margin-top:8px;font-size:13px;color:var(--coral)">从今天（'+WEEK_FULL[todayWk]+'）所在位置 <b>往前倒着</b> 推 '+acc+' 天，余数格落到的就是 1 月 1 日的星期</p>'
+  + renderModuloViz(acc, 7, todayWk, 'mv', todayWk, 'backward')
+  + '<p class="step-desc" style="margin-top:14px">星期推移：从 <b>'+WEEK_FULL[todayWk]+'</b> 往前推 <b>'+(acc % 7)+'</b> 天</p>'
+  + renderWeekShift(todayWk, jan1Weekday(y), '往前', acc % 7)
+  + '<div class="step-result">1月1日是 '+WEEK_FULL[jan1Weekday(y)]+'，今天是 '+WEEK_FULL[todayWk]+'</div>';
+}
+
+/* 7进制消除动画 */
+function renderModuloViz(total, divisor, todayWk, idPrefix, startPos, direction){
+  idPrefix = idPrefix || 'mv';
+  direction = direction || 'forward';
+  startPos = startPos || 0;
+  var slotsId = idPrefix + 'Slots';
+  var weeksId = idPrefix + 'Weeks';
+  var remId = idPrefix + 'Remainder';
+  var playId = idPrefix + 'Play';
+  var weeks = Math.floor(total / divisor);
+  var remainder = total % divisor;
+  // 将方向与起点信息存入 data 属性，供 runModuloAnimation 读取
+  var html = '<div class="modulo-viz" data-start-pos="'+startPos+'" data-direction="'+direction+'">'
+  + '<div class="mv-equation">' + total + ' ÷ ' + divisor + ' = <b>' + weeks + '</b> 周 余 <b style="color:var(--coral)">' + remainder + '</b></div>'
+  + '<div class="mv-week-labels">';
+  for(var i=0; i<divisor; i++) html += '<div class="mv-wl">' + WEEK_NAMES[i] + '</div>';
+  html += '</div><div class="mv-slots" id="'+slotsId+'">';
+  for(var i=0; i<divisor; i++) html += '<div class="mv-slot" data-idx="'+i+'"></div>';
+  html += '</div>'
+  + '<div class="mv-status">'
+  +   '<div>已过 <b id="'+weeksId+'">0</b> / ' + weeks + ' 周</div>'
+  +   '<div>余数 <b id="'+remId+'">—</b></div>'
+  + '</div>'
+  + '<button class="btn btn-ghost btn-sm" id="'+playId+'" style="margin-top:10px">播放动画</button>'
+  + '<p class="mv-hint">每 7 天为一组，满 7 消除，最后剩下的就是余数（对应星期几）</p>'
+  + '</div>';
+  return html;
+}
+
+function runModuloAnimation(total, divisor, idPrefix, startPos, direction){
+  idPrefix = idPrefix || 'mv';
+  direction = direction || 'forward';
+  startPos = startPos || 0;
+  var slotsId = '#' + idPrefix + 'Slots';
+  var slots = document.querySelectorAll(slotsId + ' .mv-slot');
+  var weeksEl = $(idPrefix + 'Weeks');
+  var remainderEl = $(idPrefix + 'Remainder');
+  var playBtn = $(idPrefix + 'Play');
+  if(!slots.length) return;
+
+  playBtn.disabled = true;
+  playBtn.textContent = '播放中…';
+  slots.forEach(function(s){ s.className = 'mv-slot'; s.textContent = ''; });
+  weeksEl.textContent = '0';
+  remainderEl.textContent = '—';
+
+  var weeks = Math.floor(total / divisor);
+  var remainder = total % divisor;
+  var currentWeek = 0;
+  // 超过5步时，前5步正常播放，第6步直接显示最终结果
+  var animMaxWeeks = weeks > 5 ? 5 : weeks;
+
+  // 根据方向计算slot索引：正着从起点向右，倒着从起点向左
+  function getSlotIndex(stepIdx){
+    if(direction === 'backward'){
+      return ((startPos - stepIdx) % divisor + divisor) % divisor;
+    } else {
+      return (startPos + stepIdx) % divisor;
+    }
+  }
+
+  function animateWeek(){
+    if(currentWeek >= weeks){
+      // 显示余数：从起点的下一格开始按方向填充 remainder 格
+      // 余数格的最后一格即为终点（目标星期）
+      for(var i=0; i<remainder; i++){
+        var slotIdx = getSlotIndex(i+1);
+        slots[slotIdx].classList.add('filled', 'remainder');
+        slots[slotIdx].textContent = (currentWeek * divisor + i + 1);
+      }
+      remainderEl.textContent = remainder;
+      remainderEl.style.color = 'var(--coral)';
+      playBtn.disabled = false;
+      playBtn.textContent = '重新播放';
+      return;
+    }
+    // 第6步及之后直接跳到最终结果
+    if(currentWeek >= animMaxWeeks){
+      currentWeek = weeks;
+      weeksEl.textContent = currentWeek;
+      animateWeek();
+      return;
+    }
+    // 填满7格：从起点开始按方向填充
+    var startDay = currentWeek * divisor;
+    for(var i=0; i<divisor; i++){
+      var slotIdx = getSlotIndex(i);
+      slots[slotIdx].classList.add('filled');
+      slots[slotIdx].textContent = (startDay + i + 1);
+    }
+    // 短暂停留后消除
+    state.moduloAnimTimer = setTimeout(function(){
+      slots.forEach(function(s){ s.classList.add('clearing'); });
+      state.moduloAnimTimer = setTimeout(function(){
+        slots.forEach(function(s){ s.className = 'mv-slot'; s.textContent = ''; });
+        currentWeek++;
+        weeksEl.textContent = currentWeek;
+        animateWeek();
+      }, 150);
+    }, 200);
+  }
+  animateWeek();
+}
+
+/* 步骤3：目标年元旦 */
+function step2HTML(){
+  var targetY = state.year;
+  var baseY = TODAY_YEAR;
+  var baseJan1Wk = jan1Weekday(baseY);
+  var targetJan1Wk = jan1Weekday(targetY);
+  var counts = countYearTypes(baseY, targetY);
+  var totalDays = daysBetweenJan1(baseY, targetY);
+  var direction = totalDays >= 0 ? '往后' : '往前';
+  var shift = Math.abs(totalDays) % 7;
+  var absShift = shift;
+
+  var start = Math.min(baseY, targetY);
+  var end = Math.max(baseY, targetY);
+  // 时间线只显示闰年和起止年份
+  var timelineHTML = '<div class="timeline">';
+  var leapYears = [];
+  for(var y=start; y<=end; y++){
+    if(isLeapYear(y)) leapYears.push(y);
+  }
+  // 限制最多显示10个闰年节点
+  var maxLeap = 10;
+  var leapStep = leapYears.length <= maxLeap ? 1 : Math.ceil(leapYears.length / maxLeap);
+  var shownLeaps = [];
+  for(var i=0; i<leapYears.length; i+=leapStep) shownLeaps.push(leapYears[i]);
+  if(shownLeaps.indexOf(leapYears[leapYears.length-1]) === -1 && leapYears.length > 0){
+    shownLeaps.push(leapYears[leapYears.length-1]);
+  }
+  for(var i=0; i<shownLeaps.length; i++){
+    var ly = shownLeaps[i];
+    var cls = '';
+    if(ly === baseY) cls = ' start';
+    else if(ly === targetY) cls = ' end';
+    timelineHTML += '<div class="timeline-node'+cls+'"><div class="tn-year">'+ly+'</div><div class="tn-type">闰年</div></div>';
+    if(i < shownLeaps.length - 1) timelineHTML += '<span class="timeline-arrow">→</span>';
+  }
+  if(shownLeaps.length === 0){
+    timelineHTML += '<div class="timeline-node"><div class="tn-year">无</div><div class="tn-type">无闰年</div></div>';
+  }
+  timelineHTML += '</div>'
+    + '<p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:6px">仅显示区间内的闰年（共 '+leapYears.length+' 个）</p>';
+
+  // 跑马灯方向：目标年大于当年→正着；目标年小于当年→倒着
+  var mvDirection = targetY > baseY ? 'forward' : 'backward';
+  var mvDirLabel = targetY > baseY ? '往后正着' : '往前倒着';
+
+  var html = ''
+  + '<div class="step-title"><span class="step-num">STEP 03</span>目标年元旦</div>'
+  + '<p class="step-desc">已知 '+baseY+' 年 1 月 1 日是 <b>'+WEEK_FULL[baseJan1Wk]+'</b>，推算 '+yearShort(targetY)+' 1 月 1 日是星期几，需计算两年间隔天数。</p>'
+  + '<p class="step-desc" style="margin-top:14px">数学公式：'+yearShort(targetY)+' 到 '+baseY+' 年共 '+Math.abs(targetY-baseY)+' 年，其中，闰年的年份有：</p>'
+  + timelineHTML
+  + '<p class="step-desc" style="margin-top:14px">统计间隔年数中的平年与闰年：</p>'
+  + '<div class="count-row">'
+  +   '<div class="count-box"><div class="cb-left"><div class="cb-days">365天</div><div class="cb-type">平年</div></div><div class="cb-divider"></div><div class="cb-right"><div class="cb-count">'+counts.common+'</div><div class="cb-count-label">次</div></div></div>'
+  +   '<div class="count-box"><div class="cb-left"><div class="cb-days">366天</div><div class="cb-type">闰年</div></div><div class="cb-divider"></div><div class="cb-right"><div class="cb-count">'+counts.leap+'</div><div class="cb-count-label">次</div></div></div>'
+  + '</div>'
+  + '<p class="step-desc" style="margin-top:14px">总天数 '+Math.abs(totalDays)+' ÷ 7，余数即为星期推移数：</p>'
+  + '<div class="formula" style="text-align:center;font-size:16px;padding:18px">'
+  +   '<span style="font-family:var(--serif)">'+Math.abs(totalDays)+' ÷ 7 = '+Math.floor(Math.abs(totalDays)/7)+' 余 <span style="color:var(--coral);font-size:1.3em;font-weight:500">'+absShift+'</span></span>'
+  + '</div>';
+  if(Math.abs(totalDays) > 0){
+    html += '<p class="step-desc" style="margin-top:8px;font-size:13px;color:var(--coral)">从当年 1 月 1 日（'+WEEK_FULL[baseJan1Wk]+'）所在位置 <b>'+mvDirLabel+'</b> 推 '+Math.abs(totalDays)+' 天，余数格落到的就是目标年 1 月 1 日的星期</p>';
+    html += renderModuloViz(Math.abs(totalDays), 7, targetJan1Wk, 'mv3', baseJan1Wk, mvDirection);
+  }
+  html += '<p class="step-desc" style="margin-top:14px">星期推移：从 <b>'+WEEK_FULL[baseJan1Wk]+'</b> '+direction+'推 <b>'+absShift+'</b> 天</p>'
+  + renderWeekShift(baseJan1Wk, targetJan1Wk, direction, absShift)
+  + '<div class="step-result">'+yearShort(targetY)+' 1 月 1 日是 '+WEEK_FULL[targetJan1Wk]+'</div>';
+  return html;
+}
+
+function renderWeekShift(fromWk, toWk, direction, shift){
+  var html = '<div class="week-shift">';
+  for(var i=0; i<7; i++){
+    var cls = 'ws-day';
+    if(i>=5) cls += ' weekend';
+    if(i === fromWk) cls += ' start';
+    if(i === toWk) cls += ' target';
+    html += '<div class="'+cls+'">'+WEEK_NAMES[i]+'</div>';
+    if(i<6) html += '<span class="ws-arrow">·</span>';
+  }
+  html += '</div>';
+  if(shift > 0){
+    var isForward = direction === '往后';
+    var arrowChar = isForward ? '→' : '←';
+    var label = isForward ? '往后推' : '往前推';
+    var fromDay = '<span class="si-day si-from">'+WEEK_FULL[fromWk]+'</span>';
+    var toDay = '<span class="si-day si-to">'+WEEK_FULL[toWk]+'</span>';
+    var flow = '<span class="si-flow">'
+      +   '<span class="si-label">'+label+' <b>'+shift+'</b> 天</span>'
+      +   '<span class="si-arrow-line">'+arrowChar+'━━━━'+arrowChar+'</span>'
+      + '</span>';
+    // 往前推时，目标日在左、起点在右，与箭头方向（向左）保持一致
+    var leftDay = isForward ? fromDay : toDay;
+    var rightDay = isForward ? toDay : fromDay;
+    html += '<div class="shift-indicator '+(isForward ? 'forward' : 'backward')+'">'
+      + leftDay
+      + flow
+      + rightDay
+      + '</div>';
+  } else {
+    html += '<div class="shift-indicator none"><span class="si-label">余数为 0，星期不变</span></div>';
+  }
+  html += '<p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px">深色为起点，珊瑚色为目标日</p>';
+  return html;
+}
+
+/* 田字格跑马灯：大网格小单元格，从1累加到当前日 */
+function renderTianGrid(total, divisor, remainder){
+  var weeks = Math.floor(total / divisor);
+  var html = '<div class="tian-grid-wrap">'
+    + '<div class="tian-status">'
+    +   '<span>共 <b>'+total+'</b> 天</span>'
+    +   '<span>满 <b>'+divisor+'</b> 天消除一周</span>'
+    +   '<span>消除 <b id="tgWeeks">0</b> 周</span>'
+    +   '<span>余 <b id="tgRemainder">—</b> 天</span>'
+    + '</div>'
+    + '<div class="tian-grid" id="tianGrid">';
+  for(var i=0; i<total; i++){
+    html += '<div class="tg-cell" data-idx="'+i+'"></div>';
+  }
+  html += '</div>'
+    + '<div class="tian-controls">'
+    +   '<button class="btn btn-ghost btn-sm" id="tgPlay">播放跑马灯</button>'
+    +   '<span class="tian-hint">每 '+divisor+' 天一组，消除整周后剩余 '+remainder+' 天即为余数</span>'
+    + '</div>'
+    + '</div>';
+  return html;
+}
+
+function runTianGridAnimation(total, divisor){
+  var grid = $('tianGrid');
+  if(!grid) return;
+  var cells = grid.querySelectorAll('.tg-cell');
+  var weeksEl = $('tgWeeks');
+  var remainderEl = $('tgRemainder');
+  var playBtn = $('tgPlay');
+  var weeks = Math.floor(total / divisor);
+  var remainder = total % divisor;
+
+  playBtn.disabled = true;
+  playBtn.textContent = '播放中…';
+  cells.forEach(function(c){ c.className = 'tg-cell'; c.textContent = ''; });
+  weeksEl.textContent = '0';
+  remainderEl.textContent = '—';
+
+  var currentWeek = 0;
+  function animateWeek(){
+    if(currentWeek >= weeks){
+      // 显示余数格
+      var remStart = weeks * divisor;
+      for(var i=0; i<remainder; i++){
+        if(cells[remStart + i]){
+          cells[remStart + i].classList.add('remainder');
+          cells[remStart + i].textContent = (remStart + i + 1);
+        }
+      }
+      remainderEl.textContent = remainder;
+      playBtn.disabled = false;
+      playBtn.textContent = '重新播放';
+      return;
+    }
+    // 填满本周7格（与第2步跑马灯一致）
+    var startIdx = currentWeek * divisor;
+    for(var i=0; i<divisor; i++){
+      if(cells[startIdx + i]){
+        cells[startIdx + i].classList.add('active');
+        cells[startIdx + i].textContent = (startIdx + i + 1);
+      }
+    }
+    // 短暂停留后消除
+    state.tianAnimTimer = setTimeout(function(){
+      for(var i=0; i<divisor; i++){
+        if(cells[startIdx + i]){
+          cells[startIdx + i].classList.add('clearing');
+          cells[startIdx + i].classList.remove('active');
+        }
+      }
+      state.tianAnimTimer = setTimeout(function(){
+        for(var i=0; i<divisor; i++){
+          if(cells[startIdx + i]){
+            cells[startIdx + i].classList.add('cleared');
+            cells[startIdx + i].textContent = '';
+          }
+        }
+        currentWeek++;
+        weeksEl.textContent = currentWeek;
+        animateWeek();
+      }, 200);
+    }, 300);
+  }
+  animateWeek();
+}
+
+/* 步骤4：生成年历 */
+function step3HTML(){
+  var y = state.year;
+  var jan1Wk = jan1Weekday(y);
+  var leap = isLeapYear(y);
+
+  // 构建天数累加表格 - 与第一步一致的形式
+  var totalDays = 0;
+  var yearDayTable = '<table class="data-table days-color-table"><thead><tr><th>月份</th>';
+  for(var m=0; m<12; m++) yearDayTable += '<th>'+(m+1)+'</th>';
+  yearDayTable += '<th>合计</th></tr></thead><tbody><tr><td>天数</td>';
+  var dayColorMap = {31:'d-31',30:'d-30',28:'d-28',29:'d-29',365:'d-total',366:'d-total'};
+  for(var m=0; m<12; m++){
+    var dm = daysInMonth(y, m);
+    totalDays += dm;
+    var cls = dayColorMap[dm] || '';
+    yearDayTable += '<td'+(cls?' class="'+cls+'"':'')+'>'+dm+'</td>';
+  }
+  yearDayTable += '<td class="'+dayColorMap[totalDays]+'">'+totalDays+'</td></tr></tbody></table>';
+
+  // 月份推移表格：月份/天数/1日星期/÷7余数
+  var tableHTML = '<table class="data-table month-shift-table">'
+    + '<thead><tr><th>月份</th><th>天数</th><th>1日星期</th><th>÷7 余数</th></tr></thead><tbody>';
+  var sumDays = 0;
+  for(var m=0; m<12; m++){
+    var dm = daysInMonth(y, m);
+    var rm = dm % 7;
+    sumDays += dm;
+    var fw = dateWeekday(y, m, 1);
+    tableHTML += '<tr class="demo-month-row" data-m="'+m+'">'
+      + '<td>'+(m+1)+'月</td>'
+      + '<td>'+dm+'</td>'
+      + '<td>'+WEEK_FULL[fw]+'</td>'
+      + '<td class="'+(rm===0?'na':'highlight')+'">'+rm+'</td>'
+      + '</tr>';
+  }
+  tableHTML += '<tr class="total">'
+    + '<td>合计</td>'
+    + '<td>'+sumDays+'</td>'
+    + '<td>'+(sumDays % 7)+'</td>'
+    + '<td>—</td>'
+    + '</tr>';
+  tableHTML += '</tbody></table>';
+
+  var html = ''
+  + '<div class="step-title"><span class="step-num">STEP 04</span>生成年历</div>'
+  + '<p class="step-desc">'+yearShort(y)+' 1 月 1 日是 <b>'+WEEK_FULL[jan1Wk]+'</b>，据此绘制月历。</p>'
+  + '<p class="step-desc" style="margin-top:12px">绘制 1 月：1 日是 '+WEEK_FULL[jan1Wk]+'，数字 1 放在第 '+(jan1Wk+1)+' 格。</p>'
+  + '<div class="cal-gen-demo"><div class="demo-grid" id="demoGrid">'+renderDemoGrid(y, 0)+'</div></div>'
+  + '<p class="step-desc" style="margin-top:14px">绘制步骤：</p>'
+  + '<div class="formula">'
+  +   '<div>1. 确定本月 1 号是星期几，决定数字起始位置</div>'
+  +   '<div>2. 按顺序填入数字，周末用珊瑚色标记</div>'
+  +   '<div>3. 这个月有几天就填到几号</div>'
+  +   '<div>4. 下月 1 号的星期 = 本月最后一天的星期 + 1</div>'
+  + '</div>'
+  + '<p class="step-desc" style="margin-top:14px">全年天数 = 每个月的天数累加：</p>'
+  + yearDayTable
+  + '<p class="step-desc" style="margin-top:14px">各月天数与 1 日星期推算结果（点击行查看该月日历演示）：</p>'
+  + tableHTML
+  + '<div class="step-result">12 个月全部绘制完成，即得 '+yearShort(y)+' 年历</div>';
+  return html;
+}
+
+function renderDemoGrid(y, m){
+  var html = '';
+  for(var d=0; d<7; d++) html += '<div class="demo-cell header'+(d>=5?' weekend':'')+'">'+WEEK_NAMES[d]+'</div>';
+  var fw = dateWeekday(y, m, 1);
+  var days = daysInMonth(y, m);
+  for(var i=0; i<fw; i++) html += '<div class="demo-cell"></div>';
+  for(var d=1; d<=days; d++){
+    var w = (fw + d - 1) % 7;
+    var cls = 'demo-cell day';
+    if(w>=5) cls += ' weekend';
+    if(d===1) cls += ' start';
+    html += '<div class="'+cls+'">'+d+'</div>';
+  }
+  return html;
+}
+
+/* ============ 步骤交互 ============ */
+function bindStepInteractions(idx){
+  if(idx === 1){
+    var playBtn = $('mvPlay');
+    if(playBtn){
+      // 步骤2：起点为今天的星期，倒着跑马灯
+      var todayWk = TODAY_WEEKDAY;
+      playBtn.addEventListener('click', function(){
+        var acc = daysFromJan1ToToday(TODAY_YEAR);
+        runModuloAnimation(acc, 7, 'mv', todayWk, 'backward');
+      });
+      setTimeout(function(){
+        var acc = daysFromJan1ToToday(TODAY_YEAR);
+        runModuloAnimation(acc, 7, 'mv', todayWk, 'backward');
+      }, 600);
+    }
+  }
+  if(idx === 2){
+    var mv3Play = $('mv3Play');
+    if(mv3Play){
+      var baseY = TODAY_YEAR;
+      var targetY = state.year;
+      var total = Math.abs(daysBetweenJan1(baseY, targetY));
+      var baseJan1Wk = jan1Weekday(baseY);
+      // 步骤3：起点为当年1月1日的星期，目标年>当年正着，目标年<当年倒着
+      var mv3Dir = targetY > baseY ? 'forward' : 'backward';
+      mv3Play.addEventListener('click', function(){
+        runModuloAnimation(total, 7, 'mv3', baseJan1Wk, mv3Dir);
+      });
+      setTimeout(function(){ runModuloAnimation(total, 7, 'mv3', baseJan1Wk, mv3Dir); }, 600);
+    }
+  }
+  if(idx === 3){
+    document.querySelectorAll('.demo-month-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        var m = parseInt(row.dataset.m, 10);
+        document.querySelectorAll('.demo-month-row').forEach(function(r){ r.classList.remove('selected'); });
+        row.classList.add('selected');
+        $('demoGrid').innerHTML = renderDemoGrid(state.year, m);
+        var cells = $('demoGrid').querySelectorAll('.demo-cell.day');
+        cells.forEach(function(c, i){
+          c.style.animation = 'none';
+          setTimeout(function(){ c.style.animation = 'popIn .3s '+(i*0.03)+'s both'; }, 10);
+        });
+      });
+    });
+  }
+}
+
+/* ============ 步骤控制 ============ */
+function goToStep(idx){ if(idx < 0 || idx > 3) return; renderStep(idx); }
+function nextStep(){ if(state.currentStep < 3) renderStep(state.currentStep + 1); }
+function prevStep(){ if(state.currentStep > 0) renderStep(state.currentStep - 1); }
+
+function toggleAutoPlay(){
+  state.autoPlay = !state.autoPlay;
+  var btn = $('autoBtn');
+  var badge = $('autoBadge');
+  if(state.autoPlay){
+    btn.textContent = '暂停';
+    badge.textContent = '播放中';
+    runAutoPlay();
+  } else {
+    btn.textContent = '自动播放';
+    badge.textContent = '';
+    if(state.autoPlayTimer){ clearTimeout(state.autoPlayTimer); state.autoPlayTimer = null; }
+  }
+}
+function runAutoPlay(){
+  if(!state.autoPlay) return;
+  state.autoPlayTimer = setTimeout(function(){
+    if(!state.autoPlay) return;
+    if(state.currentStep < 3){ renderStep(state.currentStep + 1); runAutoPlay(); }
+    else { state.autoPlay = false; $('autoBtn').textContent = '重新播放'; $('autoBadge').textContent = '已完成'; }
+  }, 15000);
+}
+
+/* ============ 打印 ============ */
+function openPrintPicker(){
+  if(!state.calendarGenerated) return;
+  var container = $('printMonths');
+  container.innerHTML = '';
+  for(var m=0; m<12; m++){
+    var label = el('label', null, '');
+    label.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;cursor:pointer';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = m; cb.checked = true;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode((m+1)+'月'));
+    container.appendChild(label);
+  }
+  $('printModal').classList.add('show');
+}
+function doPrint(){
+  var months = [];
+  document.querySelectorAll('#printMonths input:checked').forEach(function(c){ months.push(parseInt(c.value, 10)); });
+  $('printModal').classList.remove('show');
+  var cards = document.querySelectorAll('.month-card');
+  cards.forEach(function(c){
+    var m = parseInt(c.id.replace('month-',''), 10);
+    c.style.display = months.indexOf(m) >= 0 ? '' : 'none';
+  });
+  setTimeout(function(){ window.print(); cards.forEach(function(c){ c.style.display = ''; }); }, 300);
+}
+
+/* ============ 事件绑定 ============ */
+function bindEvents(){
+  var input = $('yearInput');
+
+  // 读取/设置 contenteditable 文本的工具函数
+  function getText(){
+    return (input.innerText || input.textContent || '').trim();
+  }
+  function setText(val){
+    input.textContent = val;
+  }
+  // 暴露给外部使用
+  input._getText = getText;
+  input._setText = setText;
+
+  // 输入过滤：允许数字和负号
+  input.addEventListener('input', function(){
+    var val = getText().replace(/[^0-9-]/g, '');
+    // 负号只能在最前面
+    if(val.indexOf('-') > 0) val = '-' + val.replace(/-/g, '');
+    // 限制长度
+    if(val.length > 6) val = val.slice(0, 6);
+    if(getText() !== val) setText(val);
+    showErr('');
+  });
+
+  // 阻止换行符输入
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      $('generateBtn').click();
+    }
+  });
+
+  // focus时清空默认值
+  input.addEventListener('focus', function(){
+    if(getText() !== '' && getText() === String(TODAY_YEAR)){
+      setText('');
+    }
+  });
+
+  $('generateBtn').addEventListener('click', function(){
+    var raw = getText();
+    if(raw === ''){ raw = String(TODAY_YEAR); setText(raw); }
+    var r = validateYear(raw);
+    if(!r.ok){ showErr(r.msg); return; }
+    showErr('');
+    generateCalendar(r.year);
+  });
+
+  $('randomBtn').addEventListener('click', function(){
+    // 随机年份 -200 到 2100
+    var y = -200 + Math.floor(Math.random() * 2301);
+    setText(y);
+    showErr('');
+    generateCalendar(y);
+  });
+
+  document.querySelectorAll('.step-tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      if(state.autoPlay) toggleAutoPlay();
+      goToStep(parseInt(t.dataset.step, 10));
+    });
+  });
+
+  $('prevBtn').addEventListener('click', function(){ if(state.autoPlay) toggleAutoPlay(); prevStep(); });
+  $('nextBtn').addEventListener('click', function(){ if(state.autoPlay) toggleAutoPlay(); nextStep(); });
+  $('autoBtn').addEventListener('click', toggleAutoPlay);
+
+  $('printAllBtn').addEventListener('click', function(){
+    if(!state.calendarGenerated) return;
+    document.querySelectorAll('.month-card').forEach(function(c){ c.style.display=''; });
+    // 生成精简版推算逻辑文本（仅核心步骤）
+    var y = state.year;
+    var leap = isLeapYear(y);
+    var jan1Wk = jan1Weekday(y);
+    var febDays = leap ? 29 : 28;
+    var yearDays = leap ? 366 : 365;
+    var mod4 = ((y % 4) + 4) % 4;
+    var mod100 = ((y % 100) + 100) % 100;
+    var mod400 = ((y % 400) + 400) % 400;
+
+    // 核心步骤一：闰年判断（单行文本）
+    var step1 = '① 闰年判断：'+y+'÷4余'+mod4+(mod4===0?'能整除':'不能整除');
+    if(mod4===0){
+      step1 += ' → ÷100余'+mod100+(mod100===0?'能整除':'不能整除');
+      if(mod100===0) step1 += ' → ÷400余'+mod400+(mod400===0?'能整除':'不能整除');
+    }
+    step1 += ' → '+(leap?'闰年（2月'+febDays+'天，全年'+yearDays+'天）':'平年（2月'+febDays+'天，全年'+yearDays+'天）');
+
+    // 核心步骤二：元旦星期（单行文本）
+    var step2 = '② 元旦星期：'+y+' 年 1 月 1 日是 '+WEEK_FULL[jan1Wk];
+
+    // 核心步骤三：规则（单行文本）
+    var step3 = '③ 推算规则：每月1日星期 = 上月1日星期 + 上月天数 ÷ 7 的余数';
+
+    var logicHTML = '<div class="print-logic">'
+      + '<div class="print-logic-title">'+y+' 年历推算逻辑</div>'
+      + '<div class="print-logic-line">'+step1+'</div>'
+      + '<div class="print-logic-line">'+step2+'</div>'
+      + '<div class="print-logic-line">'+step3+'</div>'
+      + '</div>';
+
+    // 移除旧的，追加新的
+    var old = document.querySelector('.print-logic');
+    if(old) old.remove();
+    var calSection = document.querySelector('.cal-section');
+    if(calSection) calSection.insertAdjacentHTML('beforeend', logicHTML);
+
+    setTimeout(function(){ window.print(); }, 300);
+  });
+  $('printPickBtn').addEventListener('click', openPrintPicker);
+  $('printGoBtn').addEventListener('click', doPrint);
+
+  document.querySelectorAll('.modal-overlay').forEach(function(ov){
+    ov.addEventListener('click', function(e){ if(e.target === ov) ov.classList.remove('show'); });
+  });
+  document.querySelectorAll('[data-modal]').forEach(function(b){
+    b.addEventListener('click', function(){ $(b.dataset.modal).classList.remove('show'); });
+  });
+}
+
+/* ============ 初始化 ============ */
+function init(){
+  bindEvents();
+  $('yearInput').textContent = TODAY_YEAR;
+  generateCalendar(TODAY_YEAR);
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+})();
+</script>
+</body>
+</html>
