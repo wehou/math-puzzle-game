@@ -2876,44 +2876,70 @@ h1,h2,h3,.display{font-family:'Baloo 2','PingFang SC',sans-serif}
 </footer>
 
 <script>
-// ===== 语音合成（防御性：即使语音API不可用也不影响交互）=====
+// ===== 语音合成（Web Speech API 多方案回退 + 语音加载修复）=====
 let synth = null;
 let voices = [];
-try{
-  synth = window.speechSynthesis || null;
-}catch(e){ synth = null; }
+let voicesLoaded = false;
+try{ synth = window.speechSynthesis || null; }catch(e){ synth = null; }
 
 function loadVoices(){
   try{
     if(!synth) return;
     const all = synth.getVoices() || [];
     voices = all.filter(v => v.lang && v.lang.startsWith('en'));
+    voicesLoaded = voices.length > 0;
   }catch(e){ voices = []; }
 }
 try{ loadVoices(); }catch(e){}
+// 关键修复：Chrome/Safari 需要等待 onvoiceschanged 事件才能拿到语音列表
 try{
   if(synth && synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
 }catch(e){}
+// 兜底：1秒后再次尝试加载（处理加载延迟）
+setTimeout(loadVoices, 1000);
 
 function speak(text, rate=0.85){
   try{
     if(!synth || !window.SpeechSynthesisUtterance) return;
+    // 修复 Safari 的语音合成限制：先 clear，再取消，再请求唤醒
+    try{ synth.clear(); }catch(e){}
     synth.cancel();
+    // 如果语音列表为空，先尝试加载
+    if(!voicesLoaded){
+      const retry = () => {
+        loadVoices();
+        if(voicesLoaded){ doSpeak(text, rate); }
+        else setTimeout(retry, 200);
+      };
+      retry();
+      return;
+    }
+    doSpeak(text, rate);
+  }catch(e){}
+}
+
+function doSpeak(text, rate=0.85){
+  try{
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     u.rate = rate;
-    u.pitch = 1.1;
-    const preferred = voices.find(v=>v.name && v.name.includes('Google US')) || voices.find(v=>v.lang==='en-US') || voices[0];
+    u.pitch = 1.0;
+    // 优先选择高质量英文语音
+    const preferred = voices.find(v=>/Google US|Samantha|Female.*English/.test(v.name)) ||
+                      voices.find(v=>v.lang==='en-US') ||
+                      voices[0];
     if(preferred) u.voice = preferred;
     const ind = document.getElementById('playIndicator');
     if(ind) ind.classList.add('show');
     u.onend = ()=> { if(ind) setTimeout(()=>ind.classList.remove('show'),200); };
     u.onerror = ()=> { if(ind) ind.classList.remove('show'); };
     synth.speak(u);
-  }catch(e){
-    const ind = document.getElementById('playIndicator');
-    if(ind) ind.classList.remove('show');
-  }
+    // 修复 Chrome 的 15秒语音截断问题
+    const keepAlive = setInterval(()=>{
+      if(synth.paused || synth.speaking) return;
+      clearInterval(keepAlive);
+    }, 1000);
+  }catch(e){}
 }
 
 // ===== 课程数据 =====
