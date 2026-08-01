@@ -158,6 +158,7 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
   .brand{font-size:15px}.brand .logo{font-size:20px}
   .nav-progress{font-size:11px}.progress-bar{width:60px}
   .stars-text{font-size:11px}.streak-pill{font-size:11px;padding:3px 8px}
+  .score-pill{font-size:11px;padding:3px 8px}
   .drag-emojis{grid-template-columns:repeat(4,1fr);gap:4px}
   .drag-emoji{font-size:26px;padding:8px 2px}
   .drag-word{font-size:18px;padding:12px 6px}
@@ -167,6 +168,43 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
   .magic-word{font-size:32px;padding:10px 16px}
   .family-word{font-size:48px}
 }
+
+/* 错题本弹窗 */
+.wrong-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wrong-modal.show{display:flex;justify-content:center;align-items:flex-start;padding:20px 10px}
+.wrong-modal-content{background:var(--bg);border-radius:20px;max-width:560px;width:100%;padding:20px 16px;box-shadow:0 12px 40px rgba(0,0,0,.3);animation:slideUp .3s;margin:0 auto}
+.wrong-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid rgba(126,200,255,.2)}
+.wrong-modal-header h3{font-size:18px;font-weight:800;font-family:'Baloo 2',sans-serif}
+.wrong-modal-close{background:var(--coral2);color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0}
+.wrong-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.wrong-filter-btn{padding:5px 12px;border-radius:20px;border:2px solid transparent;background:var(--card);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink2);transition:all .12s}
+.wrong-filter-btn.active{background:var(--sky2);color:#fff;border-color:var(--sky2)}
+.wrong-list{max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wrong-item{background:var(--card);border-radius:12px;padding:14px 12px;margin-bottom:10px;box-shadow:0 2px 4px rgba(0,0,0,.06)}
+.wrong-item.redone{opacity:.5;border:2px solid var(--grass2)}
+.wrong-item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.wrong-item-q{font-weight:700;font-size:14px;color:var(--ink);line-height:1.5}
+.wrong-item-type{background:rgba(183,148,246,.15);color:var(--grape2);font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.wrong-item-answers{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:13px}
+.wrong-ans-box{padding:4px 10px;border-radius:8px;font-weight:700}
+.wrong-ans-box.user{background:#ffcccc;color:#c0392b}
+.wrong-ans-box.correct{background:#c6f0d4;color:#1b8a4d}
+.wrong-item-actions{display:flex;gap:8px;flex-wrap:wrap}
+.wrong-action-btn{padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s}
+.wrong-action-btn:active{transform:scale(.94)}
+.wrong-action-btn.redo{background:var(--sun);color:var(--ink)}
+.wrong-action-btn.review{background:var(--sky2);color:#fff}
+.wrong-action-btn.delete{background:rgba(255,107,74,.15);color:var(--coral2)}
+.wrong-review-panel{background:rgba(126,200,255,.08);border-radius:10px;padding:12px;margin-top:8px;font-size:13px;line-height:1.7;color:var(--ink2)}
+.wrong-review-panel strong{color:var(--ink)}
+.wrong-review-panel .kp{color:var(--grape2);font-weight:800}
+.wrong-empty{text-align:center;padding:40px 20px;color:var(--ink2);font-size:14px}
+.wrong-redo-area{background:var(--card);border-radius:16px;padding:20px;text-align:center;margin:10px 0}
+.wrong-redo-area .q-word{font-family:'Baloo 2',sans-serif;font-size:40px;font-weight:800;color:var(--coral2);margin:8px 0}
+.wrong-count-badge{background:var(--coral2);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px}
+.wrong-stat{cursor:pointer;transition:transform .1s}
+.wrong-stat:active{transform:scale(.92)}
+.wrong-stat:hover{background:rgba(255,107,74,.12)}
 </style>
 </head>
 <body>
@@ -180,6 +218,7 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
       <span class="stars-text"><span id="navStars">0</span>/42 ⭐</span>
     </div>
     <span class="streak-pill">🔥 <span id="navStreak">0</span></span>
+    <span class="score-pill" id="navWrongBtn" style="background:var(--coral2);color:#fff;cursor:pointer">❌ <span id="navWrongCount">0</span></span>
     <span class="score-pill">⭐ <span id="totalStars">0</span></span>
   </div>
 </nav>
@@ -203,6 +242,7 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 
 <div class="badge-popup" id="badgePopup"></div>
 <div class="confetti-container" id="confetti"></div>
+<div class="wrong-modal" id="wrongModal"></div>
 
 <script>
 'use strict';
@@ -332,7 +372,7 @@ let progress={
   totalStars:0, gamesPlayed:0, correctCount:0, wrongCount:0,
   masteredWords:[], streak:0, bestStreak:0, lastPlayed:null,
   badges:[], level:1, dayStreak:0, playedGames:[],
-  gameStats:{}
+  gameStats:{}, wrongRecords:[]
 };
 
 function loadProgress(){
@@ -347,6 +387,7 @@ function loadProgress(){
       if(!progress.playedGames) progress.playedGames=[];
       if(!progress.streak) progress.streak=0;
       if(!progress.bestStreak) progress.bestStreak=0;
+      if(!progress.wrongRecords) progress.wrongRecords=[];
     }
   }catch(e){console.warn('Failed to load progress:',e);}
 }
@@ -575,6 +616,9 @@ function refreshStarsUI(){
   document.getElementById('navStars').textContent=total;
   document.getElementById('navLevel').textContent=getLevel(total);
   document.getElementById('navStreak').textContent=progress.streak||0;
+  var wc=getUnredoneWrongCount();
+  var nwc=document.getElementById('navWrongCount');
+  if(nwc) nwc.textContent=wc;
   const pct=Math.min(100,(total/MAX_STARS)*100);
   document.getElementById('navProgressFill').style.width=pct+'%';
   for(const g in state.stars){
@@ -690,9 +734,10 @@ function startGame(g){
 // ═══ 统计HTML ═══
 function statsHTML(){
   const timerText=state.timerStarted?'⏱ '+formatTime(getElapsedSeconds()):'⏱ 0:00';
+  var wrongTotal=progress.wrongRecords?progress.wrongRecords.filter(function(r){return !r.redone;}).length:0;
   return '<div class="stats-row">'+
     '<span class="stat correct-stat">✅ '+state.correct+'</span>'+
-    '<span class="stat wrong-stat">❌ '+state.wrong+'</span>'+
+    '<span class="stat wrong-stat" id="wrongStatBtn">❌ '+state.wrong+(wrongTotal>0?' <span class="wrong-count-badge">'+wrongTotal+'</span>':'')+'</span>'+
     '<span class="stat">📝 '+(state.idx+1)+'/'+state.questions.length+'</span>'+
     '<span class="stat timer-stat">'+timerText+'</span>'+
   '</div>';
@@ -745,9 +790,37 @@ function handleCorrect(gameId,word){
   scheduleAdvance(1500);
 }
 
-function handleWrong(gameId){
+function handleWrong(gameId,detail){
   state.wrong++;
   recordAnswer(false,gameId,null);
+  if(detail){
+    var gameDef=GAME_DEFS.find(function(g){return g.id===gameId;});
+    var rec={
+      id:'w'+Date.now()+Math.random().toString(36).substr(2,5),
+      gameId:gameId,
+      gameName:gameDef?gameDef.title:gameId,
+      gameIcon:gameDef?gameDef.icon:'❓',
+      question:detail.question||'',
+      word:detail.word||'',
+      ipa:detail.ipa||'',
+      cn:detail.cn||'',
+      userAnswer:detail.userAnswer||'',
+      correctAnswer:detail.correctAnswer||'',
+      knowledgePoint:detail.knowledgePoint||'',
+      analysis:detail.analysis||'',
+      opts:detail.opts||[],
+      timestamp:Date.now(),
+      date:new Date().toISOString().split('T')[0],
+      redone:false
+    };
+    var exists=progress.wrongRecords.some(function(r){
+      return r.word===rec.word&&r.gameId===rec.gameId&&r.userAnswer===rec.userAnswer&&!r.redone;
+    });
+    if(!exists){
+      progress.wrongRecords.push(rec);
+      saveProgress();
+    }
+  }
   refreshStarsUI();
 }
 
@@ -770,13 +843,20 @@ function renderLetterGame(){
   '</div>'+
   statsHTML();
   area.innerHTML=html;
-  bindOptClick(area,q.answer,function(isCorrect){
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
     onFirstAnswer();
     if(isCorrect){
       speak(q.word);
       handleCorrect('letters',q.word);
     }else{
-      handleWrong('letters');
+      handleWrong('letters',{
+        question:'单词 "'+esc(q.word)+'" 以哪个字母开头？ Which letter does it start with?',
+        word:q.word,ipa:q.ipa,cn:q.cn,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'字母 '+q.letter.toUpperCase()+' 的发音 '+q.ipa,
+        analysis:'字母 '+q.letter.toUpperCase()+' 在闭音节中发 '+q.ipa+' 音。发音要领：'+q.hint+'。例句：'+q.tip,
+        opts:q.opts
+      });
       if(!q.wrongHint){q.wrongHint=true; renderLetterGame();}
       else{scheduleAdvance(800);}
     }
@@ -805,13 +885,20 @@ function renderFamilyGame(){
   '</div>'+
   statsHTML();
   area.innerHTML=html;
-  bindOptClick(area,q.answer,function(isCorrect){
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
     onFirstAnswer();
     if(isCorrect){
       speak(q.word);
       handleCorrect('families',q.word);
     }else{
-      handleWrong('families');
+      handleWrong('families',{
+        question:'词族 '+esc(q.fam)+' 填入哪个元音字母？ Which vowel fits the word family?',
+        word:q.word,ipa:q.ipa,cn:q.fam+'家族',
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'短元音词族 '+q.fam+' · 发音 '+q.ipa,
+        analysis:'词族 '+q.fam+' 中的元音字母是 '+q.answer.toUpperCase()+'，发 '+q.ipa+' 音。正确单词是 "'+q.word+'"。',
+        opts:q.opts
+      });
       scheduleAdvance(800);
     }
   });
@@ -844,13 +931,20 @@ function renderMagicGame(){
   '</div>'+
   statsHTML();
   area.innerHTML=html;
-  bindOptClick(area,q.answer,function(isCorrect){
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
     onFirstAnswer();
     if(isCorrect){
       speak(q.long);
       handleCorrect('magnetice',q.long);
     }else{
-      handleWrong('magnetice');
+      handleWrong('magnetice',{
+        question:'魔术E：'+esc(q.short)+' → '+esc(q.long)+' 中短音词的元音是？ Which vowel is in the short word?',
+        word:q.short+'→'+q.long,ipa:q.ipa_s+' → '+q.ipa_l,cn:q.cn_s+' → '+q.cn_l,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'魔术E规则 · 词尾e让元音发长音',
+        analysis:'短音词 "'+q.short+'" 的元音字母是 '+q.answer.toUpperCase()+'（发 '+q.ipa_s+'），加上词尾e后变成 "'+q.long+'"（发 '+q.ipa_l+'）。魔术E不发音，但让前面的元音"喊出自己的名字"。',
+        opts:q.opts
+      });
       scheduleAdvance(800);
     }
   });
@@ -877,13 +971,20 @@ function renderVowelRGame(){
   '</div>'+
   statsHTML();
   area.innerHTML=html;
-  bindOptClick(area,q.answer,function(isCorrect){
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
     onFirstAnswer();
     if(isCorrect){
       speak(q.example);
       handleCorrect('vowelR',q.example);
     }else{
-      handleWrong('vowelR');
+      handleWrong('vowelR',{
+        question:'单词 "'+esc(q.example)+'" 包含哪个元音+r组合？ Which vowel+r combo?',
+        word:q.example,ipa:q.ipa,cn:q.cn,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'元音+r组合 · '+q.combo+' 发 '+q.ipa,
+        analysis:q.tip+'。单词 "'+q.example+'"（'+q.cn+'）中，'+q.combo+' 发 '+q.ipa+' 音。',
+        opts:q.opts
+      });
       scheduleAdvance(800);
     }
   });
@@ -913,13 +1014,20 @@ function renderBlendGame(){
   '</div>'+
   statsHTML();
   area.innerHTML=html;
-  bindOptClick(area,q.answer,function(isCorrect){
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
     onFirstAnswer();
     if(isCorrect){
       speak(q.word);
       handleCorrect('blends',q.word);
     }else{
-      handleWrong('blends');
+      handleWrong('blends',{
+        question:'单词 "'+esc(q.word)+'" 包含哪个辅音组合？ Which consonant blend?',
+        word:q.word,ipa:q.ipa,cn:q.cn,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'辅音组合 · '+q.blend+' 发 '+q.ipa,
+        analysis:'辅音组合 '+q.blend+' 是两个辅音字母合在一起发两个音。单词 "'+q.word+'"（'+q.cn+'）中，'+q.blend+' 发 '+q.ipa+' 音。',
+        opts:q.opts
+      });
       scheduleAdvance(800);
     }
   });
@@ -949,13 +1057,20 @@ function renderDigraphGame(){
   '</div>'+
   statsHTML();
   area.innerHTML=html;
-  bindOptClick(area,q.answer,function(isCorrect){
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
     onFirstAnswer();
     if(isCorrect){
       speak(q.example);
       handleCorrect('digraphs',q.example);
     }else{
-      handleWrong('digraphs');
+      handleWrong('digraphs',{
+        question:'单词 "'+esc(q.example)+'" 包含哪个双字母组合？ Which double letter sound?',
+        word:q.example,ipa:q.ipa,cn:q.cn,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'双字母音 · '+q.dg+' 发 '+q.ipa,
+        analysis:q.hint+'。单词 "'+q.example+'"（'+q.cn+'）中，'+q.dg+' 发 '+q.ipa+' 音。',
+        opts:q.opts
+      });
       scheduleAdvance(800);
     }
   });
@@ -1052,7 +1167,14 @@ function initDragHandlers(area,q){
           }else{
             wordCard.classList.add('shake-red');
             setTimeout(function(){wordCard.classList.remove('shake-red');},500);
-            handleWrong('dragmatch');
+            handleWrong('dragmatch',{
+              question:'拖拽匹配：将emoji拖到正确的单词上 Drag emoji to the correct word',
+              word:word,ipa:'',cn:'',
+              userAnswer:emojiWord,correctAnswer:word,
+              knowledgePoint:'拖拽匹配 · 图文配对',
+              analysis:'正确的匹配是：'+emojiWord+'应该匹配到"'+emojiWord+'"。你把emoji拖到了"'+word+'"上。',
+              opts:[]
+            });
           }
         }
       }
@@ -1073,12 +1195,12 @@ function bindOptClick(area,correctAnswer,onResult){
       if(ans===correctAnswer){
         this.classList.add('correct');
         area.querySelectorAll('.opt').forEach(function(b){b.classList.add('dim');});
-        onResult(true);
+        onResult(true,ans);
       }else{
         this.classList.add('wrong');
         var self=this;
         setTimeout(function(){self.classList.remove('wrong');},500);
-        onResult(false);
+        onResult(false,ans);
       }
     });
   });
@@ -1152,6 +1274,213 @@ function renderComplete(){
   }
 }
 
+// ═══ 错题本 ═══
+var wrongFilter='all';
+
+function getUnredoneWrongCount(){
+  return progress.wrongRecords?progress.wrongRecords.filter(function(r){return !r.redone;}).length:0;
+}
+
+function openWrongBook(){
+  renderWrongBook('all');
+}
+
+function closeWrongBook(){
+  var modal=document.getElementById('wrongModal');
+  modal.classList.remove('show');
+  modal.innerHTML='';
+}
+
+function renderWrongBook(filter){
+  wrongFilter=filter||'all';
+  var modal=document.getElementById('wrongModal');
+  var records=progress.wrongRecords||[];
+
+  // 获取所有游戏类型用于筛选
+  var gameTypes=[];
+  records.forEach(function(r){if(gameTypes.indexOf(r.gameId)<0)gameTypes.push(r.gameId);});
+
+  // 获取所有日期用于筛选
+  var dates=[];
+  records.forEach(function(r){if(dates.indexOf(r.date)<0)dates.unshift(r.date);});
+
+  // 筛选
+  var filtered=records.slice().reverse();
+  if(wrongFilter==='unredone'){
+    filtered=filtered.filter(function(r){return !r.redone;});
+  }else if(wrongFilter==='redone'){
+    filtered=filtered.filter(function(r){return r.redone;});
+  }else if(wrongFilter.indexOf('game:')===0){
+    var gid=wrongFilter.split(':')[1];
+    filtered=filtered.filter(function(r){return r.gameId===gid;});
+  }else if(wrongFilter.indexOf('date:')===0){
+    var d=wrongFilter.split(':')[1];
+    filtered=filtered.filter(function(r){return r.date===d;});
+  }
+
+  // 构建筛选按钮
+  var filterBtns='<button class="wrong-filter-btn '+(wrongFilter==='all'?'active':'')+'" data-filter="all">全部 All ('+records.length+')</button>';
+  filterBtns+='<button class="wrong-filter-btn '+(wrongFilter==='unredone'?'active':'')+'" data-filter="unredone">未重做 Unredone ('+getUnredoneWrongCount()+')</button>';
+  filterBtns+='<button class="wrong-filter-btn '+(wrongFilter==='redone'?'active':'')+'" data-filter="redone">已掌握 Mastered ('+(records.length-getUnredoneWrongCount())+')</button>';
+  gameTypes.forEach(function(gid){
+    var gd=GAME_DEFS.find(function(g){return g.id===gid;});
+    if(gd){
+      var cnt=records.filter(function(r){return r.gameId===gid;}).length;
+      filterBtns+='<button class="wrong-filter-btn '+(wrongFilter==='game:'+gid?'active':'')+'" data-filter="game:'+esc(gid)+'">'+gd.icon+' '+esc(gd.title)+' ('+cnt+')</button>';
+    }
+  });
+
+  // 构建列表
+  var listHTML='';
+  if(filtered.length===0){
+    listHTML='<div class="wrong-empty">🎉 暂无错题 No wrong answers yet!<br>继续保持加油！</div>';
+  }else{
+    filtered.forEach(function(r){
+      var dateStr=new Date(r.timestamp).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      listHTML+='<div class="wrong-item '+(r.redone?'redone':'')+'" data-id="'+esc(r.id)+'">'+
+        '<div class="wrong-item-head">'+
+          '<div class="wrong-item-q">'+r.gameIcon+' '+esc(r.question)+'</div>'+
+          '<span class="wrong-item-type">'+esc(r.gameName)+'</span>'+
+        '</div>'+
+        '<div class="wrong-item-answers">'+
+          '<span class="wrong-ans-box user">你的答案: '+esc(r.userAnswer)+'</span>'+
+          '<span class="wrong-ans-box correct">正确答案: '+esc(r.correctAnswer)+'</span>'+
+        '</div>'+
+        (r.word?'<div style="font-size:12px;color:var(--ink2);margin-bottom:6px">📖 '+esc(r.word)+(r.cn?' · '+esc(r.cn):'')+(r.ipa?' · '+esc(r.ipa):'')+'</div>':'')+
+        '<div style="font-size:11px;color:var(--ink2);margin-bottom:8px">🕒 '+esc(dateStr)+(r.redone?' · ✅ 已重做正确':'')+'</div>'+
+        '<div class="wrong-item-actions">'+
+          (r.redone?'':'<button class="wrong-action-btn redo" data-action="redo" data-id="'+esc(r.id)+'">🔄 重做 Redo</button>')+
+          '<button class="wrong-action-btn review" data-action="review" data-id="'+esc(r.id)+'">📖 复习 Review</button>'+
+          '<button class="wrong-action-btn delete" data-action="delete" data-id="'+esc(r.id)+'">🗑 删除</button>'+
+        '</div>'+
+        '<div id="review-'+esc(r.id)+'"></div>'+
+      '</div>';
+    });
+  }
+
+  modal.innerHTML=
+    '<div class="wrong-modal-content">'+
+      '<div class="wrong-modal-header">'+
+        '<h3>📋 错题本 Wrong Answer Book <span class="wrong-count-badge">'+getUnredoneWrongCount()+'</span></h3>'+
+        '<button class="wrong-modal-close" id="wrongCloseBtn">✕</button>'+
+      '</div>'+
+      '<div class="wrong-filters">'+filterBtns+'</div>'+
+      '<div class="wrong-list" id="wrongList">'+listHTML+'</div>'+
+    '</div>';
+
+  modal.classList.add('show');
+
+  // 绑定事件
+  document.getElementById('wrongCloseBtn').addEventListener('click',closeWrongBook);
+  modal.querySelectorAll('.wrong-filter-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){renderWrongBook(this.dataset.filter);});
+  });
+  modal.querySelectorAll('.wrong-action-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var action=this.dataset.action;
+      var id=this.dataset.id;
+      if(action==='redo') redoWrongItem(id);
+      else if(action==='review') reviewWrongItem(id);
+      else if(action==='delete') deleteWrongItem(id);
+    });
+  });
+  // 点击遮罩关闭
+  modal.addEventListener('click',function(e){
+    if(e.target===modal) closeWrongBook();
+  });
+}
+
+function findWrongRecord(id){
+  return progress.wrongRecords.find(function(r){return r.id===id;});
+}
+
+function redoWrongItem(id){
+  var r=findWrongRecord(id);
+  if(!r) return;
+  var modal=document.getElementById('wrongModal');
+
+  // 构建选项
+  var opts=r.opts||[r.correctAnswer];
+  if(opts.length<4){
+    // 如果没有选项数据，构建简单选项
+    var extra=['A','B','C','D'].filter(function(x){return opts.indexOf(x)<0;});
+    while(opts.length<4&&extra.length>0){opts.push(extra.shift());}
+    opts.sort(function(){return Math.random()-0.5;});
+  }
+
+  modal.innerHTML=
+    '<div class="wrong-modal-content">'+
+      '<div class="wrong-modal-header">'+
+        '<h3>🔄 重做错题 Redo</h3>'+
+        '<button class="wrong-modal-close" id="wrongCloseBtn">✕</button>'+
+      '</div>'+
+      '<div class="wrong-redo-area" id="redoArea">'+
+        '<div style="font-size:12px;color:var(--sky2);font-weight:800">'+r.gameIcon+' '+esc(r.gameName)+'</div>'+
+        '<div class="q-word">'+esc((r.word||'').toUpperCase())+'</div>'+
+        (r.ipa?'<div class="q-ipa">'+esc(r.ipa)+'</div>':'')+
+        (r.cn?'<div class="q-meaning">意思：<strong>'+esc(r.cn)+'</strong></div>':'')+
+        '<div style="font-size:14px;color:var(--ink);margin:8px 0;font-weight:700">'+esc(r.question)+'</div>'+
+        '<button class="q-play" id="redoPlayBtn">🔊 听发音 Listen</button>'+
+        '<div class="opts" style="margin-top:12px">'+
+          opts.map(function(o){return '<button class="opt" data-ans="'+esc(o)+'">'+esc(o.toUpperCase())+'</button>';}).join('')+
+        '</div>'+
+        '<div id="redoResult"></div>'+
+      '</div>'+
+    '</div>';
+
+  modal.classList.add('show');
+
+  document.getElementById('wrongCloseBtn').addEventListener('click',closeWrongBook);
+  var playBtn=document.getElementById('redoPlayBtn');
+  if(playBtn&&r.word) playBtn.addEventListener('click',function(){speak(r.word);});
+
+  var redoArea=document.getElementById('redoArea');
+  bindOptClick(redoArea,r.correctAnswer,function(isCorrect){
+    var result=document.getElementById('redoResult');
+    if(isCorrect){
+      result.innerHTML='<div style="color:var(--grass2);font-weight:800;font-size:16px;margin-top:12px">🎉 答对了！Correct!</div>';
+      if(r.word) speak(r.word);
+      r.redone=true;
+      saveProgress();
+      setTimeout(function(){
+        renderWrongBook(wrongFilter);
+        refreshStarsUI();
+      },1500);
+    }else{
+      result.innerHTML='<div style="color:var(--coral2);font-weight:800;font-size:14px;margin-top:12px">❌ 再想想，正确答案是 '+esc(r.correctAnswer)+'</div>';
+    }
+  });
+}
+
+function reviewWrongItem(id){
+  var r=findWrongRecord(id);
+  if(!r) return;
+  var panel=document.getElementById('review-'+id);
+  if(!panel) return;
+  // 切换显示
+  if(panel.innerHTML){
+    panel.innerHTML='';
+    return;
+  }
+  panel.innerHTML='<div class="wrong-review-panel">'+
+    '<div><strong>📌 知识点 Knowledge Point:</strong><br><span class="kp">'+esc(r.knowledgePoint)+'</span></div>'+
+    '<div style="margin-top:8px"><strong>💡 解题思路 Analysis:</strong><br>'+esc(r.analysis)+'</div>'+
+    (r.word?'<div style="margin-top:8px"><strong>🔊 朗读:</strong> <button class="wrong-action-btn review" id="reviewPlayBtn">🔊 Listen</button></div>':'')+
+  '</div>';
+  var playBtn=panel.querySelector('#reviewPlayBtn');
+  if(playBtn&&r.word) playBtn.addEventListener('click',function(){speak(r.word);});
+}
+
+function deleteWrongItem(id){
+  var idx=progress.wrongRecords.findIndex(function(r){return r.id===id;});
+  if(idx>=0){
+    progress.wrongRecords.splice(idx,1);
+    saveProgress();
+    renderWrongBook(wrongFilter);
+    refreshStarsUI();
+  }
+}
+
 // ═══ 初始化 ═══
 function init(){
   loadProgress();
@@ -1160,6 +1489,15 @@ function init(){
   renderGameGrid();
   refreshStarsUI();
   startGame('letters');
+  // 错题本入口：监听 stats-row 中错题数字的点击
+  document.getElementById('gameArea').addEventListener('click',function(e){
+    if(e.target&&e.target.closest('#wrongStatBtn')){
+      openWrongBook();
+    }
+  });
+  // 导航栏错题按钮
+  var navWrongBtn=document.getElementById('navWrongBtn');
+  if(navWrongBtn) navWrongBtn.addEventListener('click',openWrongBook);
 }
 
 init();
