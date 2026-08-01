@@ -350,7 +350,11 @@ function statsHTML(){
   return `<div class="stats-row"><span class="stat correct-stat">✅ ${state.correct}</span><span class="stat wrong-stat">❌ ${state.wrong}</span><span class="stat">📝 ${state.idx+1}/${state.questions.length}</span></div>`;
 }
 
-function nextQuestion(){state.idx++;}
+function nextQuestion(){state.idx++; renderCurrent();}
+function renderCurrent(){
+  const m={letters:renderLetterGame,families:renderFamilyGame,magnetice:renderMagicGame,vowelR:renderVowelRGame,blends:renderBlendGame,digraphs:renderDigraphGame};
+  const fn=m[state.game]; if(fn) fn();
+}
 
 // ─── 字母游戏 ──
 function renderLetterGame(){
@@ -379,8 +383,8 @@ function renderLetterGame(){
       setTimeout(()=>nextQuestion(),1500);
     } else {
       state.wrong++;
-      if(!q.wrongHint){q.wrongHint=true; state.wrongAttempts++; state.questions[state.idx]=q; renderLetterGame();}
-      else {state.wrong++; nextQuestion();}
+      if(!q.wrongHint){q.wrongHint=true; renderLetterGame();}
+      else {setTimeout(()=>nextQuestion(),800);}
     }
   });
   area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
@@ -391,17 +395,16 @@ function renderFamilyGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  let display='';
-  for(const c of q.fam){display+=c==='_'?'<span class="blank">_</span>':c;}
-  const wordWithVowel=q.fam.replace('_',q.answer);
+  // 用实际单词展示，元音位置用空白替代
+  const display=q.word.split('').map(c=>c===q.answer?'<span class="blank">_</span>':c).join('');
   const html=`
   <div class="question-card">
     <div class="q-category">📦 词族填空 · Word Family</div>
     <div class="q-tip">💡 短元音家族 ${esc(q.fam)} · ${esc(q.ipa)}</div>
     <div class="family-word">${display}</div>
     <div class="family-hint">填入正确元音字母，组成完整单词</div>
-    <div class="family-meaning">提示：短元音家族 — 例如 ${wordWithVowel}</div>
-    <button class="q-play" data-play="${esc(wordWithVowel)}">🔊 听完整单词 Listen</button>
+    <div class="family-meaning">提示：短元音家族 — 正确答案将拼出 ${esc(q.word)}</div>
+    <button class="q-play" data-play="${esc(q.word)}">🔊 听完整单词 Listen</button>
   </div>
   <div class="opts">
     ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
@@ -411,7 +414,7 @@ function renderFamilyGame(){
   bindOptClick(area, q.answer, (isCorrect)=>{
     if(isCorrect){
       state.correct++; state.stars.families=Math.min(6,state.stars.families+1); refreshStarsUI();
-      speak(wordWithVowel);
+      speak(q.word);
       setTimeout(()=>nextQuestion(),1200);
     } else {
       state.wrong++;
@@ -451,7 +454,7 @@ function renderMagicGame(){
       state.correct++; state.stars.magnetice=Math.min(6,state.stars.magnetice+1); refreshStarsUI();
       speak(q.long);
       setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++;}
+    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
   });
   const playBtn=area.querySelector('[data-play-multi]');
   if(playBtn) playBtn.addEventListener('click',()=>{speak(q.short);setTimeout(()=>speak(q.long),900);});
@@ -481,7 +484,7 @@ function renderVowelRGame(){
       state.correct++; state.stars.vowelR=Math.min(6,state.stars.vowelR+1); refreshStarsUI();
       speak(q.example);
       setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++;}
+    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
   });
   area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
 }
@@ -513,7 +516,7 @@ function renderBlendGame(){
       state.correct++; state.stars.blends=Math.min(6,state.stars.blends+1); refreshStarsUI();
       speak(q.word);
       setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++;}
+    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
   });
   area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
 }
@@ -545,7 +548,7 @@ function renderDigraphGame(){
       state.correct++; state.stars.digraphs=Math.min(6,state.stars.digraphs+1); refreshStarsUI();
       speak(q.example);
       setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++;}
+    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
   });
   area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
 }
