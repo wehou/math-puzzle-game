@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>拼读小能手 · Phonics Hero — 7款互动小游戏</title>
+<title>拼读小能手 · Phonics Hero — 9款互动小游戏</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
@@ -215,7 +215,7 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
     <div class="nav-progress">
       <span class="level-badge">Lv.<span id="navLevel">1</span></span>
       <div class="progress-bar"><div class="progress-fill" id="navProgressFill" style="width:0%"></div></div>
-      <span class="stars-text"><span id="navStars">0</span>/42 ⭐</span>
+      <span class="stars-text"><span id="navStars">0</span>/54 ⭐</span>
     </div>
     <span class="streak-pill">🔥 <span id="navStreak">0</span></span>
     <span class="score-pill" id="navWrongBtn" style="background:var(--coral2);color:#fff;cursor:pointer">❌ <span id="navWrongCount">0</span></span>
@@ -227,7 +227,7 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 
 <header class="hero">
   <h1><span style="color:var(--coral2)">拼读小能手</span><span class="en-sub">Phonics Hero — Mini Games</span></h1>
-  <p>从《斗半匠自然拼读记单词一本通》精选130条规则，化身为7款互动小游戏！<br>130 phonics rules in 7 interactive mini-games!</p>
+  <p>从《斗半匠自然拼读记单词一本通》精选130条规则，化身为9款互动小游戏！<br>130 phonics rules in 9 interactive mini-games!</p>
   <p class="source">📖 Source: 斗半匠《自然拼读记单词一本通》24春 · 每日一规则，见词就能读</p>
 </header>
 
@@ -249,32 +249,32 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 
 // ═══ 数据（斗半匠 PDF 提取整理）═══
 const LETTERS=[
- {l:'a',ipa:'/æ/',hint:'嘴张三指',word:'ant',cn:'蚂蚁',tip:'The ant has an apple as food at home.'},
- {l:'b',ipa:'/b/',hint:'双唇相碰',word:'banana',cn:'香蕉',tip:'A boy buys some bananas for his baby brother.'},
- {l:'c',ipa:'/k/',hint:'像蜗牛重壳',word:'cow',cn:'奶牛',tip:'Act like a cow with a cup of cola.'},
- {l:'d',ipa:'/d/',hint:'像扇门',word:'dance',cn:'跳舞',tip:'A lady dances around the desk one day.'},
- {l:'e',ipa:'/e/',hint:'嘴张一指',word:'egg',cn:'蛋',tip:'This elephant likes eggs best.'},
- {l:'f',ipa:'/f/',hint:'上牙碰下唇',word:'fish',cn:'鱼',tip:'Five cats like four fish for lunch.'},
- {l:'g',ipa:'/g/',hint:'像大山喊g',word:'garden',cn:'花园',tip:'A good girl goes to the garden with a goat.'},
- {l:'h',ipa:'/h/',hint:'轻轻呵气',word:'help',cn:'帮助',tip:'Hello, please help me park here.'},
- {l:'i',ipa:'/ɪ/',hint:'轻轻咧嘴',word:'in',cn:'在里',tip:'Give him a gift if he is there.'},
- {l:'j',ipa:'/dʒ/',hint:'像拐杖',word:'job',cn:'工作',tip:'Joe likes to drink juice in June.'},
- {l:'k',ipa:'/k/',hint:'很口渴',word:'key',cn:'钥匙',tip:'This man drinking milk likes cooking.'},
- {l:'l',ipa:'/l/',hint:'后有元音快乐',word:'lion',cn:'狮子',tip:'The pilot loves the plan to fly a plane.'},
- {l:'m',ipa:'/m/',hint:'像山峰闭嘴',word:'money',cn:'钱',tip:'The man climbs a mountain on a warm morning.'},
- {l:'n',ipa:'/n/',hint:'像扇门舌尖上腭',word:'no',cn:'不',tip:'Only one kind animal won the game in the end.'},
- {l:'o',ipa:'/ɒ/',hint:'双唇噘起',word:'orange',cn:'橙子',tip:'He lost lots of oranges on the box.'},
- {l:'p',ipa:'/p/',hint:'和b是一家',word:'panda',cn:'大熊猫',tip:'Mr Panda, please have some pizza.'},
- {l:'q',ipa:'/kw/',hint:'u不分家',word:'queen',cn:'女王',tip:'Answer the queen and answer quickly.'},
- {l:'r',ipa:'/r/',hint:'像豆芽脆弱',word:'robot',cn:'机器人',tip:'The reporter sees a robot in the library every day.'},
- {l:'s',ipa:'/s/',hint:'像小蛇',word:'sister',cn:'姐妹',tip:'My sister sits beside the sofa and sends messages.'},
- {l:'t',ipa:'/t/',hint:'像伞柄',word:'tiger',cn:'老虎',tip:'The tiger near the table has a long tail.'},
- {l:'u',ipa:'/ʌ/',hint:'舌抵下齿',word:'cup',cn:'杯子',tip:'The bus runs in the sun, through the mud.'},
- {l:'v',ipa:'/v/',hint:'上牙碰下唇',word:'very',cn:'非常',tip:'Very little love lives in five lives.'},
- {l:'w',ipa:'/w/',hint:'双唇拢圆',word:'water',cn:'水',tip:'Why do we win the water game?'},
- {l:'x',ipa:'/ks/',hint:'双音合发',word:'fox',cn:'狐狸',tip:'Six foxes in the box take a taxi to the exit.'},
- {l:'y',ipa:'/j/',hint:'半元音',word:'yes',cn:'是',tip:'Yes, you are young and yellow like yesterday.'},
- {l:'z',ipa:'/z/',hint:'像蜜蜂嗡嗡',word:'zoo',cn:'动物园',tip:'Zero zebras zip to the zoo.'},
+ {l:'a',ipa:'/æ/',hint:'嘴张三指',word:'ant',cn:'蚂蚁',tip:'The ant has an apple as food at home.',words:['ant','apple','arm','ax','arrow']},
+ {l:'b',ipa:'/b/',hint:'双唇相碰',word:'banana',cn:'香蕉',tip:'A boy buys some bananas for his baby brother.',words:['banana','boy','baby','book','ball']},
+ {l:'c',ipa:'/k/',hint:'像蜗牛重壳',word:'cow',cn:'奶牛',tip:'Act like a cow with a cup of cola.',words:['cow','cat','cup','cake','cold']},
+ {l:'d',ipa:'/d/',hint:'像扇门',word:'dance',cn:'跳舞',tip:'A lady dances around the desk one day.',words:['dance','dog','desk','day','door']},
+ {l:'e',ipa:'/e/',hint:'嘴张一指',word:'egg',cn:'蛋',tip:'This elephant likes eggs best.',words:['egg','elephant','elbow','end','engine']},
+ {l:'f',ipa:'/f/',hint:'上牙碰下唇',word:'fish',cn:'鱼',tip:'Five cats like four fish for lunch.',words:['fish','five','four','flag','food']},
+ {l:'g',ipa:'/g/',hint:'像大山喊g',word:'garden',cn:'花园',tip:'A good girl goes to the garden with a goat.',words:['garden','girl','goat','good','game']},
+ {l:'h',ipa:'/h/',hint:'轻轻呵气',word:'help',cn:'帮助',tip:'Hello, please help me park here.',words:['help','hat','hello','house','hand']},
+ {l:'i',ipa:'/ɪ/',hint:'轻轻咧嘴',word:'in',cn:'在里',tip:'Give him a gift if he is there.',words:['in','if','is','it','ink']},
+ {l:'j',ipa:'/dʒ/',hint:'像拐杖',word:'job',cn:'工作',tip:'Joe likes to drink juice in June.',words:['job','juice','jump','June','jelly']},
+ {l:'k',ipa:'/k/',hint:'很口渴',word:'key',cn:'钥匙',tip:'This man drinking milk likes cooking.',words:['key','kid','kite','kick','king']},
+ {l:'l',ipa:'/l/',hint:'后有元音快乐',word:'lion',cn:'狮子',tip:'The pilot loves the plan to fly a plane.',words:['lion','leg','lamp','leaf','lip']},
+ {l:'m',ipa:'/m/',hint:'像山峰闭嘴',word:'money',cn:'钱',tip:'The man climbs a mountain on a warm morning.',words:['money','man','moon','morning','mother']},
+ {l:'n',ipa:'/n/',hint:'像扇门舌尖上腭',word:'no',cn:'不',tip:'Only one kind animal won the game in the end.',words:['no','nut','nose','net','nest']},
+ {l:'o',ipa:'/ɒ/',hint:'双唇噘起',word:'orange',cn:'橙子',tip:'He lost lots of oranges on the box.',words:['orange','on','ox','octopus','open']},
+ {l:'p',ipa:'/p/',hint:'和b是一家',word:'panda',cn:'大熊猫',tip:'Mr Panda, please have some pizza.',words:['panda','pig','pen','pizza','park']},
+ {l:'q',ipa:'/kw/',hint:'u不分家',word:'queen',cn:'女王',tip:'Answer the queen and answer quickly.',words:['queen','quick','quiet','question','quilt']},
+ {l:'r',ipa:'/r/',hint:'像豆芽脆弱',word:'robot',cn:'机器人',tip:'The reporter sees a robot in the library every day.',words:['robot','red','rain','run','rabbit']},
+ {l:'s',ipa:'/s/',hint:'像小蛇',word:'sister',cn:'姐妹',tip:'My sister sits beside the sofa and sends messages.',words:['sister','sun','sit','see','song']},
+ {l:'t',ipa:'/t/',hint:'像伞柄',word:'tiger',cn:'老虎',tip:'The tiger near the table has a long tail.',words:['tiger','table','tail','ten','taxi']},
+ {l:'u',ipa:'/ʌ/',hint:'舌抵下齿',word:'cup',cn:'杯子',tip:'The bus runs in the sun, through the mud.',words:['cup','up','us','umbrella','uncle']},
+ {l:'v',ipa:'/v/',hint:'上牙碰下唇',word:'very',cn:'非常',tip:'Very little love lives in five lives.',words:['very','van','violin','vest','voice']},
+ {l:'w',ipa:'/w/',hint:'双唇拢圆',word:'water',cn:'水',tip:'Why do we win the water game?',words:['water','we','win','window','walk']},
+ {l:'x',ipa:'/ks/',hint:'双音合发',word:'fox',cn:'狐狸',tip:'Six foxes in the box take a taxi to the exit.',words:['fox','box','six','taxi','exit']},
+ {l:'y',ipa:'/j/',hint:'半元音',word:'yes',cn:'是',tip:'Yes, you are young and yellow like yesterday.',words:['yes','you','yellow','young','yogurt']},
+ {l:'z',ipa:'/z/',hint:'像蜜蜂嗡嗡',word:'zoo',cn:'动物园',tip:'Zero zebras zip to the zoo.',words:['zoo','zero','zebra','zip','buzz']},
 ];
 
 const FAMILIES=[
@@ -284,6 +284,11 @@ const FAMILIES=[
  {fam:'-og',vowel:'o',ipa:'/ɒ/',words:['bog','dog','fog','hog','log','mug']},
  {fam:'-ub',vowel:'u',ipa:'/ʌ/',words:['bub','cub','dub','rub','tub','sub']},
  {fam:'-an',vowel:'a',ipa:'/æn/',words:['ban','can','dan','fan','man','pan','ran','tan']},
+ {fam:'-ad',vowel:'a',ipa:'/æd/',words:['bad','dad','had','mad','pad','sad']},
+ {fam:'-en',vowel:'e',ipa:'/en/',words:['den','hen','men','pen','ten']},
+ {fam:'-in',vowel:'i',ipa:'/ɪn/',words:['bin','fin','pin','tin','win']},
+ {fam:'-ot',vowel:'o',ipa:'/ɒt/',words:['cot','dot','hot','lot','pot']},
+ {fam:'-ug',vowel:'u',ipa:'/ʌg/',words:['bug','hug','jug','mug','rug']},
 ];
 
 const MAGIC_E=[
@@ -313,6 +318,17 @@ const BLENDS=[
  {blend:'fl',words:['flower','fly','flag','flat','flock'],cn:'fl组合',ipa:'/fl/'},
  {blend:'pr',words:['prince','print','prize','proof','pray'],cn:'pr组合',ipa:'/pr/'},
  {blend:'dr',words:['drum','dress','drive','drop','dream'],cn:'dr组合',ipa:'/dr/'},
+ {blend:'gl',words:['glass','glow','glue','glad','globe'],cn:'gl组合',ipa:'/gl/'},
+ {blend:'pl',words:['play','plane','plate','plus','plug'],cn:'pl组合',ipa:'/pl/'},
+ {blend:'sl',words:['sleep','slide','slow','slim','slip'],cn:'sl组合',ipa:'/sl/'},
+ {blend:'fr',words:['frog','free','fruit','friend','fresh'],cn:'fr组合',ipa:'/fr/'},
+ {blend:'gr',words:['grape','green','grow','grass','great'],cn:'gr组合',ipa:'/gr/'},
+ {blend:'sm',words:['smile','small','smell','smoke','smooth'],cn:'sm组合',ipa:'/sm/'},
+ {blend:'sn',words:['snow','snake','snack','sneeze','snail'],cn:'sn组合',ipa:'/sn/'},
+ {blend:'sp',words:['spider','spoon','spell','spend','sport'],cn:'sp组合',ipa:'/sp/'},
+ {blend:'sw',words:['swim','swing','sweet','sweater','sweep'],cn:'sw组合',ipa:'/sw/'},
+ {blend:'sk',words:['skate','skip','sky','skin','skirt'],cn:'sk组合',ipa:'/sk/'},
+ {blend:'sc',words:['school','scarf','scale','scoop','scan'],cn:'sc组合',ipa:'/sc/'},
 ];
 
 const DIGRAPHS=[
@@ -326,6 +342,40 @@ const DIGRAPHS=[
  {dg:'kn',ipa:'/n/',example:'know',cn:'知道',hint:'k不发音'},
  {dg:'wr',ipa:'/r/',example:'write',cn:'写',hint:'w不发音'},
  {dg:'mb',ipa:'/m/',example:'lamb',cn:'羔羊',hint:'b不发音'},
+ {dg:'ck',ipa:'/k/',example:'duck',cn:'鸭子',hint:'ck发音就是k'},
+ {dg:'tw',ipa:'/tw/',example:'two',cn:'二',hint:'tw发t+w音'},
+ {dg:'ng',ipa:'/ŋ/',example:'sing',cn:'唱歌',hint:'ng发鼻音'},
+ {dg:'ch(k)',ipa:'/k/',example:'school',cn:'学校',hint:'ch有时发k音'},
+];
+
+const VOWEL_DIGRAPHS=[
+ {dg:'ai',ipa:'/eɪ/',example:'rain',cn:'雨',hint:'ai发字母A的音',words:['rain','train','main','wait','paint']},
+ {dg:'ay',ipa:'/eɪ/',example:'day',cn:'天',hint:'ay在词尾发字母A的音',words:['day','play','say','may','stay']},
+ {dg:'ea(长)',ipa:'/i:/',example:'sea',cn:'海',hint:'ea常发长音i:',words:['sea','tea','clean','read','meat']},
+ {dg:'ea(短)',ipa:'/e/',example:'bread',cn:'面包',hint:'ea有时发短音e',words:['bread','ready','head','breakfast','sweater']},
+ {dg:'ee',ipa:'/i:/',example:'tree',cn:'树',hint:'ee发长音i:',words:['see','tree','three','green','feet']},
+ {dg:'ie',ipa:'/i:/',example:'field',cn:'田野',hint:'ie发长音i:',words:['chief','field','piece','thief','believe']},
+ {dg:'igh',ipa:'/aɪ/',example:'night',cn:'夜晚',hint:'igh发字母I的音',words:['night','right','light','high','fight']},
+ {dg:'oa',ipa:'/əʊ/',example:'boat',cn:'船',hint:'oa发字母O的音',words:['boat','road','goat','coat','soap']},
+ {dg:'oi',ipa:'/ɔɪ/',example:'coin',cn:'硬币',hint:'oi发男孩音',words:['coin','join','oil','point','boil']},
+ {dg:'oy',ipa:'/ɔɪ/',example:'boy',cn:'男孩',hint:'oy在词尾发男孩音',words:['boy','toy','joy','enjoy','destroy']},
+ {dg:'oo(长)',ipa:'/u:/',example:'moon',cn:'月亮',hint:'oo常发长音u:',words:['moon','spoon','room','food','zoo']},
+ {dg:'oo(短)',ipa:'/ʊ/',example:'book',cn:'书',hint:'oo有时发短音',words:['book','look','foot','good','wood']},
+ {dg:'ou',ipa:'/aʊ/',example:'house',cn:'房子',hint:'ou发房子音',words:['house','mouse','out','cloud','mouth']},
+ {dg:'ow(长)',ipa:'/aʊ/',example:'cow',cn:'奶牛',hint:'ow常发奶牛音',words:['cow','now','how','town','flower']},
+ {dg:'ow(短)',ipa:'/əʊ/',example:'snow',cn:'雪',hint:'ow有时发字母O的音',words:['window','snow','flow','yellow','grow']},
+ {dg:'aw',ipa:'/ɔ:/',example:'law',cn:'法律',hint:'aw发哦音',words:['law','draw','saw','straw','crawl']},
+ {dg:'au',ipa:'/ɔ:/',example:'cause',cn:'原因',hint:'au发哦音',words:['cause','sauce','August','auto','autumn']},
+ {dg:'air',ipa:'/eə/',example:'chair',cn:'椅子',hint:'air发空气音',words:['air','chair','fair','hair','pair']},
+ {dg:'ear(长)',ipa:'/ɪə/',example:'ear',cn:'耳朵',hint:'ear常发耳朵音',words:['ear','near','clear','hear','dear']},
+ {dg:'ear(短)',ipa:'/ɜ:/',example:'learn',cn:'学习',hint:'ear有时发饿音',words:['learn','early','earth','search','heard']},
+];
+
+const CG_SOUNDS=[
+ {letter:'c',sound:'hard',ipa:'/k/',example:'cat',cn:'猫',hint:'c在a/o/u前发/k/',words:['cat','cup','cake','cold','color']},
+ {letter:'c',sound:'soft',ipa:'/s/',example:'city',cn:'城市',hint:'c在e/i/y前发/s/',words:['city','ice','rice','nice','circle']},
+ {letter:'g',sound:'hard',ipa:'/g/',example:'goat',cn:'山羊',hint:'g在a/o/u前发/g/',words:['goat','game','green','good','garden']},
+ {letter:'g',sound:'soft',ipa:'/dʒ/',example:'giant',cn:'巨人',hint:'g在e/i/y前发/dʒ/',words:['giant','giraffe','gem','ginger','gentle']},
 ];
 
 const DRAG_DATA=[
@@ -341,15 +391,17 @@ const DRAG_DATA=[
  {word:'tree',emoji:'🌳',cn:'树'},
 ];
 
-// ═══ 游戏定义（7款）═══
+// ═══ 游戏定义（9款）═══
 const GAME_DEFS=[
- {id:'letters',icon:'🔤',title:'字母发音',desc:'26字母 · 听听猜猜',en:'26 Letters · Letter Sounds'},
- {id:'families',icon:'📦',title:'词族填空',desc:'短元音词族',en:'Short Vowel Families'},
- {id:'magnetice',icon:'✨',title:'魔术E',desc:'短音→长音',en:'Magic E Transformation'},
- {id:'vowelR',icon:'🌈',title:'元音+r',desc:'ar er ir or ur',en:'Vowel + r Sounds'},
- {id:'blends',icon:'🧩',title:'辅音组合',desc:'bl cl br cr tr',en:'Consonant Blends'},
- {id:'digraphs',icon:'🎯',title:'双字母音',desc:'sh ch th wh ph',en:'Double Letter Sounds'},
- {id:'dragmatch',icon:'🎪',title:'拖拽匹配',desc:'图文配对挑战',en:'Drag & Match Game'},
+ {id:'letters',icon:'🔤',title:'字母发音',desc:'26字母 · 听听猜猜',en:'26 Letters · Letter Sounds',stage:1,stageName:'基础',stageEn:'Basics'},
+ {id:'families',icon:'📦',title:'词族填空',desc:'短元音词族',en:'Short Vowel Families',stage:2,stageName:'短元音',stageEn:'Short Vowels'},
+ {id:'magnetice',icon:'✨',title:'魔术E',desc:'短音→长音',en:'Magic E Transformation',stage:3,stageName:'魔术E',stageEn:'Magic E'},
+ {id:'vowelR',icon:'🌈',title:'元音+r',desc:'ar er ir or ur',en:'Vowel + r Sounds',stage:4,stageName:'元音+r',stageEn:'Vowel + r'},
+ {id:'voweldig',icon:'🔗',title:'元音组合',desc:'ai ay ea ee oa',en:'Vowel Digraphs',stage:5,stageName:'元音组合',stageEn:'Vowel Digraphs'},
+ {id:'blends',icon:'🧩',title:'辅音组合',desc:'bl cl br cr tr',en:'Consonant Blends',stage:6,stageName:'辅音组合',stageEn:'Consonant Blends'},
+ {id:'digraphs',icon:'🎯',title:'双字母音',desc:'sh ch th wh ph',en:'Double Letter Sounds',stage:7,stageName:'双辅音',stageEn:'Double Consonants'},
+ {id:'cgsounds',icon:'⚡',title:'c和g双音',desc:'c/g硬音软音',en:'C & G Dual Sounds',stage:8,stageName:'c和g双音',stageEn:'C & G Dual Sounds'},
+ {id:'dragmatch',icon:'🎪',title:'拖拽匹配',desc:'图文配对挑战',en:'Drag & Match Game',stage:9,stageName:'综合',stageEn:'Comprehensive'},
 ];
 
 // ═══ 徽章定义（8枚）═══
@@ -357,14 +409,14 @@ const BADGES=[
  {id:'first_star',icon:'🌟',name:'First Star',cn:'第一颗星',desc:'Earn your first star · 赢得第一颗星'},
  {id:'perfect_game',icon:'🎯',name:'Perfect Game',cn:'完美通关',desc:'Complete a game with 0 wrong · 零错误通关'},
  {id:'streak_master',icon:'🔥',name:'Streak Master',cn:'连胜大师',desc:'Get 5 correct in a row · 连续答对5题'},
- {id:'explorer',icon:'🗺️',name:'Explorer',cn:'探索者',desc:'Play all 7 game types · 体验全部7种游戏'},
+ {id:'explorer',icon:'🗺️',name:'Explorer',cn:'探索者',desc:'Play all 9 game types · 体验全部9种游戏'},
  {id:'collector',icon:'💎',name:'Collector',cn:'收藏家',desc:'Earn 30 total stars · 累计30颗星'},
  {id:'speed_learner',icon:'⚡',name:'Speed Learner',cn:'速学者',desc:'Complete a game in under 60s · 60秒内通关'},
- {id:'scholar',icon:'🎓',name:'Phonics Scholar',cn:'拼读学者',desc:'Earn 42 total stars · 全部42颗星'},
+ {id:'scholar',icon:'🎓',name:'Phonics Scholar',cn:'拼读学者',desc:'Earn 54 total stars · 全部54颗星'},
  {id:'comeback_kid',icon:'🏅',name:'Comeback Kid',cn:'连续玩家',desc:'Play 3 days in a row · 连续3天游戏'},
 ];
 
-const MAX_STARS=42;
+const MAX_STARS=54;
 const PROGRESS_KEY='phonics_hero_progress';
 
 // ═══ 进度系统 ═══
@@ -413,8 +465,8 @@ function getLevel(stars){
 }
 
 function getLevelRange(level){
-  const ranges=[[0,5],[6,12],[13,20],[21,30],[31,42]];
-  return ranges[level-1]||[0,42];
+  const ranges=[[0,5],[6,12],[13,20],[21,30],[31,54]];
+  return ranges[level-1]||[0,54];
 }
 
 function updateDayStreak(){
@@ -460,7 +512,7 @@ let state={
   correct:0,
   wrong:0,
   wrongAttempts:0,
-  stars:{letters:0,families:0,magnetice:0,vowelR:0,blends:0,digraphs:0,dragmatch:0},
+  stars:{letters:0,families:0,magnetice:0,vowelR:0,blends:0,digraphs:0,voweldig:0,cgsounds:0,dragmatch:0},
   timerStarted:false,
   startTime:null,
   endTime:null,
@@ -585,8 +637,8 @@ function checkBadges(){
   if(progress.totalStars>=1) earnBadge('first_star');
   if(progress.streak>=5) earnBadge('streak_master');
   if(progress.totalStars>=30) earnBadge('collector');
-  if(progress.totalStars>=42) earnBadge('scholar');
-  if(progress.playedGames.length>=7) earnBadge('explorer');
+  if(progress.totalStars>=54) earnBadge('scholar');
+  if(progress.playedGames.length>=9) earnBadge('explorer');
   if(progress.dayStreak>=3) earnBadge('comeback_kid');
 }
 
@@ -641,14 +693,21 @@ function renderBadgeBar(){
 // ═══ 游戏卡片渲染 ═══
 function renderGameGrid(){
   const grid=document.getElementById('gameGrid');
-  grid.innerHTML=GAME_DEFS.map(d=>{
-    return '<div class="game-card '+(state.game===d.id?'active':'')+'" data-game="'+esc(d.id)+'">'+
+  let lastStage=0;
+  let html='';
+  GAME_DEFS.forEach(d=>{
+    if(d.stage!==lastStage){
+      html+='<div style="grid-column:1/-1;font-size:12px;font-weight:800;color:var(--grape2);padding:10px 4px 2px;margin-top:4px;border-bottom:2px solid rgba(183,148,246,.2)">第'+d.stage+'阶段：'+esc(d.stageName)+' · Stage '+d.stage+': '+esc(d.stageEn)+'</div>';
+      lastStage=d.stage;
+    }
+    html+='<div class="game-card '+(state.game===d.id?'active':'')+'" data-game="'+esc(d.id)+'">'+
       '<span class="icon">'+d.icon+'</span>'+
       '<div class="title">'+esc(d.title)+'</div>'+
       '<div class="desc">'+esc(d.desc)+'<br><span style="color:var(--sky2)">'+esc(d.en)+'</span></div>'+
-      '<div class="stars" id="s-'+esc(d.id)+'">⭐ '+state.stars[d.id]+'/6</div>'+
+      '<div class="stars" id="s-'+esc(d.id)+'">⭐ '+(state.stars[d.id]||0)+'/6</div>'+
     '</div>';
-  }).join('');
+  });
+  grid.innerHTML=html;
   grid.querySelectorAll('.game-card').forEach(card=>{
     card.addEventListener('click',function(){selectGame(this.dataset.game);});
   });
@@ -706,7 +765,7 @@ function startGame(g){
     const blends=shuffle(BLENDS).slice(0,6);
     state.questions=blends.map(b=>{
       const word=b.words[Math.floor(Math.random()*b.words.length)];
-      const allBlends=['bl','cl','br','cr','tr','fl','pr','dr'];
+      const allBlends=BLENDS.map(x=>x.blend);
       const wrong=allBlends.filter(x=>x!==b.blend).sort(()=>Math.random()-0.5).slice(0,3);
       const opts=[b.blend].concat(wrong).sort(()=>Math.random()-0.5);
       return {type:'blend',word:word,blend:b.blend,ipa:b.ipa,opts:opts,answer:b.blend,cn:b.cn};
@@ -715,12 +774,29 @@ function startGame(g){
   }else if(g==='digraphs'){
     const items=shuffle(DIGRAPHS).slice(0,6);
     state.questions=items.map(it=>{
-      const allDG=['sh','ch','th','ph','wh','kn','wr','mb'];
+      const allDG=DIGRAPHS.map(x=>x.dg);
       const wrong=allDG.filter(x=>x!==it.dg).sort(()=>Math.random()-0.5).slice(0,3);
       const opts=[it.dg].concat(wrong).sort(()=>Math.random()-0.5);
       return {type:'digraph',dg:it.dg,ipa:it.ipa,example:it.example,cn:it.cn,hint:it.hint,opts:opts,answer:it.dg};
     });
     renderDigraphGame();
+  }else if(g==='voweldig'){
+    const items=shuffle(VOWEL_DIGRAPHS).slice(0,6);
+    state.questions=items.map(it=>{
+      const allDG=VOWEL_DIGRAPHS.map(x=>x.dg);
+      const wrong=allDG.filter(x=>x!==it.dg).sort(()=>Math.random()-0.5).slice(0,3);
+      const opts=[it.dg].concat(wrong).sort(()=>Math.random()-0.5);
+      return {type:'voweldig',dg:it.dg,ipa:it.ipa,example:it.example,cn:it.cn,hint:it.hint,opts:opts,answer:it.dg};
+    });
+    renderVowelDigGame();
+  }else if(g==='cgsounds'){
+    const items=shuffle(CG_SOUNDS).slice(0,4);
+    state.questions=items.map(it=>{
+      const allIPA=['/k/','/s/','/g/','/dʒ/'];
+      const opts=allIPA.slice().sort(()=>Math.random()-0.5);
+      return {type:'cgsounds',letter:it.letter,sound:it.sound,ipa:it.ipa,example:it.example,cn:it.cn,hint:it.hint,opts:opts,answer:it.ipa};
+    });
+    renderCGGame();
   }else if(g==='dragmatch'){
     state.questions=[];
     for(let i=0;i<6;i++){
@@ -761,6 +837,7 @@ function renderCurrent(){
   const m={
     letters:renderLetterGame, families:renderFamilyGame, magnetice:renderMagicGame,
     vowelR:renderVowelRGame, blends:renderBlendGame, digraphs:renderDigraphGame,
+    voweldig:renderVowelDigGame, cgsounds:renderCGGame,
     dragmatch:renderDragGame
   };
   const fn=m[state.game];
@@ -1078,6 +1155,92 @@ function renderDigraphGame(){
   if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
 }
 
+// ═══ 元音组合游戏 ═══
+function renderVowelDigGame(){
+  const area=document.getElementById('gameArea');
+  if(state.idx>=state.questions.length){renderComplete();return;}
+  const q=state.questions[state.idx];
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">🔗 元音组合 · Vowel Digraphs</div>'+
+    '<div class="q-word">'+esc(q.example.toUpperCase())+'</div>'+
+    '<div class="q-ipa">'+esc(q.ipa)+'</div>'+
+    '<div class="q-meaning">意思是 <strong>'+esc(q.cn)+'</strong></div>'+
+    '<div class="q-tip">💡 '+esc(q.hint)+'</div>'+
+    '<button class="q-play" data-play="'+esc(q.example)+'">🔊 听发音 Listen</button>'+
+  '</div>'+
+  '<div style="margin-top:8px">'+
+    '<div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 这个单词包含哪个元音组合？</div>'+
+    '<div class="opts">'+
+      q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+esc(o)+'</button>').join('')+
+    '</div>'+
+  '</div>'+
+  statsHTML();
+  area.innerHTML=html;
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
+    onFirstAnswer();
+    if(isCorrect){
+      speak(q.example);
+      handleCorrect('voweldig',q.example);
+    }else{
+      handleWrong('voweldig',{
+        question:'单词 "'+esc(q.example)+'" 包含哪个元音组合？ Which vowel digraph?',
+        word:q.example,ipa:q.ipa,cn:q.cn,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:'元音组合 · '+q.dg+' 发 '+q.ipa,
+        analysis:q.hint+'。单词 "'+q.example+'"（'+q.cn+'）中，'+q.dg+' 发 '+q.ipa+' 音。',
+        opts:q.opts
+      });
+      scheduleAdvance(800);
+    }
+  });
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
+}
+
+// ═══ c和g双音游戏 ═══
+function renderCGGame(){
+  const area=document.getElementById('gameArea');
+  if(state.idx>=state.questions.length){renderComplete();return;}
+  const q=state.questions[state.idx];
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">⚡ c和g双音 · C & G Dual Sounds</div>'+
+    '<div class="q-word">'+esc(q.example.toUpperCase())+'</div>'+
+    '<div class="q-ipa">'+esc(q.ipa)+'</div>'+
+    '<div class="q-meaning">意思是 <strong>'+esc(q.cn)+'</strong></div>'+
+    '<div class="q-tip">💡 '+esc(q.hint)+'</div>'+
+    '<button class="q-play" data-play="'+esc(q.example)+'">🔊 听发音 Listen</button>'+
+  '</div>'+
+  '<div style="margin-top:8px">'+
+    '<div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 字母 '+esc(q.letter.toUpperCase())+' 在这个单词中发哪个音？</div>'+
+    '<div class="opts">'+
+      q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+esc(o)+'</button>').join('')+
+    '</div>'+
+  '</div>'+
+  statsHTML();
+  area.innerHTML=html;
+  bindOptClick(area,q.answer,function(isCorrect,userAns){
+    onFirstAnswer();
+    if(isCorrect){
+      speak(q.example);
+      handleCorrect('cgsounds',q.example);
+    }else{
+      handleWrong('cgsounds',{
+        question:'字母 '+q.letter.toUpperCase()+' 在单词 "'+esc(q.example)+'" 中发哪个音？ Which sound does '+q.letter.toUpperCase()+' make?',
+        word:q.example,ipa:q.ipa,cn:q.cn,
+        userAnswer:userAns,correctAnswer:q.answer,
+        knowledgePoint:q.letter.toUpperCase()+'的'+q.sound+'音 · '+q.ipa,
+        analysis:q.hint+'。单词 "'+q.example+'"（'+q.cn+'）中，字母 '+q.letter.toUpperCase()+' 发 '+q.ipa+' 音（'+q.sound+'音）。',
+        opts:q.opts
+      });
+      scheduleAdvance(800);
+    }
+  });
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
+}
+
 // ═══ 拖拽匹配游戏 ═══
 function renderDragGame(){
   const area=document.getElementById('gameArea');
@@ -1213,7 +1376,13 @@ function getRecommendation(accuracy){
   }else if(accuracy<=0.8){
     return {msg:'继续努力！试试下一关 · Keep going! Try the next level',action:'next',btnText:'➡️ 下一关 Next'};
   }else{
-    return {msg:'太棒了！推荐挑战拖拽匹配 · Great! Try Drag & Match',action:'dragmatch',btnText:'🎪 拖拽匹配 Drag Match'};
+    var ids=GAME_DEFS.map(function(g){return g.id;});
+    var idx=ids.indexOf(state.game);
+    if(idx>=0&&idx<ids.length-1){
+      var nextDef=GAME_DEFS[idx+1];
+      return {msg:'太棒了！推荐挑战：'+nextDef.title+' · Great! Try: '+nextDef.en,action:'next',btnText:nextDef.icon+' '+nextDef.title};
+    }
+    return {msg:'太棒了！你已通关全部关卡！· Amazing! All levels completed!',action:'replay',btnText:'🔄 再来一次 Replay'};
   }
 }
 
