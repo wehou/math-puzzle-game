@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>拼读小能手 · Phonics Hero — 6款互动小游戏</title>
+<title>拼读小能手 · Phonics Hero — 7款互动小游戏</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
@@ -18,32 +18,54 @@ html,body{font-family:'Nunito','PingFang SC','Microsoft YaHei',sans-serif;backgr
 h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 
 /* 顶部导航 */
-.nav{position:sticky;top:0;z-index:100;background:rgba(255,248,231,.94);backdrop-filter:blur(10px);border-bottom:3px solid rgba(126,200,255,.25);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
-.brand .logo{font-size:26px}
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,248,231,.94);backdrop-filter:blur(10px);border-bottom:3px solid rgba(126,200,255,.25);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:6px;font-weight:800;font-size:18px}
+.brand .logo{font-size:24px}
 .brand .en{color:var(--sky2)}
-.score-pill{background:var(--sun);color:var(--ink);padding:4px 12px;border-radius:30px;font-weight:800;font-size:14px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-progress{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.level-badge{background:var(--coral2);color:#fff;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800;white-space:nowrap}
+.progress-bar{width:80px;height:8px;background:rgba(126,200,255,.2);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--sun),var(--coral2));border-radius:4px;transition:width .4s ease}
+.stars-text{color:var(--sun2);white-space:nowrap;font-size:12px}
+.streak-pill{background:var(--coral);color:#fff;padding:3px 10px;border-radius:20px;font-weight:800;font-size:12px;white-space:nowrap}
+.score-pill{background:var(--sun);color:var(--ink);padding:4px 12px;border-radius:30px;font-weight:800;font-size:14px;white-space:nowrap}
+
+/* 徽章栏 */
+.badge-bar{display:flex;gap:8px;padding:8px 16px;overflow-x:auto;background:rgba(126,200,255,.08);border-bottom:2px solid rgba(126,200,255,.15);scrollbar-width:thin}
+.badge-bar::-webkit-scrollbar{height:4px}
+.badge-bar::-webkit-scrollbar-thumb{background:rgba(126,200,255,.3);border-radius:2px}
+.badge{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.5);min-width:62px;transition:all .2s;cursor:default}
+.badge .b-icon{font-size:24px;filter:grayscale(1);opacity:.4}
+.badge .b-name{font-size:9px;font-weight:700;color:var(--ink2);margin-top:2px;text-align:center;line-height:1.2;white-space:nowrap}
+.badge.earned{background:rgba(255,216,77,.2);box-shadow:0 2px 6px rgba(255,184,0,.15)}
+.badge.earned .b-icon{filter:none;opacity:1}
+.badge.earned .b-name{color:var(--sun2)}
 
 /* 英雄区 */
-.hero{padding:36px 20px 28px;text-align:center}
-.hero h1{font-size:28px;font-weight:800}
-.hero .en-sub{font-size:16px;color:var(--sky2);display:block;margin-top:2px;font-weight:700}
-.hero p{font-size:14px;color:var(--ink2);margin-top:6px;max-width:520px;margin-left:auto;margin-right:auto}
-.hero .source{margin-top:6px;font-size:12px;color:var(--grape2);font-weight:700}
+.hero{padding:28px 20px 24px;text-align:center}
+.hero h1{font-size:26px;font-weight:800}
+.hero .en-sub{font-size:15px;color:var(--sky2);display:block;margin-top:2px;font-weight:700}
+.hero p{font-size:13px;color:var(--ink2);margin-top:6px;max-width:520px;margin-left:auto;margin-right:auto}
+.hero .source{margin-top:6px;font-size:11px;color:var(--grape2);font-weight:700}
 
 /* 游戏选择 */
-.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:8px 20px 28px;max-width:760px;margin:0 auto}
-.game-card{background:var(--card);border-radius:var(--r);padding:20px 14px;text-align:center;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.06),0 8px 16px rgba(0,0,0,.08);border:3px solid transparent;transition:transform .12s,border-color .12s;user-select:none;width:100%;min-width:0}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:8px 20px 24px;max-width:760px;margin:0 auto}
+.game-card{background:var(--card);border-radius:var(--r);padding:18px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.06),0 8px 16px rgba(0,0,0,.08);border:3px solid transparent;transition:transform .12s,border-color .12s;user-select:none;width:100%;min-width:0}
 .game-card:active{transform:scale(.96)}
 .game-card.active{border-color:var(--coral);box-shadow:0 4px 0 rgba(0,0,0,.06),0 8px 16px rgba(255,107,74,.15)}
-.game-card .icon{font-size:40px;display:block;margin-bottom:6px}
-.game-card .title{font-weight:800;font-size:15px}
+.game-card .icon{font-size:36px;display:block;margin-bottom:4px}
+.game-card .title{font-weight:800;font-size:14px}
 .game-card .desc{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.4}
-.game-card .stars{margin-top:6px;font-size:12px;color:var(--sun2);font-weight:700}
+.game-card .stars{margin-top:5px;font-size:11px;color:var(--sun2);font-weight:700}
 
 /* 游戏主区域 */
 .game-area{max-width:760px;margin:0 auto;padding:0 20px 40px}
-.question-card{background:var(--card);border-radius:20px;padding:24px 20px;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.06),0 12px 24px rgba(0,0,0,.1);margin-bottom:18px}
+.recommendation-banner{background:linear-gradient(135deg,rgba(126,200,255,.15),rgba(183,148,246,.15));border:2px solid rgba(126,200,255,.3);border-radius:14px;padding:12px 16px;margin-bottom:14px;text-align:center;animation:fadeIn .3s ease-out}
+.rec-message{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.rec-btn{background:var(--coral2);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:transform .1s;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+.rec-btn:active{transform:scale(.95)}
+.question-card{background:var(--card);border-radius:20px;padding:24px 20px;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.06),0 12px 24px rgba(0,0,0,.1);margin-bottom:18px;animation:fadeIn .3s ease-out}
 .q-category{font-size:12px;color:var(--sky2);font-weight:800;text-transform:uppercase;letter-spacing:1px}
 .q-word{font-family:'Baloo 2',sans-serif;font-size:54px;font-weight:800;color:var(--coral2);margin:8px 0 4px;letter-spacing:2px}
 .q-ipa{font-size:16px;color:var(--ink2);font-weight:600;margin-bottom:4px}
@@ -62,20 +84,36 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 .opt.wrong{background:#ffcccc;border-color:var(--coral2);color:#c0392b;animation:shake .4s}
 .opt.dim{opacity:.4;pointer-events:none}
 
-@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* 下一题按钮 */
+.next-btn{display:block;margin:14px auto 0;padding:10px 28px;background:var(--grass2);color:#fff;border:none;border-radius:24px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 rgba(60,184,120,.3);transition:transform .1s;animation:pop .3s}
+.next-btn:active{transform:scale(.95)}
+
+/* 拖拽匹配游戏 */
+.drag-instruction{font-size:13px;color:var(--ink2);margin:6px 0 4px;font-weight:600}
+.drag-words{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.drag-word{background:rgba(126,200,255,.12);border:3px solid var(--sky2);border-radius:14px;padding:14px 8px;text-align:center;font-family:'Baloo 2',sans-serif;font-size:22px;font-weight:800;color:var(--sky2);transition:all .2s;position:relative}
+.drag-word-cn{display:block;font-size:11px;color:var(--ink2);font-family:'Nunito',sans-serif;font-weight:700;margin-top:2px}
+.drag-word.drag-over{background:rgba(255,216,77,.25);border-color:var(--sun2);transform:scale(1.05)}
+.drag-word.matched{background:#c6f0d4;border-color:var(--grass2);color:#1b8a4d;animation:pop .3s}
+.drag-word.shake-red{background:#ffcccc;border-color:var(--coral2);color:#c0392b;animation:shake .4s}
+.drag-emojis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 4px}
+.drag-emoji{background:var(--card);border:3px solid var(--coral2);border-radius:14px;padding:10px 4px;text-align:center;font-size:32px;cursor:grab;touch-action:none;user-select:none;transition:transform .1s,box-shadow .15s;box-shadow:0 3px 0 rgba(255,107,74,.2)}
+.drag-emoji:active{cursor:grabbing}
+.drag-emoji.dragging{cursor:grabbing;opacity:.85;box-shadow:0 8px 20px rgba(0,0,0,.2);z-index:1000}
+.drag-emoji.matched{background:#c6f0d4;border-color:var(--grass2);opacity:.4;pointer-events:none;animation:pop .3s}
 
 /* 统计 */
-.stats-row{display:flex;justify-content:center;gap:16px;margin-top:14px;font-size:13px;font-weight:700;color:var(--ink2);flex-wrap:wrap}
+.stats-row{display:flex;justify-content:center;gap:12px;margin-top:14px;font-size:13px;font-weight:700;color:var(--ink2);flex-wrap:wrap}
 .stat{background:var(--card);padding:6px 14px;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,.06)}
 .correct-stat{color:var(--grass2)} .wrong-stat{color:var(--coral2)}
+.timer-stat{color:var(--grape2)}
 
 /* 完成 */
-.complete{display:none;background:var(--card);border-radius:24px;padding:36px 24px;text-align:center;max-width:380px;margin:40px auto;box-shadow:0 8px 0 rgba(0,0,0,.06),0 20px 40px rgba(0,0,0,.12);animation:slideUp .4s}
+.complete{display:none;background:var(--card);border-radius:24px;padding:32px 20px;text-align:center;max-width:400px;margin:30px auto;box-shadow:0 8px 0 rgba(0,0,0,.06),0 20px 40px rgba(0,0,0,.12);animation:slideUp .4s}
 .complete.show{display:block}
-.complete .trophy{font-size:72px}
-.complete h2{font-size:24px;font-weight:800;margin:8px 0 4px}
-.complete .stats{font-size:14px;color:var(--ink2);margin:8px 0}
+.complete .trophy{font-size:64px}
+.complete h2{font-size:22px;font-weight:800;margin:8px 0 4px}
+.complete .stats{font-size:14px;color:var(--ink2);margin:8px 0;line-height:1.8}
 
 /* 词族 */
 .family-word{font-family:'Baloo 2',sans-serif;font-size:64px;font-weight:800;letter-spacing:6px;color:var(--sky2);margin:16px 0}
@@ -94,17 +132,40 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 /* 辅音组合 */
 .blend-word{font-family:'Baloo 2',sans-serif;font-size:48px;font-weight:800;color:var(--coral2);margin:16px 0;letter-spacing:2px}
 
+/* 徽章弹窗 */
+.badge-popup{position:fixed;top:90px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--card);border:3px solid var(--sun2);border-radius:18px;padding:18px 28px;box-shadow:0 8px 30px rgba(0,0,0,.2);z-index:2000;opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:320px;text-align:center}
+.badge-popup.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;cursor:pointer}
+
+/* 彩纸 */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1999;overflow:hidden}
+.confetti-piece{position:absolute;top:-12px;width:10px;height:10px;border-radius:2px;animation:confetti-fall 2s ease-out forwards}
+
 /* 页脚 */
 .footer{background:var(--ink);color:#a0a8bd;text-align:center;padding:24px 20px;font-size:12px;line-height:1.8;margin-top:30px}
 
+/* 动画 */
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 
 @media(max-width:480px){
-  .hero h1{font-size:22px}.hero .en-sub{font-size:14px}
+  .hero h1{font-size:22px}.hero .en-sub{font-size:13px}
   .game-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:8px 12px 20px}
-  .game-card{padding:14px 10px}.game-card .icon{font-size:32px}
+  .game-card{padding:14px 10px}.game-card .icon{font-size:30px}
   .q-word{font-size:40px}.opts{grid-template-columns:repeat(2,1fr)}
-  .brand{font-size:16px}.stats-row{gap:8px}
+  .brand{font-size:15px}.brand .logo{font-size:20px}
+  .nav-progress{font-size:11px}.progress-bar{width:60px}
+  .stars-text{font-size:11px}.streak-pill{font-size:11px;padding:3px 8px}
+  .drag-emojis{grid-template-columns:repeat(4,1fr);gap:4px}
+  .drag-emoji{font-size:26px;padding:8px 2px}
+  .drag-word{font-size:18px;padding:12px 6px}
+  .stats-row{gap:8px;font-size:12px}
+  .badge{min-width:54px;padding:5px 8px}
+  .badge .b-icon{font-size:20px}.badge .b-name{font-size:8px}
+  .magic-word{font-size:32px;padding:10px 16px}
+  .family-word{font-size:48px}
 }
 </style>
 </head>
@@ -112,12 +173,22 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 
 <nav class="nav">
   <div class="brand"><span class="logo">🦉</span><span>拼读小能手 <span class="en">Phonics Hero</span></span></div>
-  <span class="score-pill">⭐ <span id="totalStars">0</span></span>
+  <div class="nav-right">
+    <div class="nav-progress">
+      <span class="level-badge">Lv.<span id="navLevel">1</span></span>
+      <div class="progress-bar"><div class="progress-fill" id="navProgressFill" style="width:0%"></div></div>
+      <span class="stars-text"><span id="navStars">0</span>/42 ⭐</span>
+    </div>
+    <span class="streak-pill">🔥 <span id="navStreak">0</span></span>
+    <span class="score-pill">⭐ <span id="totalStars">0</span></span>
+  </div>
 </nav>
+
+<div class="badge-bar" id="badgeBar"></div>
 
 <header class="hero">
   <h1><span style="color:var(--coral2)">拼读小能手</span><span class="en-sub">Phonics Hero — Mini Games</span></h1>
-  <p>从《斗半匠自然拼读记单词一本通》精选130条规则，化身为6款互动小游戏！</p>
+  <p>从《斗半匠自然拼读记单词一本通》精选130条规则，化身为7款互动小游戏！<br>130 phonics rules in 7 interactive mini-games!</p>
   <p class="source">📖 Source: 斗半匠《自然拼读记单词一本通》24春 · 每日一规则，见词就能读</p>
 </header>
 
@@ -130,10 +201,13 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
   <p>拼读小能手 Phonics Hero · 使用 Web Speech API 语音合成 · 适合小学生自然拼读启蒙</p>
 </footer>
 
+<div class="badge-popup" id="badgePopup"></div>
+<div class="confetti-container" id="confetti"></div>
+
 <script>
 'use strict';
 
-// ─── 数据（斗半匠 PDF 提取整理）───
+// ═══ 数据（斗半匠 PDF 提取整理）═══
 const LETTERS=[
  {l:'a',ipa:'/æ/',hint:'嘴张三指',word:'ant',cn:'蚂蚁',tip:'The ant has an apple as food at home.'},
  {l:'b',ipa:'/b/',hint:'双唇相碰',word:'banana',cn:'香蕉',tip:'A boy buys some bananas for his baby brother.'},
@@ -214,7 +288,111 @@ const DIGRAPHS=[
  {dg:'mb',ipa:'/m/',example:'lamb',cn:'羔羊',hint:'b不发音'},
 ];
 
-// ─── 语音合成（多方案回退）───
+const DRAG_DATA=[
+ {word:'cat',emoji:'🐱',cn:'猫'},
+ {word:'dog',emoji:'🐶',cn:'狗'},
+ {word:'sun',emoji:'☀️',cn:'太阳'},
+ {word:'hat',emoji:'🎩',cn:'帽子'},
+ {word:'bus',emoji:'🚌',cn:'公交车'},
+ {word:'fox',emoji:'🦊',cn:'狐狸'},
+ {word:'fish',emoji:'🐟',cn:'鱼'},
+ {word:'cake',emoji:'🎂',cn:'蛋糕'},
+ {word:'star',emoji:'⭐',cn:'星星'},
+ {word:'tree',emoji:'🌳',cn:'树'},
+];
+
+// ═══ 游戏定义（7款）═══
+const GAME_DEFS=[
+ {id:'letters',icon:'🔤',title:'字母发音',desc:'26字母 · 听听猜猜',en:'26 Letters · Letter Sounds'},
+ {id:'families',icon:'📦',title:'词族填空',desc:'短元音词族',en:'Short Vowel Families'},
+ {id:'magnetice',icon:'✨',title:'魔术E',desc:'短音→长音',en:'Magic E Transformation'},
+ {id:'vowelR',icon:'🌈',title:'元音+r',desc:'ar er ir or ur',en:'Vowel + r Sounds'},
+ {id:'blends',icon:'🧩',title:'辅音组合',desc:'bl cl br cr tr',en:'Consonant Blends'},
+ {id:'digraphs',icon:'🎯',title:'双字母音',desc:'sh ch th wh ph',en:'Double Letter Sounds'},
+ {id:'dragmatch',icon:'🎪',title:'拖拽匹配',desc:'图文配对挑战',en:'Drag & Match Game'},
+];
+
+// ═══ 徽章定义（8枚）═══
+const BADGES=[
+ {id:'first_star',icon:'🌟',name:'First Star',cn:'第一颗星',desc:'Earn your first star · 赢得第一颗星'},
+ {id:'perfect_game',icon:'🎯',name:'Perfect Game',cn:'完美通关',desc:'Complete a game with 0 wrong · 零错误通关'},
+ {id:'streak_master',icon:'🔥',name:'Streak Master',cn:'连胜大师',desc:'Get 5 correct in a row · 连续答对5题'},
+ {id:'explorer',icon:'🗺️',name:'Explorer',cn:'探索者',desc:'Play all 7 game types · 体验全部7种游戏'},
+ {id:'collector',icon:'💎',name:'Collector',cn:'收藏家',desc:'Earn 30 total stars · 累计30颗星'},
+ {id:'speed_learner',icon:'⚡',name:'Speed Learner',cn:'速学者',desc:'Complete a game in under 60s · 60秒内通关'},
+ {id:'scholar',icon:'🎓',name:'Phonics Scholar',cn:'拼读学者',desc:'Earn 42 total stars · 全部42颗星'},
+ {id:'comeback_kid',icon:'🏅',name:'Comeback Kid',cn:'连续玩家',desc:'Play 3 days in a row · 连续3天游戏'},
+];
+
+const MAX_STARS=42;
+const PROGRESS_KEY='phonics_hero_progress';
+
+// ═══ 进度系统 ═══
+let progress={
+  totalStars:0, gamesPlayed:0, correctCount:0, wrongCount:0,
+  masteredWords:[], streak:0, bestStreak:0, lastPlayed:null,
+  badges:[], level:1, dayStreak:0, playedGames:[],
+  gameStats:{}
+};
+
+function loadProgress(){
+  try{
+    const saved=localStorage.getItem(PROGRESS_KEY);
+    if(saved){
+      const parsed=JSON.parse(saved);
+      progress=Object.assign({},progress,parsed);
+      if(!progress.gameStats) progress.gameStats={};
+      if(!progress.badges) progress.badges=[];
+      if(!progress.masteredWords) progress.masteredWords=[];
+      if(!progress.playedGames) progress.playedGames=[];
+      if(!progress.streak) progress.streak=0;
+      if(!progress.bestStreak) progress.bestStreak=0;
+    }
+  }catch(e){console.warn('Failed to load progress:',e);}
+}
+
+function saveProgress(){
+  try{
+    progress.totalStars=Object.values(state.stars).reduce((a,b)=>a+b,0);
+    progress.level=getLevel(progress.totalStars);
+    for(const g in state.stars){
+      if(!progress.gameStats[g]) progress.gameStats[g]={played:0,correct:0,wrong:0,bestScore:0};
+      progress.gameStats[g].bestScore=Math.max(progress.gameStats[g].bestScore||0,state.stars[g]);
+    }
+    localStorage.setItem(PROGRESS_KEY,JSON.stringify(progress));
+  }catch(e){console.warn('Failed to save progress:',e);}
+}
+
+function getLevel(stars){
+  if(stars<=5) return 1;
+  if(stars<=12) return 2;
+  if(stars<=20) return 3;
+  if(stars<=30) return 4;
+  return 5;
+}
+
+function getLevelRange(level){
+  const ranges=[[0,5],[6,12],[13,20],[21,30],[31,42]];
+  return ranges[level-1]||[0,42];
+}
+
+function updateDayStreak(){
+  const today=new Date().toISOString().split('T')[0];
+  if(progress.lastPlayed===today) return;
+  const yesterday=new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+  const yStr=yesterday.toISOString().split('T')[0];
+  if(progress.lastPlayed===yStr){
+    progress.dayStreak=(progress.dayStreak||0)+1;
+  }else{
+    progress.dayStreak=1;
+  }
+  progress.lastPlayed=today;
+  if(progress.dayStreak>=3) earnBadge('comeback_kid');
+  saveProgress();
+}
+
+// ═══ 语音合成（多方案回退）═══
 let voices=[];
 function loadVoices(){voices=speechSynthesis.getVoices();}
 loadVoices();
@@ -226,14 +404,14 @@ function speak(text){
   try{
     const u=new SpeechSynthesisUtterance(text);
     u.lang='en-US'; u.rate=0.85; u.pitch=1.1;
-    const voices=speechSynthesis.getVoices();
-    const v=voices.find(x=>/Google US|Samantha|Female.*English/.test(x.name))||voices.find(x=>x.lang==='en-US')||voices[0];
+    const vs=speechSynthesis.getVoices();
+    const v=vs.find(x=>/Google US|Samantha|Female.*English/.test(x.name))||vs.find(x=>x.lang==='en-US')||vs[0];
     if(v) u.voice=v;
     speechSynthesis.speak(u);
   }catch(e){console.warn('TTS failed:',e);}
 }
 
-// ─── 状态 ──
+// ═══ 状态 ═══
 let state={
   game:'letters',
   questions:[],
@@ -241,353 +419,750 @@ let state={
   correct:0,
   wrong:0,
   wrongAttempts:0,
-  stars:{letters:0,families:0,magnetice:0,vowelR:0,blends:0,digraphs:0},
+  stars:{letters:0,families:0,magnetice:0,vowelR:0,blends:0,digraphs:0,dragmatch:0},
+  timerStarted:false,
+  startTime:null,
+  endTime:null,
+  timerInterval:null,
 };
+
 function ts(){return Object.values(state.stars).reduce((a,b)=>a+b,0);}
-function refreshStarsUI(){
-  document.getElementById('totalStars').textContent=ts();
-  for(const g in state.stars) {const el=document.getElementById('s-'+g);if(el) el.textContent='⭐ '+state.stars[g]+'/6';}
+
+function loadStarsFromProgress(){
+  for(const g in state.stars){
+    if(progress.gameStats[g]&&progress.gameStats[g].bestScore){
+      state.stars[g]=progress.gameStats[g].bestScore;
+    }
+  }
 }
 
-// ─── 工具 ──
+// ═══ 工具 ═══
 function shuffle(arr){return arr.slice().sort(()=>Math.random()-0.5);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function formatTime(sec){
+  const m=Math.floor(sec/60);
+  const s=Math.floor(sec%60);
+  return m+':'+String(s).padStart(2,'0');
+}
+function getElapsedSeconds(){
+  if(!state.timerStarted||!state.startTime) return 0;
+  const end=state.endTime||Date.now();
+  return (end-state.startTime)/1000;
+}
 
-// ─── 渲染游戏卡片 ──
-const GAME_DEFS=[
- {id:'letters',icon:'🔤',title:'字母发音',desc:'26字母 · 听听猜猜',en:'26 Letters · Letter Sounds'},
- {id:'families',icon:'📦',title:'词族填空',desc:'短元音词族',en:'Short Vowel Families'},
- {id:'magnetice',icon:'✨',title:'魔术E',desc:'短音→长音',en:'Magic E Transformation'},
- {id:'vowelR',icon:'🌈',title:'元音+r',desc:'ar er ir or ur',en:'Vowel + r Sounds'},
- {id:'blends',icon:'🧩',title:'辅音组合',desc:'bl cl br cr tr',en:'Consonant Blends'},
- {id:'digraphs',icon:'🎯',title:'双字母音',desc:'sh ch th wh ph',en:'Double Letter Sounds'},
-];
+// ═══ 计时器 ═══
+function onFirstAnswer(){
+  if(!state.timerStarted){
+    state.timerStarted=true;
+    state.startTime=Date.now();
+    state.endTime=null;
+    startTimerDisplay();
+  }
+}
 
+function startTimerDisplay(){
+  if(state.timerInterval) clearInterval(state.timerInterval);
+  state.timerInterval=setInterval(()=>{
+    const el=document.querySelector('.timer-stat');
+    if(el) el.textContent='⏱ '+formatTime(getElapsedSeconds());
+  },1000);
+}
+
+function stopTimer(){
+  state.endTime=Date.now();
+  if(state.timerInterval){
+    clearInterval(state.timerInterval);
+    state.timerInterval=null;
+  }
+}
+
+// ═══ 彩纸动画 ═══
+function showConfetti(){
+  const container=document.getElementById('confetti');
+  container.innerHTML='';
+  const colors=['#ff8a6b','#ffd84d','#6dd47e','#7ec8ff','#b794f6','#ff6b4a','#3cb878'];
+  for(let i=0;i<36;i++){
+    const piece=document.createElement('div');
+    piece.className='confetti-piece';
+    piece.style.left=Math.random()*100+'%';
+    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDelay=Math.random()*0.5+'s';
+    piece.style.animationDuration=(1.5+Math.random()*1.2)+'s';
+    piece.style.width=(6+Math.random()*8)+'px';
+    piece.style.height=(6+Math.random()*8)+'px';
+    container.appendChild(piece);
+  }
+  setTimeout(()=>{container.innerHTML='';},3500);
+}
+
+// ═══ 徽章系统 ═══
+let badgeQueue=[];
+let badgeShowing=false;
+
+function earnBadge(id){
+  if(progress.badges.includes(id)) return;
+  const badge=BADGES.find(b=>b.id===id);
+  if(!badge) return;
+  progress.badges.push(id);
+  saveProgress();
+  badgeQueue.push(id);
+  processBadgeQueue();
+  renderBadgeBar();
+}
+
+function processBadgeQueue(){
+  if(badgeShowing||badgeQueue.length===0) return;
+  badgeShowing=true;
+  const id=badgeQueue.shift();
+  const badge=BADGES.find(b=>b.id===id);
+  if(badge){
+    showBadgePopup(badge);
+    setTimeout(()=>{
+      badgeShowing=false;
+      processBadgeQueue();
+    },4500);
+  }else{
+    badgeShowing=false;
+    processBadgeQueue();
+  }
+}
+
+function showBadgePopup(badge){
+  const popup=document.getElementById('badgePopup');
+  popup.innerHTML=
+    '<div style="font-size:48px">'+badge.icon+'</div>'+
+    '<div style="font-weight:800;font-size:18px;margin:4px 0">'+esc(badge.cn)+' · '+esc(badge.name)+'</div>'+
+    '<div style="font-size:13px;color:var(--ink2)">'+esc(badge.desc)+'</div>'+
+    '<div style="font-size:12px;color:var(--sun2);font-weight:700;margin-top:6px">🎉 成就解锁！Badge Earned!</div>';
+  popup.classList.add('show');
+  popup.onclick=function(){popup.classList.remove('show');};
+  showConfetti();
+  setTimeout(function(){popup.classList.remove('show');},4200);
+}
+
+function checkBadges(){
+  if(progress.totalStars>=1) earnBadge('first_star');
+  if(progress.streak>=5) earnBadge('streak_master');
+  if(progress.totalStars>=30) earnBadge('collector');
+  if(progress.totalStars>=42) earnBadge('scholar');
+  if(progress.playedGames.length>=7) earnBadge('explorer');
+  if(progress.dayStreak>=3) earnBadge('comeback_kid');
+}
+
+// ═══ 记录答题 ═══
+function recordAnswer(isCorrect,gameId,word){
+  if(!progress.gameStats[gameId]) progress.gameStats[gameId]={played:0,correct:0,wrong:0,bestScore:0};
+  if(isCorrect){
+    progress.correctCount++;
+    progress.gameStats[gameId].correct++;
+    progress.streak++;
+    if(progress.streak>progress.bestStreak) progress.bestStreak=progress.streak;
+    if(word&&!progress.masteredWords.includes(word)) progress.masteredWords.push(word);
+  }else{
+    progress.wrongCount++;
+    progress.gameStats[gameId].wrong++;
+    progress.streak=0;
+  }
+  saveProgress();
+  checkBadges();
+  refreshStarsUI();
+}
+
+// ═══ UI 刷新 ═══
+function refreshStarsUI(){
+  const total=ts();
+  document.getElementById('totalStars').textContent=total;
+  document.getElementById('navStars').textContent=total;
+  document.getElementById('navLevel').textContent=getLevel(total);
+  document.getElementById('navStreak').textContent=progress.streak||0;
+  const pct=Math.min(100,(total/MAX_STARS)*100);
+  document.getElementById('navProgressFill').style.width=pct+'%';
+  for(const g in state.stars){
+    const el=document.getElementById('s-'+g);
+    if(el) el.textContent='⭐ '+state.stars[g]+'/6';
+  }
+}
+
+function renderBadgeBar(){
+  const bar=document.getElementById('badgeBar');
+  bar.innerHTML=BADGES.map(b=>{
+    const earned=progress.badges.includes(b.id);
+    return '<div class="badge '+(earned?'earned':'')+'" title="'+esc(b.cn)+'">'+
+      '<span class="b-icon">'+b.icon+'</span>'+
+      '<span class="b-name">'+esc(b.cn)+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+// ═══ 游戏卡片渲染 ═══
 function renderGameGrid(){
   const grid=document.getElementById('gameGrid');
-  grid.innerHTML=GAME_DEFS.map(d=>`
-    <div class="game-card ${state.game===d.id?'active':''}" data-game="${d.id}">
-      <span class="icon">${d.icon}</span>
-      <div class="title">${d.title}</div>
-      <div class="desc">${d.desc}<br><span style="color:var(--sky2)">${d.en}</span></div>
-      <div class="stars" id="s-${d.id}">⭐ 0/6</div>
-    </div>`).join('');
-  // 使用 addEventListener 而非 onclick，避免单引号转义问题
+  grid.innerHTML=GAME_DEFS.map(d=>{
+    return '<div class="game-card '+(state.game===d.id?'active':'')+'" data-game="'+esc(d.id)+'">'+
+      '<span class="icon">'+d.icon+'</span>'+
+      '<div class="title">'+esc(d.title)+'</div>'+
+      '<div class="desc">'+esc(d.desc)+'<br><span style="color:var(--sky2)">'+esc(d.en)+'</span></div>'+
+      '<div class="stars" id="s-'+esc(d.id)+'">⭐ '+state.stars[d.id]+'/6</div>'+
+    '</div>';
+  }).join('');
   grid.querySelectorAll('.game-card').forEach(card=>{
-    card.addEventListener('click',()=>selectGame(card.dataset.game));
+    card.addEventListener('click',function(){selectGame(this.dataset.game);});
   });
 }
 
 function selectGame(g){
   state.game=g; state.idx=0; state.correct=0; state.wrong=0; state.wrongAttempts=0; state.questions=[];
+  state.timerStarted=false; state.startTime=null; state.endTime=null;
+  if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null;}
+  updateDayStreak();
   renderGameGrid();
   startGame(g);
 }
 
+// ═══ 游戏启动 ═══
 function startGame(g){
-  const area=document.getElementById('gameArea');
   if(g==='letters'){
     const letters=shuffle(LETTERS).slice(0,6);
     state.questions=letters.map(it=>{
       const wrong=LETTERS.filter(x=>x.l!==it.l).sort(()=>Math.random()-0.5).slice(0,3);
-      const opts=[it.l,...wrong.map(x=>x.l)].sort(()=>Math.random()-0.5);
+      const opts=[it.l].concat(wrong.map(x=>x.l)).sort(()=>Math.random()-0.5);
       return {type:'letter',word:it.word,ipa:it.ipa,cn:it.cn,letter:it.l,opts:opts,answer:it.l,tip:it.tip};
     });
     renderLetterGame();
-  } else if(g==='families'){
+  }else if(g==='families'){
     const fams=shuffle(FAMILIES).slice(0,6);
     state.questions=fams.map(f=>{
       const allVowels=['a','e','i','o','u'];
       const wrong=allVowels.filter(v=>v!==f.vowel).sort(()=>Math.random()-0.5).slice(0,3);
-      const opts=[f.vowel,...wrong].sort(()=>Math.random()-0.5);
+      const opts=[f.vowel].concat(wrong).sort(()=>Math.random()-0.5);
       const word=f.words[Math.floor(Math.random()*f.words.length)];
       return {type:'family',word:word,ipa:f.ipa,fam:f.fam,opts:opts,answer:f.vowel};
     });
     renderFamilyGame();
-  } else if(g==='magnetice'){
+  }else if(g==='magnetice'){
     const pairs=shuffle(MAGIC_E).slice(0,6);
     state.questions=pairs.map(p=>{
       const allVowels=['a','e','i','o','u'];
       const rightVowel=p.short[0];
       const wrong=allVowels.filter(v=>v!==rightVowel).sort(()=>Math.random()-0.5).slice(0,3);
-      const opts=[rightVowel,...wrong].sort(()=>Math.random()-0.5);
+      const opts=[rightVowel].concat(wrong).sort(()=>Math.random()-0.5);
       return {type:'magic',short:p.short,long:p.long,ipa_s:p.ipa_s,ipa_l:p.ipa_l,cn_s:p.cn_s,cn_l:p.cn_l,opts:opts,answer:rightVowel};
     });
     renderMagicGame();
-  } else if(g==='vowelR'){
+  }else if(g==='vowelR'){
     const items=shuffle(VOWEL_R).slice(0,6);
     state.questions=items.map(it=>{
       const allCombos=['ar','er','ir','or','ur','ear'];
       const wrong=allCombos.filter(c=>c!==it.combo).sort(()=>Math.random()-0.5).slice(0,3);
-      const opts=[it.combo,...wrong].sort(()=>Math.random()-0.5);
+      const opts=[it.combo].concat(wrong).sort(()=>Math.random()-0.5);
       return {type:'vowelR',combo:it.combo,ipa:it.ipa,example:it.example,cn:it.cn,opts:opts,answer:it.combo,tip:it.tip};
     });
     renderVowelRGame();
-  } else if(g==='blends'){
+  }else if(g==='blends'){
     const blends=shuffle(BLENDS).slice(0,6);
     state.questions=blends.map(b=>{
       const word=b.words[Math.floor(Math.random()*b.words.length)];
       const allBlends=['bl','cl','br','cr','tr','fl','pr','dr'];
       const wrong=allBlends.filter(x=>x!==b.blend).sort(()=>Math.random()-0.5).slice(0,3);
-      const opts=[b.blend,...wrong].sort(()=>Math.random()-0.5);
+      const opts=[b.blend].concat(wrong).sort(()=>Math.random()-0.5);
       return {type:'blend',word:word,blend:b.blend,ipa:b.ipa,opts:opts,answer:b.blend,cn:b.cn};
     });
     renderBlendGame();
-  } else if(g==='digraphs'){
+  }else if(g==='digraphs'){
     const items=shuffle(DIGRAPHS).slice(0,6);
     state.questions=items.map(it=>{
       const allDG=['sh','ch','th','ph','wh','kn','wr','mb'];
       const wrong=allDG.filter(x=>x!==it.dg).sort(()=>Math.random()-0.5).slice(0,3);
-      const opts=[it.dg,...wrong].sort(()=>Math.random()-0.5);
+      const opts=[it.dg].concat(wrong).sort(()=>Math.random()-0.5);
       return {type:'digraph',dg:it.dg,ipa:it.ipa,example:it.example,cn:it.cn,hint:it.hint,opts:opts,answer:it.dg};
     });
     renderDigraphGame();
+  }else if(g==='dragmatch'){
+    state.questions=[];
+    for(let i=0;i<6;i++){
+      const items=shuffle(DRAG_DATA).slice(0,4);
+      state.questions.push({type:'drag',items:items,matched:0});
+    }
+    renderDragGame();
   }
 }
 
-// 通用 stats HTML
+// ═══ 统计HTML ═══
 function statsHTML(){
-  return `<div class="stats-row"><span class="stat correct-stat">✅ ${state.correct}</span><span class="stat wrong-stat">❌ ${state.wrong}</span><span class="stat">📝 ${state.idx+1}/${state.questions.length}</span></div>`;
+  const timerText=state.timerStarted?'⏱ '+formatTime(getElapsedSeconds()):'⏱ 0:00';
+  return '<div class="stats-row">'+
+    '<span class="stat correct-stat">✅ '+state.correct+'</span>'+
+    '<span class="stat wrong-stat">❌ '+state.wrong+'</span>'+
+    '<span class="stat">📝 '+(state.idx+1)+'/'+state.questions.length+'</span>'+
+    '<span class="stat timer-stat">'+timerText+'</span>'+
+  '</div>';
 }
 
+// ═══ 导航 ═══
+let advanceTimeout=null;
+function scheduleAdvance(delay){
+  if(advanceTimeout) clearTimeout(advanceTimeout);
+  advanceTimeout=setTimeout(function(){
+    advanceTimeout=null;
+    nextQuestion();
+  },delay);
+}
+function advanceNow(){
+  if(advanceTimeout){clearTimeout(advanceTimeout);advanceTimeout=null;}
+  nextQuestion();
+}
 function nextQuestion(){state.idx++; renderCurrent();}
 function renderCurrent(){
-  const m={letters:renderLetterGame,families:renderFamilyGame,magnetice:renderMagicGame,vowelR:renderVowelRGame,blends:renderBlendGame,digraphs:renderDigraphGame};
-  const fn=m[state.game]; if(fn) fn();
+  const m={
+    letters:renderLetterGame, families:renderFamilyGame, magnetice:renderMagicGame,
+    vowelR:renderVowelRGame, blends:renderBlendGame, digraphs:renderDigraphGame,
+    dragmatch:renderDragGame
+  };
+  const fn=m[state.game];
+  if(fn) fn();
 }
 
-// ─── 字母游戏 ──
+function showNextButton(){
+  const area=document.getElementById('gameArea');
+  let btn=area.querySelector('.next-btn');
+  if(!btn){
+    btn=document.createElement('button');
+    btn.className='next-btn';
+    btn.textContent='下一题 Next →';
+    btn.type='button';
+    btn.addEventListener('click',advanceNow);
+    area.appendChild(btn);
+  }
+  btn.style.display='block';
+}
+
+function handleCorrect(gameId,word){
+  state.correct++;
+  state.stars[gameId]=Math.min(6,state.stars[gameId]+1);
+  recordAnswer(true,gameId,word);
+  refreshStarsUI();
+  showNextButton();
+  scheduleAdvance(1500);
+}
+
+function handleWrong(gameId){
+  state.wrong++;
+  recordAnswer(false,gameId,null);
+  refreshStarsUI();
+}
+
+// ═══ 字母游戏 ═══
 function renderLetterGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  const tip=q.tip||'';
-  const html=`
-  <div class="question-card">
-    <div class="q-category">🔤 字母发音 · Letter Sounds</div>
-    <div class="q-word">${q.word.toUpperCase()}</div>
-    <div class="q-ipa">${esc(q.ipa)}</div>
-    <div class="q-meaning">这个单词是 <strong>${q.cn}</strong>，它开头发哪个字母的音？</div>
-    ${q.wrongHint?'<div class="q-tip">💡 提示：字母 '+q.letter+' 在闭音节中发 '+esc(q.ipa)+'。'+esc(q.tip)+'</div>':''}
-    <button class="q-play" data-play="${esc(q.word)}">🔊 听发音 Listen</button>
-  </div>
-  <div class="opts">
-    ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
-  </div>
-  ${statsHTML()}`;
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">🔤 字母发音 · Letter Sounds</div>'+
+    '<div class="q-word">'+esc(q.word.toUpperCase())+'</div>'+
+    '<div class="q-ipa">'+esc(q.ipa)+'</div>'+
+    '<div class="q-meaning">这个单词是 <strong>'+esc(q.cn)+'</strong>，它开头发哪个字母的音？<br>Which letter does it start with?</div>'+
+    (q.wrongHint?'<div class="q-tip">💡 提示：字母 '+esc(q.letter)+' 在闭音节中发 '+esc(q.ipa)+'。'+esc(q.tip)+'</div>':'')+
+    '<button class="q-play" data-play="'+esc(q.word)+'">🔊 听发音 Listen</button>'+
+  '</div>'+
+  '<div class="opts">'+
+    q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+o.toUpperCase()+'</button>').join('')+
+  '</div>'+
+  statsHTML();
   area.innerHTML=html;
-  bindOptClick(area, q.answer, (isCorrect)=>{
+  bindOptClick(area,q.answer,function(isCorrect){
+    onFirstAnswer();
     if(isCorrect){
-      state.correct++; state.stars.letters=Math.min(6,state.stars.letters+1); refreshStarsUI();
       speak(q.word);
-      setTimeout(()=>nextQuestion(),1500);
-    } else {
-      state.wrong++;
+      handleCorrect('letters',q.word);
+    }else{
+      handleWrong('letters');
       if(!q.wrongHint){q.wrongHint=true; renderLetterGame();}
-      else {setTimeout(()=>nextQuestion(),800);}
+      else{scheduleAdvance(800);}
     }
   });
-  area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
 }
 
-// ─── 词族游戏 ──
+// ═══ 词族游戏 ═══
 function renderFamilyGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  // 用实际单词展示，元音位置用空白替代
   const display=q.word.split('').map(c=>c===q.answer?'<span class="blank">_</span>':c).join('');
-  const html=`
-  <div class="question-card">
-    <div class="q-category">📦 词族填空 · Word Family</div>
-    <div class="q-tip">💡 短元音家族 ${esc(q.fam)} · ${esc(q.ipa)}</div>
-    <div class="family-word">${display}</div>
-    <div class="family-hint">填入正确元音字母，组成完整单词</div>
-    <div class="family-meaning">提示：短元音家族 — 正确答案将拼出 ${esc(q.word)}</div>
-    <button class="q-play" data-play="${esc(q.word)}">🔊 听完整单词 Listen</button>
-  </div>
-  <div class="opts">
-    ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
-  </div>
-  ${statsHTML()}`;
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">📦 词族填空 · Word Family</div>'+
+    '<div class="q-tip">💡 短元音家族 '+esc(q.fam)+' · '+esc(q.ipa)+'</div>'+
+    '<div class="family-word">'+display+'</div>'+
+    '<div class="family-hint">填入正确元音字母，组成完整单词<br>Fill in the correct vowel</div>'+
+    '<div class="family-meaning">提示：正确答案将拼出 '+esc(q.word)+'</div>'+
+    '<button class="q-play" data-play="'+esc(q.word)+'">🔊 听完整单词 Listen</button>'+
+  '</div>'+
+  '<div class="opts">'+
+    q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+o.toUpperCase()+'</button>').join('')+
+  '</div>'+
+  statsHTML();
   area.innerHTML=html;
-  bindOptClick(area, q.answer, (isCorrect)=>{
+  bindOptClick(area,q.answer,function(isCorrect){
+    onFirstAnswer();
     if(isCorrect){
-      state.correct++; state.stars.families=Math.min(6,state.stars.families+1); refreshStarsUI();
       speak(q.word);
-      setTimeout(()=>nextQuestion(),1200);
-    } else {
-      state.wrong++;
-      setTimeout(()=>nextQuestion(),800);
+      handleCorrect('families',q.word);
+    }else{
+      handleWrong('families');
+      scheduleAdvance(800);
     }
   });
-  area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
 }
 
-// ─── 魔术E游戏 ──
+// ═══ 魔术E游戏 ═══
 function renderMagicGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  const html=`
-  <div class="question-card">
-    <div class="q-category">✨ 魔术E · Magic E</div>
-    <div class="q-tip">💡 词尾不发音的 e 让前面的元音喊出自己的名字发长音</div>
-    <div class="magic-pair">
-      <span class="magic-word short">${esc(q.short)} <span style="font-size:18px;color:var(--ink2)">${q.cn_s} ${esc(q.ipa_s)}</span></span>
-      <span class="magic-arrow">→</span>
-      <span class="magic-word long">${esc(q.long)} <span style="font-size:18px;color:var(--ink2)">${q.cn_l} ${esc(q.ipa_l)}</span></span>
-    </div>
-    <div style="font-size:14px;color:var(--ink2);margin:8px 0">短音词 <strong style="color:var(--sky2)">${esc(q.short)}</strong> 加词尾 <span class="magic-e">e</span> 变长音词 <strong style="color:var(--sun2)">${esc(q.long)}</strong></div>
-    <button class="q-play" data-play-multi="1">🔊 听对比 Listen Both</button>
-  </div>
-  <div style="margin-top:8px">
-    <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 ${esc(q.short)} 的元音字母是？</div>
-    <div class="opts">
-      ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
-    </div>
-  </div>
-  ${statsHTML()}`;
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">✨ 魔术E · Magic E</div>'+
+    '<div class="q-tip">💡 词尾不发音的 e 让前面的元音喊出自己的名字发长音</div>'+
+    '<div class="magic-pair">'+
+      '<span class="magic-word short">'+esc(q.short)+' <span style="font-size:18px;color:var(--ink2)">'+esc(q.cn_s)+' '+esc(q.ipa_s)+'</span></span>'+
+      '<span class="magic-arrow">→</span>'+
+      '<span class="magic-word long">'+esc(q.long)+' <span style="font-size:18px;color:var(--ink2)">'+esc(q.cn_l)+' '+esc(q.ipa_l)+'</span></span>'+
+    '</div>'+
+    '<div style="font-size:14px;color:var(--ink2);margin:8px 0">短音词 <strong style="color:var(--sky2)">'+esc(q.short)+'</strong> 加词尾 <span class="magic-e">e</span> 变长音词 <strong style="color:var(--sun2)">'+esc(q.long)+'</strong></div>'+
+    '<button class="q-play" data-play-multi="1">🔊 听对比 Listen Both</button>'+
+  '</div>'+
+  '<div style="margin-top:8px">'+
+    '<div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 '+esc(q.short)+' 的元音字母是？</div>'+
+    '<div class="opts">'+
+      q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+o.toUpperCase()+'</button>').join('')+
+    '</div>'+
+  '</div>'+
+  statsHTML();
   area.innerHTML=html;
-  bindOptClick(area, q.answer, (isCorrect)=>{
+  bindOptClick(area,q.answer,function(isCorrect){
+    onFirstAnswer();
     if(isCorrect){
-      state.correct++; state.stars.magnetice=Math.min(6,state.stars.magnetice+1); refreshStarsUI();
       speak(q.long);
-      setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
+      handleCorrect('magnetice',q.long);
+    }else{
+      handleWrong('magnetice');
+      scheduleAdvance(800);
+    }
   });
-  const playBtn=area.querySelector('[data-play-multi]');
-  if(playBtn) playBtn.addEventListener('click',()=>{speak(q.short);setTimeout(()=>speak(q.long),900);});
+  var playBtn=area.querySelector('[data-play-multi]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(q.short);setTimeout(function(){speak(q.long);},900);});
 }
 
-// ─── 元音R游戏 ──
+// ═══ 元音R游戏 ═══
 function renderVowelRGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  const html=`
-  <div class="question-card">
-    <div class="q-category">🌈 元音+r · Vowel + r</div>
-    <div class="q-word">${q.example.toUpperCase()}</div>
-    <div class="q-ipa">${esc(q.ipa)}</div>
-    <div class="q-meaning">意思是 <strong>${q.cn}</strong></div>
-    <div class="q-tip">💡 ${esc(q.tip)}</div>
-    <button class="q-play" data-play="${esc(q.example)}">🔊 听发音 Listen</button>
-  </div>
-  <div class="opts">
-    ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
-  </div>
-  ${statsHTML()}`;
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">🌈 元音+r · Vowel + r</div>'+
+    '<div class="q-word">'+esc(q.example.toUpperCase())+'</div>'+
+    '<div class="q-ipa">'+esc(q.ipa)+'</div>'+
+    '<div class="q-meaning">意思是 <strong>'+esc(q.cn)+'</strong></div>'+
+    '<div class="q-tip">💡 '+esc(q.tip)+'</div>'+
+    '<button class="q-play" data-play="'+esc(q.example)+'">🔊 听发音 Listen</button>'+
+  '</div>'+
+  '<div class="opts">'+
+    q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+o.toUpperCase()+'</button>').join('')+
+  '</div>'+
+  statsHTML();
   area.innerHTML=html;
-  bindOptClick(area, q.answer, (isCorrect)=>{
+  bindOptClick(area,q.answer,function(isCorrect){
+    onFirstAnswer();
     if(isCorrect){
-      state.correct++; state.stars.vowelR=Math.min(6,state.stars.vowelR+1); refreshStarsUI();
       speak(q.example);
-      setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
+      handleCorrect('vowelR',q.example);
+    }else{
+      handleWrong('vowelR');
+      scheduleAdvance(800);
+    }
   });
-  area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
 }
 
-// ─── 辅音组合游戏 ──
+// ═══ 辅音组合游戏 ═══
 function renderBlendGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  const html=`
-  <div class="question-card">
-    <div class="q-category">🧩 辅音组合 · Consonant Blends</div>
-    <div class="q-word">${q.word.toUpperCase()}</div>
-    <div class="q-ipa">${esc(q.ipa)}</div>
-    <div class="q-meaning">意思是 <strong>${q.cn}</strong></div>
-    <div class="q-tip">💡 两个辅音合在一起发两个音，${q.cn}</div>
-    <button class="q-play" data-play="${esc(q.word)}">🔊 听发音 Listen</button>
-  </div>
-  <div style="margin-top:8px">
-    <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 包含哪个辅音组合？</div>
-    <div class="opts">
-      ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
-    </div>
-  </div>
-  ${statsHTML()}`;
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">🧩 辅音组合 · Consonant Blends</div>'+
+    '<div class="q-word">'+esc(q.word.toUpperCase())+'</div>'+
+    '<div class="q-ipa">'+esc(q.ipa)+'</div>'+
+    '<div class="q-meaning">意思是 <strong>'+esc(q.cn)+'</strong></div>'+
+    '<div class="q-tip">💡 两个辅音合在一起发两个音，'+esc(q.cn)+'</div>'+
+    '<button class="q-play" data-play="'+esc(q.word)+'">🔊 听发音 Listen</button>'+
+  '</div>'+
+  '<div style="margin-top:8px">'+
+    '<div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 包含哪个辅音组合？</div>'+
+    '<div class="opts">'+
+      q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+o.toUpperCase()+'</button>').join('')+
+    '</div>'+
+  '</div>'+
+  statsHTML();
   area.innerHTML=html;
-  bindOptClick(area, q.answer, (isCorrect)=>{
+  bindOptClick(area,q.answer,function(isCorrect){
+    onFirstAnswer();
     if(isCorrect){
-      state.correct++; state.stars.blends=Math.min(6,state.stars.blends+1); refreshStarsUI();
       speak(q.word);
-      setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
+      handleCorrect('blends',q.word);
+    }else{
+      handleWrong('blends');
+      scheduleAdvance(800);
+    }
   });
-  area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
 }
 
-// ─── 双字母音游戏 ──
+// ═══ 双字母音游戏 ═══
 function renderDigraphGame(){
   const area=document.getElementById('gameArea');
   if(state.idx>=state.questions.length){renderComplete();return;}
   const q=state.questions[state.idx];
-  const html=`
-  <div class="question-card">
-    <div class="q-category">🎯 双字母音 · Double Letter Sounds</div>
-    <div class="q-word">${q.example.toUpperCase()}</div>
-    <div class="q-ipa">${esc(q.ipa)}</div>
-    <div class="q-meaning">意思是 <strong>${q.cn}</strong></div>
-    <div class="q-tip">💡 ${esc(q.hint)}，${esc(q.dg)}发 ${esc(q.ipa)}</div>
-    <button class="q-play" data-play="${esc(q.example)}">🔊 听发音 Listen</button>
-  </div>
-  <div style="margin-top:8px">
-    <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 包含哪个双字母组合？</div>
-    <div class="opts">
-      ${q.opts.map(o=>`<button class="opt" data-ans="${esc(o)}">${o.toUpperCase()}</button>`).join('')}
-    </div>
-  </div>
-  ${statsHTML()}`;
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">🎯 双字母音 · Double Letter Sounds</div>'+
+    '<div class="q-word">'+esc(q.example.toUpperCase())+'</div>'+
+    '<div class="q-ipa">'+esc(q.ipa)+'</div>'+
+    '<div class="q-meaning">意思是 <strong>'+esc(q.cn)+'</strong></div>'+
+    '<div class="q-tip">💡 '+esc(q.hint)+'，'+esc(q.dg)+'发 '+esc(q.ipa)+'</div>'+
+    '<button class="q-play" data-play="'+esc(q.example)+'">🔊 听发音 Listen</button>'+
+  '</div>'+
+  '<div style="margin-top:8px">'+
+    '<div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">🧠 包含哪个双字母组合？</div>'+
+    '<div class="opts">'+
+      q.opts.map(o=>'<button class="opt" data-ans="'+esc(o)+'">'+o.toUpperCase()+'</button>').join('')+
+    '</div>'+
+  '</div>'+
+  statsHTML();
   area.innerHTML=html;
-  bindOptClick(area, q.answer, (isCorrect)=>{
+  bindOptClick(area,q.answer,function(isCorrect){
+    onFirstAnswer();
     if(isCorrect){
-      state.correct++; state.stars.digraphs=Math.min(6,state.stars.digraphs+1); refreshStarsUI();
       speak(q.example);
-      setTimeout(()=>nextQuestion(),1200);
-    } else {state.wrong++; setTimeout(()=>nextQuestion(),800);}
+      handleCorrect('digraphs',q.example);
+    }else{
+      handleWrong('digraphs');
+      scheduleAdvance(800);
+    }
   });
-  area.querySelector('[data-play]').addEventListener('click',function(){speak(this.dataset.play);});
+  var playBtn=area.querySelector('[data-play]');
+  if(playBtn) playBtn.addEventListener('click',function(){speak(this.dataset.play);});
 }
 
-// ─── 通用选项点击绑定（data-ans 属性） ──
-function bindOptClick(area, correctAnswer, onResult){
-  area.querySelectorAll('.opt').forEach(btn=>{
+// ═══ 拖拽匹配游戏 ═══
+function renderDragGame(){
+  const area=document.getElementById('gameArea');
+  if(state.idx>=state.questions.length){renderComplete();return;}
+  const q=state.questions[state.idx];
+  const words=q.items.slice();
+  const emojis=shuffle(q.items.slice());
+  const html=
+  '<div class="question-card">'+
+    '<div class="q-category">🎪 拖拽匹配 · Drag & Match</div>'+
+    '<div class="drag-instruction">把下方的表情拖到对应的单词上<br>Drag the emoji to match the correct word</div>'+
+    '<div class="drag-words">'+
+      words.map(w=>'<div class="drag-word" data-word="'+esc(w.word)+'">'+esc(w.word.toUpperCase())+'<span class="drag-word-cn">'+esc(w.cn)+'</span></div>').join('')+
+    '</div>'+
+    '<div class="drag-emojis">'+
+      emojis.map(e=>'<div class="drag-emoji" data-word="'+esc(e.word)+'">'+e.emoji+'</div>').join('')+
+    '</div>'+
+  '</div>'+
+  statsHTML();
+  area.innerHTML=html;
+  initDragHandlers(area,q);
+}
+
+function initDragHandlers(area,q){
+  const wordCards=area.querySelectorAll('.drag-word');
+  const emojiCards=area.querySelectorAll('.drag-emoji');
+  let matchedCount=0;
+  let roundDone=false;
+
+  emojiCards.forEach(function(emoji){
+    let dragData=null;
+
+    emoji.addEventListener('pointerdown',function(e){
+      if(emoji.classList.contains('matched')||roundDone) return;
+      e.preventDefault();
+      dragData={startX:e.clientX,startY:e.clientY,pointerId:e.pointerId};
+      try{emoji.setPointerCapture(e.pointerId);}catch(err){}
+      emoji.classList.add('dragging');
+      emoji.style.zIndex='1000';
+    });
+
+    emoji.addEventListener('pointermove',function(e){
+      if(!dragData||e.pointerId!==dragData.pointerId) return;
+      e.preventDefault();
+      const dx=e.clientX-dragData.startX;
+      const dy=e.clientY-dragData.startY;
+      emoji.style.transform='translate('+dx+'px,'+dy+'px)';
+      emoji.style.pointerEvents='none';
+      const elBelow=document.elementFromPoint(e.clientX,e.clientY);
+      emoji.style.pointerEvents='';
+      wordCards.forEach(function(w){w.classList.remove('drag-over');});
+      if(elBelow){
+        const wordCard=elBelow.closest('.drag-word');
+        if(wordCard&&!wordCard.classList.contains('matched')){
+          wordCard.classList.add('drag-over');
+        }
+      }
+    });
+
+    function endDrag(e){
+      if(!dragData||e.pointerId!==dragData.pointerId) return;
+      e.preventDefault();
+      onFirstAnswer();
+      emoji.style.pointerEvents='none';
+      const elBelow=document.elementFromPoint(e.clientX,e.clientY);
+      emoji.style.pointerEvents='';
+      wordCards.forEach(function(w){w.classList.remove('drag-over');});
+      emoji.classList.remove('dragging');
+      emoji.style.transform='';
+      emoji.style.zIndex='';
+
+      if(elBelow){
+        const wordCard=elBelow.closest('.drag-word');
+        if(wordCard&&!wordCard.classList.contains('matched')){
+          const word=wordCard.dataset.word;
+          const emojiWord=emoji.dataset.word;
+          if(word===emojiWord){
+            emoji.classList.add('matched');
+            wordCard.classList.add('matched');
+            speak(word);
+            matchedCount++;
+            q.matched=matchedCount;
+            if(matchedCount>=4&&!roundDone){
+              roundDone=true;
+              handleCorrect('dragmatch',null);
+            }
+          }else{
+            wordCard.classList.add('shake-red');
+            setTimeout(function(){wordCard.classList.remove('shake-red');},500);
+            handleWrong('dragmatch');
+          }
+        }
+      }
+      dragData=null;
+    }
+
+    emoji.addEventListener('pointerup',endDrag);
+    emoji.addEventListener('pointercancel',endDrag);
+  });
+}
+
+// ═══ 通用选项点击绑定 ═══
+function bindOptClick(area,correctAnswer,onResult){
+  area.querySelectorAll('.opt').forEach(function(btn){
     btn.addEventListener('click',function(){
       if(this.classList.contains('dim')) return;
-      const ans=this.dataset.ans;
+      var ans=this.dataset.ans;
       if(ans===correctAnswer){
         this.classList.add('correct');
-        area.querySelectorAll('.opt').forEach(b=>b.classList.add('dim'));
+        area.querySelectorAll('.opt').forEach(function(b){b.classList.add('dim');});
         onResult(true);
-      } else {
+      }else{
         this.classList.add('wrong');
-        setTimeout(()=>this.classList.remove('wrong'),500);
+        var self=this;
+        setTimeout(function(){self.classList.remove('wrong');},500);
         onResult(false);
       }
     });
   });
 }
 
-// ─── 完成 ──
-function renderComplete(){
-  const starsEarned=state.stars[state.game]||0;
-  let starsText=''; for(let i=0;i<starsEarned;i++) starsText+='⭐';
-  document.getElementById('gameArea').innerHTML=`
-  <div class="complete show">
-    <div class="trophy">🏆</div>
-    <h2>恭喜你完成本关！</h2>
-    <div class="stats">答对 <strong style="color:var(--grass2)">${state.correct}</strong> · 答错 <strong style="color:var(--coral2)">${state.wrong}</strong><br>获得 <strong>${starsEarned}</strong> 颗星 — ${starsText}</div>
-    <p style="font-size:13px;color:var(--ink2);margin-top:8px">从顶部游戏卡片中选择下一关继续挑战</p>
-  </div>`;
+// ═══ 学习路径推荐 ═══
+function getRecommendation(accuracy){
+  if(accuracy<0.5){
+    return {msg:'建议重新挑战本关 · Try this level again',action:'replay',btnText:'🔄 重新挑战 Replay'};
+  }else if(accuracy<=0.8){
+    return {msg:'继续努力！试试下一关 · Keep going! Try the next level',action:'next',btnText:'➡️ 下一关 Next'};
+  }else{
+    return {msg:'太棒了！推荐挑战拖拽匹配 · Great! Try Drag & Match',action:'dragmatch',btnText:'🎪 拖拽匹配 Drag Match'};
+  }
 }
 
-// ─── 初始化 ──
-renderGameGrid();
-startGame('letters');
+function getNextGame(currentId){
+  const ids=GAME_DEFS.map(function(g){return g.id;});
+  const idx=ids.indexOf(currentId);
+  if(idx<0||idx>=ids.length-1) return ids[0];
+  return ids[idx+1];
+}
+
+// ═══ 完成画面 ═══
+function renderComplete(){
+  stopTimer();
+  progress.gamesPlayed++;
+  if(!progress.playedGames.includes(state.game)){
+    progress.playedGames.push(state.game);
+  }
+  if(state.wrong===0){
+    earnBadge('perfect_game');
+  }
+  const elapsed=getElapsedSeconds();
+  if(elapsed>0&&elapsed<60){
+    earnBadge('speed_learner');
+  }
+  checkBadges();
+  saveProgress();
+  refreshStarsUI();
+  renderBadgeBar();
+
+  const total=state.correct+state.wrong;
+  const accuracy=total>0?state.correct/total:0;
+  const rec=getRecommendation(accuracy);
+  const starsEarned=state.stars[state.game]||0;
+  var starsText='';
+  for(var i=0;i<starsEarned;i++) starsText+='⭐';
+
+  const area=document.getElementById('gameArea');
+  area.innerHTML=
+    '<div class="recommendation-banner">'+
+      '<div class="rec-message">'+esc(rec.msg)+'</div>'+
+      '<button class="rec-btn" data-action="'+esc(rec.action)+'">'+esc(rec.btnText)+'</button>'+
+    '</div>'+
+    '<div class="complete show">'+
+      '<div class="trophy">🏆</div>'+
+      '<h2>恭喜你完成本关！<br>Well Done!</h2>'+
+      '<div class="stats">答对 <strong style="color:var(--grass2)">'+state.correct+'</strong> · 答错 <strong style="color:var(--coral2)">'+state.wrong+'</strong><br>获得 <strong>'+starsEarned+'</strong> 颗星 — '+starsText+'<br>用时 '+formatTime(elapsed)+'</div>'+
+      '<p style="font-size:13px;color:var(--ink2);margin-top:8px">从顶部游戏卡片中选择下一关继续挑战<br>Choose the next level from the game cards above</p>'+
+    '</div>';
+
+  const recBtn=area.querySelector('.rec-btn');
+  if(recBtn){
+    recBtn.addEventListener('click',function(){
+      var action=this.dataset.action;
+      if(action==='replay'){selectGame(state.game);}
+      else if(action==='next'){selectGame(getNextGame(state.game));}
+      else if(action==='dragmatch'){selectGame('dragmatch');}
+    });
+  }
+}
+
+// ═══ 初始化 ═══
+function init(){
+  loadProgress();
+  loadStarsFromProgress();
+  renderBadgeBar();
+  renderGameGrid();
+  refreshStarsUI();
+  startGame('letters');
+}
+
+init();
 
 </script>
 </body>
