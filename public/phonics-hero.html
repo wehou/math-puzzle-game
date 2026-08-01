@@ -22,7 +22,7 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 .brand{display:flex;align-items:center;gap:6px;font-weight:800;font-size:18px}
 .brand .logo{font-size:24px}
 .brand .en{color:var(--sky2)}
-.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:1;min-width:0}
 .nav-progress{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
 .level-badge{background:var(--coral2);color:#fff;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800;white-space:nowrap}
 .progress-bar{width:80px;height:8px;background:rgba(126,200,255,.2);border-radius:4px;overflow:hidden}
@@ -50,13 +50,13 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 .hero .source{margin-top:6px;font-size:11px;color:var(--grape2);font-weight:700}
 
 /* 游戏选择 */
-.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:8px 20px 24px;max-width:760px;margin:0 auto}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:8px 20px 24px;max-width:760px;margin:0 auto;align-items:start}
 .game-card{background:var(--card);border-radius:var(--r);padding:18px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.06),0 8px 16px rgba(0,0,0,.08);border:3px solid transparent;transition:transform .12s,border-color .12s;user-select:none;width:100%;min-width:0}
 .game-card:active{transform:scale(.96)}
 .game-card.active{border-color:var(--coral);box-shadow:0 4px 0 rgba(0,0,0,.06),0 8px 16px rgba(255,107,74,.15)}
 .game-card .icon{font-size:36px;display:block;margin-bottom:4px}
 .game-card .title{font-weight:800;font-size:14px}
-.game-card .desc{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.4}
+.game-card .desc{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.4;word-break:break-word;min-width:0}
 .game-card .stars{margin-top:5px;font-size:11px;color:var(--sun2);font-weight:700}
 
 /* 游戏主区域 */
@@ -140,6 +140,10 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 .confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1999;overflow:hidden}
 .confetti-piece{position:absolute;top:-12px;width:10px;height:10px;border-radius:2px;animation:confetti-fall 2s ease-out forwards}
 
+/* 阶段标题 */
+.stage-header{grid-column:1/-1;font-size:12px;font-weight:800;color:var(--grape2);padding:10px 4px 2px;margin-top:4px;border-bottom:2px solid rgba(183,148,246,.2);display:flex;align-items:center;gap:6px}
+.stage-header .stage-num{background:var(--grape2);color:#fff;border-radius:6px;padding:1px 7px;font-size:11px}
+
 /* 页脚 */
 .footer{background:var(--ink);color:#a0a8bd;text-align:center;padding:24px 20px;font-size:12px;line-height:1.8;margin-top:30px}
 
@@ -150,23 +154,109 @@ h1,h2,h3{font-family:'Baloo 2','PingFang SC',sans-serif}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 
-@media(max-width:480px){
-  .hero h1{font-size:22px}.hero .en-sub{font-size:13px}
-  .game-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:8px 12px 20px}
-  .game-card{padding:14px 10px}.game-card .icon{font-size:30px}
-  .q-word{font-size:40px}.opts{grid-template-columns:repeat(2,1fr)}
-  .brand{font-size:15px}.brand .logo{font-size:20px}
-  .nav-progress{font-size:11px}.progress-bar{width:60px}
-  .stars-text{font-size:11px}.streak-pill{font-size:11px;padding:3px 8px}
-  .score-pill{font-size:11px;padding:3px 8px}
-  .drag-emojis{grid-template-columns:repeat(4,1fr);gap:4px}
-  .drag-emoji{font-size:26px;padding:8px 2px}
-  .drag-word{font-size:18px;padding:12px 6px}
+@media(max-width:768px){
+  .nav{padding:6px 10px;gap:6px}
+  .brand{font-size:16px;gap:4px}
+  .brand .logo{font-size:22px}
+  .nav-right{gap:5px}
+  .nav-progress{font-size:11px;gap:4px}
+  .progress-bar{width:60px}
+  .stars-text{font-size:11px}
+  .streak-pill{font-size:11px;padding:2px 8px}
+  .score-pill{font-size:11px;padding:2px 8px}
+  .level-badge{font-size:10px;padding:2px 6px}
+  .game-grid{grid-template-columns:repeat(3,1fr);gap:10px;padding:8px 14px 20px}
+  .game-card{padding:14px 8px}
+  .game-card .icon{font-size:30px}
+  .game-card .title{font-size:13px}
+  .game-card .desc{font-size:10px}
+  .q-word{font-size:46px}
+  .opts{grid-template-columns:repeat(2,1fr);gap:8px}
+  .opt{font-size:16px;padding:12px 8px;word-break:break-word}
+  .drag-emojis{grid-template-columns:repeat(4,1fr);gap:6px}
+  .drag-emoji{font-size:28px;padding:8px 2px}
+  .drag-word{font-size:20px;padding:12px 6px}
   .stats-row{gap:8px;font-size:12px}
-  .badge{min-width:54px;padding:5px 8px}
+  .badge{min-width:56px;padding:5px 8px}
   .badge .b-icon{font-size:20px}.badge .b-name{font-size:8px}
-  .magic-word{font-size:32px;padding:10px 16px}
-  .family-word{font-size:48px}
+  .magic-word{font-size:36px;padding:10px 16px}
+  .family-word{font-size:52px}
+  .wrong-modal-content{padding:16px 12px}
+  .wrong-list{max-height:55vh}
+}
+
+@media(max-width:480px){
+  .nav{padding:5px 8px;gap:4px}
+  .brand{font-size:14px;gap:3px}
+  .brand .logo{font-size:18px}
+  .brand .en{display:none}
+  .nav-right{gap:4px}
+  .nav-progress{font-size:10px;gap:3px}
+  .progress-bar{width:50px;height:6px}
+  .stars-text{font-size:10px}
+  .streak-pill{font-size:10px;padding:2px 6px}
+  .score-pill{font-size:10px;padding:2px 6px}
+  .level-badge{font-size:9px;padding:1px 5px}
+  .hero{padding:20px 14px 16px}
+  .hero h1{font-size:20px}
+  .hero .en-sub{font-size:12px}
+  .hero p{font-size:12px}
+  .game-grid{grid-template-columns:repeat(2,1fr);gap:8px;padding:6px 10px 16px}
+  .game-card{padding:12px 6px}
+  .game-card .icon{font-size:26px}
+  .game-card .title{font-size:12px}
+  .game-card .desc{font-size:10px}
+  .game-area{padding:0 10px 30px}
+  .question-card{padding:18px 12px;border-radius:16px}
+  .q-word{font-size:36px;letter-spacing:1px}
+  .q-ipa{font-size:14px}
+  .q-meaning{font-size:13px}
+  .q-tip{font-size:12px;padding:3px 10px}
+  .q-play{font-size:13px;padding:6px 14px}
+  .opts{grid-template-columns:repeat(2,1fr);gap:6px}
+  .opt{font-size:15px;padding:10px 6px;word-break:break-word}
+  .next-btn{font-size:14px;padding:8px 22px}
+  .drag-emojis{grid-template-columns:repeat(4,1fr);gap:4px}
+  .drag-emoji{font-size:24px;padding:6px 2px}
+  .drag-word{font-size:18px;padding:10px 4px}
+  .drag-word-cn{font-size:10px}
+  .stats-row{gap:6px;font-size:11px}
+  .stat{padding:4px 10px}
+  .complete{padding:24px 14px;margin:20px auto}
+  .complete .trophy{font-size:52px}
+  .complete h2{font-size:18px}
+  .badge{min-width:50px;padding:4px 6px}
+  .badge .b-icon{font-size:18px}.badge .b-name{font-size:7px}
+  .magic-word{font-size:28px;padding:8px 12px}
+  .magic-arrow{font-size:22px}
+  .family-word{font-size:42px;letter-spacing:4px}
+  .blend-word{font-size:36px}
+  .stage-header{font-size:11px;padding:8px 2px 2px}
+  .stage-header .stage-num{font-size:10px;padding:1px 5px}
+  .wrong-modal-content{padding:14px 10px;border-radius:16px}
+  .wrong-list{max-height:60vh}
+  .wrong-item{padding:10px 8px;margin-bottom:8px}
+  .wrong-item-q{font-size:13px}
+  .wrong-item-answers{font-size:12px}
+  .wrong-ans-box{padding:3px 8px}
+  .wrong-action-btn{font-size:11px;padding:5px 10px}
+  .wrong-filters{gap:4px}
+  .wrong-filter-btn{font-size:11px;padding:4px 8px}
+  .wrong-redo-area{padding:16px 10px}
+  .wrong-redo-area .q-word{font-size:32px}
+}
+
+@media(max-width:360px){
+  .nav{flex-wrap:nowrap;overflow:hidden}
+  .brand{font-size:12px}
+  .brand .logo{font-size:16px}
+  .nav-progress{display:none}
+  .streak-pill{font-size:9px;padding:1px 4px}
+  .score-pill{font-size:9px;padding:1px 4px}
+  .game-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .game-card{padding:10px 4px}
+  .q-word{font-size:30px}
+  .opt{font-size:13px;padding:8px 4px}
 }
 
 /* 错题本弹窗 */
@@ -697,7 +787,7 @@ function renderGameGrid(){
   let html='';
   GAME_DEFS.forEach(d=>{
     if(d.stage!==lastStage){
-      html+='<div style="grid-column:1/-1;font-size:12px;font-weight:800;color:var(--grape2);padding:10px 4px 2px;margin-top:4px;border-bottom:2px solid rgba(183,148,246,.2)">第'+d.stage+'阶段：'+esc(d.stageName)+' · Stage '+d.stage+': '+esc(d.stageEn)+'</div>';
+      html+='<div class="stage-header"><span class="stage-num">'+d.stage+'</span> '+esc(d.stageName)+' · '+esc(d.stageEn)+'</div>';
       lastStage=d.stage;
     }
     html+='<div class="game-card '+(state.game===d.id?'active':'')+'" data-game="'+esc(d.id)+'">'+
